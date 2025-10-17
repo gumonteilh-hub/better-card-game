@@ -14,11 +14,13 @@ function App() {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				faction: "Human",
+				faction: "HUMAN",
 				cards: [],
 			}),
 		}).then(res => {
-			console.log(res);
+			res.json().then(data => {
+				console.log(data);
+			})
 		}).catch(err => {
 			console.log(err)
 		})

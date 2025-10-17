@@ -7,12 +7,29 @@ import PlayerBoard from './components/PlayerBoard'
 
 function App() {
 
+	function handleClick(): void {
+		fetch("api/start", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				faction: "Human",
+				cards: [],
+			}),
+		}).then(res => {
+			console.log(res);
+		}).catch(err => {
+			console.log(err)
+		})
+	}
+
 	return (
 		<div className='main'>
 			<DndContext autoScroll={false}>
 				<PlayerBoard side='enemy'></PlayerBoard>
 				<div className='middle-part'>
-					<button>end turn</button>
+					<button onClick={handleClick}>end turn</button>
 				</div>
 				<PlayerBoard side='player'></PlayerBoard>
 			</DndContext >

@@ -9,7 +9,7 @@
 		img {
 			width: 100%;
 			aspect-ratio: 1;
-			border: solid 3px grey;
+			border: outset 3px grey;
 			border-top-right-radius: 20%;
 			border-top-left-radius: 20%;
 		}
@@ -58,5 +58,43 @@
 	align-items: center;
 	justify-content: center;
 	font-size: 1.5rem;
+}
 
+.field-slot {
+	height: var(--card-miniature-height);
+	aspect-ratio: 1;
+	position: relative;
+
+	box-sizing: border-box;
+	border: dashed 5px ;
+
+	.sword {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scaleX(-1);
+		width: 80%;
+	}
+
+	.shield {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scaleX(-1);
+		width: 80%;
+	}
+
+/*
+	&.attack {
+		background-color: var(--attack-color);
+	}
+
+	&.defense {
+		background-color: var(--defense-color);
+	}
+
+	&.both {
+		background: #EA2B1F;
+		background: linear-gradient(180deg, var(--attack-color) 25%, var(--defense-color) 75%);
+	}*/
 }

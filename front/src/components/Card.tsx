@@ -44,11 +44,12 @@ export const Card = ({ card }: ICardProps) => {
 }
 
 interface ICardMiniatureProps {
-	card: ICard
+	card: ICard,
+	type: 'attack' | 'defense' | 'both'
 }
 
-export const CardMiniature = ({ card }: ICardMiniatureProps) => {
-	return <div className="card card-miniature untransformed">
+export const CardMiniature = ({ card, type }: ICardMiniatureProps) => {
+	return <div className={`card card-miniature untransformed ${type}`}>
 		<div className='card-body'>
 			<div className='card-image'>
 				<img src={test} />

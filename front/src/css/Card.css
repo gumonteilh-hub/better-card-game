@@ -71,7 +71,7 @@
 	align-items: flex-end;
 
 	.card-attack {
-		background-color: #EA2B1F;
+		background-color: var(--attack-color);
 		height: 90%;
 		width: 30%;
 		display: flex;
@@ -80,7 +80,7 @@
 	}
 
 	.card-defense {
-		background-color: #858786;
+		background-color: var(--defense-color);
 		height: 90%;
 		width: 30%;
 		display: flex;
@@ -93,6 +93,19 @@
 .card-miniature {
 	height: var(--card-miniature-height);
 	aspect-ratio: 1;
+
+	&.attack {
+		background-color: var(--attack-color);
+	}
+
+	&.defense {
+		background-color: var(--defense-color);
+	}
+
+	&.both {
+		background: #EA2B1F;
+		background: linear-gradient(180deg, var(--attack-color) 25%, var(--defense-color) 75%);
+	}
 
 	.card-body {
 		height: 90%;

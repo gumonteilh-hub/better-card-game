@@ -1,5 +1,5 @@
 import { Card, CardMiniature, type ICard } from "./Card";
-import { CardBack, Deck, HeroPortrait, ManaHud, TrapCardSlot } from "./Hud";
+import { CardBack, Deck, FieldSlot, HeroPortrait, ManaHud, TrapCardSlot } from "./Hud";
 import { Draggable } from "./DragAndDrop";
 
 interface IPlayerBoardProps {
@@ -31,22 +31,22 @@ const PlayerBoard = ({ side }: IPlayerBoardProps) => {
 		<div className='middle-panel'>
 			<div className='field'>
 				<div className='column'>
-					<CardMiniature card={testCard} />
-					<CardMiniature card={testCard} />
+					<CardMiniature type="attack" card={testCard} />
+					<FieldSlot type="defense" />
 				</div>
 				<div className='column'>
-					<CardMiniature card={testCard} />
+					<FieldSlot type="both" />
 				</div>
 				<div className='column'>
-					<CardMiniature card={testCard} />
-					<CardMiniature card={testCard} />
+					<FieldSlot type="attack" />
+					<CardMiniature type="defense" card={testCard} />
 				</div>
 				<div className='column'>
-					<CardMiniature card={testCard} />
+					<CardMiniature type="both" card={testCard} />
 				</div>
 				<div className='column'>
-					<CardMiniature card={testCard} />
-					<CardMiniature card={testCard} />
+					<CardMiniature type="attack" card={testCard} />
+					<CardMiniature type="defense" card={testCard} />
 				</div>
 			</div>
 			<div className='hand'>

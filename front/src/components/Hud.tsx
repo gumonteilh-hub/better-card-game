@@ -1,4 +1,6 @@
 import dragon from '../assets/hero-dragon.png'
+import sword from '../assets/sword.svg'
+import shield from '../assets/shield.svg'
 
 export const CardBack = () => {
 	return <div className="card-back">
@@ -48,4 +50,15 @@ interface IManaHudProps {
 
 export const ManaHud = ({ current, max }: IManaHudProps) => {
 	return <div className='mana-crystal untransformed'>{current} /{max}</div>
+}
+
+interface IFieldSlotProps {
+	type: 'attack' | 'defense' | 'both'
+}
+
+export const FieldSlot = ({ type }: IFieldSlotProps) => {
+	return <div className={`field-slot ${type}`}>
+		{(type == 'defense' || type == 'both') && <img className='shield' src={shield} />}
+		{(type == 'attack' || type == 'both') && <img className='sword' src={sword} />}
+	</div>
 }

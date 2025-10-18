@@ -5,6 +5,7 @@ body {
 	width: 100vw;
 	overflow: hidden;
 	-moz-user-select: none;
+	-webkit-user-drag: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
@@ -12,4 +13,6 @@ body {
 	--card-heigh: 300px;
 	--card-aspect-ratio: 0.70;
 	--card-miniature-height: 150px;
+	--attack-color: #EA2B1F;
+	--defense-color: #858786
 }

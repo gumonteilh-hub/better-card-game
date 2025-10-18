@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use crate::collection::Faction;
+pub use crate::collection::Faction;
 pub use crate::game::Game;
 use crate::game::action::Action;
-use crate::game::card::CardTemplate;
+pub use crate::game::card::CardTemplate;
 use crate::game::view::PublicGameState;
 
 mod collection;

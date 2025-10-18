@@ -5,14 +5,28 @@ body {
 	width: 100vw;
 	overflow: hidden;
 	-moz-user-select: none;
-	-webkit-user-drag: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 	background-color: #363537;
 	--card-heigh: 300px;
-	--card-aspect-ratio: 0.70;
+	--card-aspect-ratio: 0.7;
 	--card-miniature-height: 150px;
-	--attack-color: #EA2B1F;
-	--defense-color: #858786
+	--attack-color: #ea2b1f;
+	--defense-color: #858786;
+}
+
+.button-unstyled {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    outline: inherit;
+  }
+
+img {
+	-webkit-user-drag: none;
 }

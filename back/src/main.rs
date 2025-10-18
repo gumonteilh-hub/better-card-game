@@ -8,7 +8,7 @@ use axum::{
     extract::{FromRequest, Path, Request, State, rejection::JsonRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::post,
+    routing::{get, post},
 };
 use serde::de::DeserializeOwned;
 use tokio::sync::Mutex;
@@ -41,7 +41,8 @@ async fn main() {
         .route("/{game_id}/end_turn", post(end_turn));
 
     let app = Router::new()
-        .nest("/api", api)
+        .route("/collection/{faction}", get(collection))
+        .nest("/game", api)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
 
@@ -50,6 +51,17 @@ async fn main() {
         .unwrap();
 
     axum::serve(listener, app).await.unwrap();
+}
+
+#[debug_handler]
+async fn collection(
+    Path(faction): Path<back::Faction>,
+) -> ApiResult<Json<Vec<back::CardTemplate>>> {
+    tracing::info!(
+        "Received get_collection request with faction: {:?}",
+        faction
+    );
+    return Ok(Json(back::get_collection(faction)));
 }
 
 #[debug_handler]

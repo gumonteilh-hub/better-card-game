@@ -1,11 +1,11 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use axum_macros::debug_handler;
 use back::{self, error::Error};
 
 use axum::{
     Json, Router,
-    extract::{FromRequest, Request, State, rejection::JsonRejection},
+    extract::{FromRequest, Path, Request, State, rejection::JsonRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::post,
@@ -14,9 +14,10 @@ use serde::de::DeserializeOwned;
 use tokio::sync::Mutex;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use uuid::Uuid;
 
 struct AppState {
-    game_states: Mutex<Vec<back::Game>>,
+    game_states: Mutex<HashMap<Uuid, back::Game>>,
 }
 
 #[tokio::main]
@@ -30,11 +31,17 @@ async fn main() {
         .init();
 
     let shared_state = Arc::new(AppState {
-        game_states: Mutex::new(Vec::new()),
+        game_states: Mutex::new(HashMap::new()),
     });
 
-    let app = Router::new()
+    let api = Router::new()
         .route("/start", post(start_game))
+        .route("/{game_id}/attack/{initiator_id}/{target_id}", post(attack))
+        .route("/{game_id}/play_card/{card_id}/{position}", post(play_card))
+        .route("/{game_id}/end_turn", post(end_turn));
+
+    let app = Router::new()
+        .nest("/api", api)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
 
@@ -52,9 +59,71 @@ async fn start_game(
 ) -> ApiResult<Json<back::GameViewResponse>> {
     tracing::info!("Received start_game request with deck: {:?}", payload);
     let (game_view, game_state) = back::start_game(payload)?;
-    state.game_states.lock().await.push(game_state);
+    state
+        .game_states
+        .lock()
+        .await
+        .insert(game_state.game_id, game_state);
     tracing::info!("Game started successfully");
     return Ok(Json(game_view));
+}
+
+#[debug_handler]
+async fn play_card(
+    State(state): State<Arc<AppState>>,
+    Path((game_id, card_id, position)): Path<(Uuid, usize, usize)>,
+) -> ApiResult<Json<back::GameViewResponse>> {
+    tracing::info!(
+        "Received play_card request for game: {}, with card_id: {}, and position: {}",
+        game_id,
+        card_id,
+        position
+    );
+    match state.game_states.lock().await.get_mut(&game_id) {
+        Some(mut game) => {
+            let game_view = back::play_card(&mut game, card_id, position)?;
+            tracing::info!("Play card performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
+}
+
+#[debug_handler]
+async fn attack(
+    State(state): State<Arc<AppState>>,
+    Path((game_id, initiator_id, target_id)): Path<(Uuid, usize, usize)>,
+) -> ApiResult<Json<back::GameViewResponse>> {
+    tracing::info!(
+        "Received attack request for game: {}, with initiator: {}, and target: {}",
+        game_id,
+        initiator_id,
+        target_id
+    );
+    match state.game_states.lock().await.get_mut(&game_id) {
+        Some(mut game) => {
+            let game_view = back::attack(&mut game, initiator_id, target_id)?;
+            tracing::info!("Attack performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
+}
+
+#[debug_handler]
+async fn end_turn(
+    State(state): State<Arc<AppState>>,
+    Path(game_id): Path<Uuid>,
+) -> ApiResult<Json<back::GameViewResponse>> {
+    tracing::info!("Received end turn request for game: {}", game_id,);
+    match state.game_states.lock().await.get_mut(&game_id) {
+        Some(mut game) => {
+            let game_view = back::end_turn(&mut game)?;
+            tracing::info!("End turn performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
 }
 
 struct LoggedJson<T>(pub T);

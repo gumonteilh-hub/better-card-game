@@ -15,15 +15,16 @@ use crate::game::card::Keyword;
 use crate::game::effects::{Effect, Target};
 use crate::game::logic::execute_effect;
 use crate::game::types::Location;
-use crate::{ia, UserDeck};
+use crate::{UserDeck, ia};
 
-use self::card::{CardInstance};
+use self::card::CardInstance;
 use self::events::EventManager;
 use self::player::PlayerInstance;
 use self::types::{EntityId, PlayerId};
 
 #[derive(Debug, Clone)]
 pub struct Game {
+    pub game_id: uuid::Uuid,
     pub player_id_a: usize,
     pub player_id_b: usize, //IA
     pub entities: HashMap<EntityId, CardInstance>,
@@ -34,8 +35,6 @@ pub struct Game {
     pub event_manager: EventManager,
     pub winner_id: Option<PlayerId>,
 }
-
-
 
 impl Game {
     pub fn new(deck_a: UserDeck, deck_b: UserDeck) -> Self {
@@ -76,6 +75,7 @@ impl Game {
         });
 
         Self {
+            game_id: uuid::Uuid::new_v4(),
             player_id_a,
             player_id_b,
             effect_queue: queue,

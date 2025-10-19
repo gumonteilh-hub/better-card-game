@@ -4,12 +4,17 @@ import type { JSX } from "react";
 export function Droppable({
 	children,
 	id,
+	position,
 }: {
 	children: JSX.Element;
 	id: string;
+	position: number;
 }) {
 	const { isOver, setNodeRef } = useDroppable({
 		id,
+		data: {
+			position: position,
+		},
 	});
 	const style = {
 		backgroundColor: isOver ? "blue" : undefined,
@@ -25,14 +30,22 @@ export function Droppable({
 export function Draggable({
 	children,
 	id,
+	cardId,
+	enabled,
 	style: externalStyle,
 }: {
 	children: JSX.Element;
 	id: string;
+	cardId: number;
+	enabled: boolean;
 	style?: React.CSSProperties;
 }) {
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
 		id,
+		disabled: !enabled,
+		data: {
+			id: cardId,
+		},
 	});
 	const style = transform
 		? {

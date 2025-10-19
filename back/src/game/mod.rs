@@ -15,7 +15,7 @@ use crate::game::card::Keyword;
 use crate::game::effects::{Effect, Target};
 use crate::game::logic::execute_effect;
 use crate::game::types::Location;
-use crate::{UserDeck, ia};
+use crate::{CardTemplate, UserDeck, ia};
 
 use self::card::CardInstance;
 use self::events::EventManager;
@@ -37,7 +37,12 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(deck_a: UserDeck, deck_b: UserDeck) -> Self {
+    pub fn new(
+        deck_a: UserDeck,
+        deck_b: UserDeck,
+        collection_a: Vec<CardTemplate>,
+        collection_b: Vec<CardTemplate>,
+    ) -> Result<Self> {
         let mut entity_id = 0;
 
         let mut players = HashMap::new();
@@ -56,11 +61,25 @@ impl Game {
 
         let mut entities = HashMap::new();
         for card in deck_a.cards.iter() {
-            entities.insert(entity_id, CardInstance::new(entity_id, player_id_a, card));
+            let template = collection_a
+                .iter()
+                .find(|t| t.id == *card)
+                .ok_or_else(|| Error::Game(format!("Template with id {} not found", card)))?;
+            entities.insert(
+                entity_id,
+                CardInstance::new(entity_id, player_id_a, template),
+            );
             entity_id += 1;
         }
         for card in deck_b.cards.iter() {
-            entities.insert(entity_id, CardInstance::new(entity_id, player_id_b, card));
+            let template = collection_b
+                .iter()
+                .find(|t| t.id == *card)
+                .ok_or_else(|| Error::Game(format!("Template with id {} not found", card)))?;
+            entities.insert(
+                entity_id,
+                CardInstance::new(entity_id, player_id_b, template),
+            );
             entity_id += 1;
         }
 
@@ -74,7 +93,7 @@ impl Game {
             amount: 5,
         });
 
-        Self {
+        Ok(Self {
             game_id: uuid::Uuid::new_v4(),
             player_id_a,
             player_id_b,
@@ -85,7 +104,7 @@ impl Game {
             current_player: player_id_a,
             event_manager: EventManager::new(),
             winner_id: None,
-        }
+        })
     }
 
     pub fn play_card(&mut self, card_id: EntityId, position: usize) -> Result<()> {

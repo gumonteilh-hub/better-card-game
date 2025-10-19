@@ -211,3 +211,63 @@
 		transform: rotate(5deg);
 	}
 }
+
+.start-attack-button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.3s ease;
+	padding: 0;
+	margin: 0;
+	display: inline-block;
+	line-height: 0;
+}
+
+.start-attack-button::before {
+	content: "";
+	position: absolute;
+	inset: -0px;
+	border-radius: 5%;
+	background: transparent;
+	box-shadow:
+		0 0 20px 4px rgba(255, 215, 0, 0.6),
+		0 0 40px 8px rgba(255, 215, 0, 0.4),
+		0 0 60px 12px rgba(255, 215, 0, 0.2),
+		inset 0 0 20px 2px rgba(255, 215, 0, 0.3);
+	pointer-events: none;
+	animation: pulseGlow 2s ease-in-out infinite;
+	z-index: -1;
+}
+
+.start-attack-button:hover {
+	transform: translateY(-4px) scale(1.02);
+}
+
+.start-attack-button:hover::before {
+	box-shadow:
+		0 0 30px 6px rgba(255, 215, 0, 0.8),
+		0 0 50px 10px rgba(255, 215, 0, 0.6),
+		0 0 80px 16px rgba(255, 215, 0, 0.3),
+		inset 0 0 25px 3px rgba(255, 215, 0, 0.4);
+}
+
+@keyframes pulseGlow {
+	0%,
+	100% {
+		opacity: 0.8;
+		box-shadow:
+			0 0 20px 4px rgba(255, 215, 0, 0.6),
+			0 0 40px 8px rgba(255, 215, 0, 0.4),
+			0 0 60px 12px rgba(255, 215, 0, 0.2),
+			inset 0 0 20px 2px rgba(255, 215, 0, 0.3);
+	}
+	50% {
+		opacity: 1;
+		box-shadow:
+			0 0 30px 6px rgba(255, 215, 0, 0.8),
+			0 0 50px 12px rgba(255, 215, 0, 0.6),
+			0 0 80px 16px rgba(255, 215, 0, 0.4),
+			inset 0 0 25px 3px rgba(255, 215, 0, 0.4);
+	}
+}

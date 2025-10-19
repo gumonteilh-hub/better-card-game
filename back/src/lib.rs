@@ -3,9 +3,9 @@
 
 pub use crate::collection::Faction;
 pub use crate::game::Game;
-use crate::game::action::Action;
 pub use crate::game::card::CardTemplate;
 use crate::game::view::PublicGameState;
+use crate::game::{action::Action, types::TemplateId};
 
 mod collection;
 pub mod error;
@@ -17,6 +17,7 @@ use error::Result;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GameViewResponse {
     actions: Vec<Action>,
     game_view: PublicGameState,
@@ -24,7 +25,7 @@ pub struct GameViewResponse {
 
 #[derive(Debug, Deserialize)]
 pub struct UserDeck {
-    pub cards: Vec<CardTemplate>,
+    pub cards: Vec<TemplateId>,
     pub faction: Faction,
 }
 
@@ -33,7 +34,15 @@ pub fn get_collection(faction: Faction) -> Vec<CardTemplate> {
 }
 
 pub fn start_game(deck: UserDeck) -> Result<(GameViewResponse, Game)> {
-    let mut game_state = Game::new(deck, collection::get_ia_deck());
+    let ia_deck = collection::get_ia_deck();
+    let ia_faction = ia_deck.faction;
+    let player_faction = deck.faction;
+    let mut game_state = Game::new(
+        deck,
+        ia_deck,
+        get_collection(player_faction),
+        get_collection(ia_faction),
+    )?;
 
     let actions = game_state.compute_commands()?;
     let game_view = PublicGameState::new(&game_state)?;

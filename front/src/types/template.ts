@@ -14,6 +14,6 @@ export interface ICardTemplate {
 	cost: number;
 	attack: number;
 	defense: number;
-	keywords: Keywords[];
+	keywords?: Keywords[];
 	faction: Faction;
 }

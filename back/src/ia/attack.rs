@@ -47,23 +47,23 @@ fn has_taunt_on_field(game: &Game, player_id: PlayerId) -> bool {
 fn evaluate_attack_control(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.atk.min(target.hp);
+    let damage_dealt = attacker.attack.min(target.defense);
     score += damage_dealt as f32 * CREATURE_VALUE_HP_WEIGHT;
 
-    if damage_dealt >= target.hp {
-        score += target.atk as f32 * CREATURE_VALUE_ATK_WEIGHT;
+    if damage_dealt >= target.defense {
+        score += target.attack as f32 * CREATURE_VALUE_ATK_WEIGHT;
     }
 
-    let damage_received = target.atk.min(attacker.hp);
+    let damage_received = target.attack.min(attacker.defense);
     score -= damage_received as f32 * CREATURE_VALUE_HP_WEIGHT;
 
-    if damage_received >= attacker.hp {
-        score -= attacker.atk as f32 * CREATURE_VALUE_ATK_WEIGHT;
+    if damage_received >= attacker.defense {
+        score -= attacker.attack as f32 * CREATURE_VALUE_ATK_WEIGHT;
     } else {
         score += SURVIVAL_BONUS;
     }
 
-    let attacker_missing_hp = attacker.template.base_hp.saturating_sub(attacker.hp);
+    let attacker_missing_hp = attacker.template.defense.saturating_sub(attacker.defense);
     if attacker_missing_hp > 0 {
         score += WOUNDED_ATTACKER_BONUS * attacker_missing_hp as f32;
     }
@@ -74,12 +74,12 @@ fn evaluate_attack_control(attacker: &CardInstance, target: &CardInstance) -> f3
 fn evaluate_attack_survival(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.atk.min(target.hp);
+    let damage_dealt = attacker.attack.min(target.defense);
     score += damage_dealt as f32 * 10.0;
 
-    if damage_dealt >= target.hp {
+    if damage_dealt >= target.defense {
         score += 100.0;
-        score += target.atk as f32 * 5.0;
+        score += target.attack as f32 * 5.0;
     }
 
     score
@@ -88,15 +88,15 @@ fn evaluate_attack_survival(attacker: &CardInstance, target: &CardInstance) -> f
 fn evaluate_attack_aggressive(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.atk.min(target.hp);
+    let damage_dealt = attacker.attack.min(target.defense);
 
-    if damage_dealt >= target.hp {
+    if damage_dealt >= target.defense {
         score += 50.0;
     } else {
         score += damage_dealt as f32;
     }
 
-    let overkill = attacker.atk.saturating_sub(target.hp);
+    let overkill = attacker.attack.saturating_sub(target.defense);
     score -= overkill as f32 * 0.5;
 
     score
@@ -110,7 +110,7 @@ fn calculate_threat_level(game: &Game, player_id: PlayerId) -> Result<f32> {
         .ok_or_else(|| Error::Game(format!("AI player {} not found", player_id)))?
         .hp;
 
-    let enemy_total_atk: usize = game.get_field(opponent_id).values().map(|c| c.atk).sum();
+    let enemy_total_atk: usize = game.get_field(opponent_id).values().map(|c| c.attack).sum();
 
     let threat = enemy_total_atk as f32 / ai_hp.max(1) as f32;
 
@@ -145,10 +145,10 @@ fn find_best_attack(
                     let threat_penalty = (1.0 - threat).max(0.0);
                     let adjusted_face_value = FACE_DAMAGE_VALUE * threat_penalty;
 
-                    adjusted_face_value * attacker.atk as f32
+                    adjusted_face_value * attacker.attack as f32
                 }
                 IaBehavior::Survival => -1000.0,
-                IaBehavior::Aggressive => attacker.atk as f32 * 100.0,
+                IaBehavior::Aggressive => attacker.attack as f32 * 100.0,
             };
 
             if best_attack.is_none() || score > best_attack.unwrap().2 {

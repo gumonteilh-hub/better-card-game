@@ -12,13 +12,14 @@ pub enum Keyword {
     Windfury
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CardTemplate {
     pub id: TemplateId,
     pub cost: usize,
     pub name: String,
     pub description: String,
-    pub base_atk: usize,
-    pub base_hp: usize,
+    pub attack: usize,
+    pub defense: usize,
     pub keywords: Vec<Keyword>,
     pub faction: Faction,
     #[serde(default)]
@@ -32,14 +33,14 @@ pub struct CardTemplate {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CardInstance {
     pub id: EntityId,
-    pub template_id: TemplateId,
     pub template: CardTemplate,
     pub owner: PlayerId,
     pub location: Location,
-    pub atk: usize,
-    pub hp: usize,
+    pub attack: usize,
+    pub defense: usize,
     pub asleep: bool,
     pub attack_count: usize,
 }
@@ -47,12 +48,11 @@ impl CardInstance {
     pub fn new(entity_id: usize, player_id: usize, card: &CardTemplate) -> Self {
         Self {
             id: entity_id,
-            template_id: card.id,
             template: card.clone(),
             owner: player_id,
             location: Location::Deck,
-            atk: card.base_atk,
-            hp: card.base_hp,
+            attack: card.attack,
+            defense: card.defense,
             asleep: !card.keywords.contains(&Keyword::Charge),
             attack_count: 0,
         }

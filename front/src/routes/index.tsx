@@ -52,9 +52,14 @@ function RouteComponent() {
 					</ul>
 				</nav>
 			</div>
-			{userInfos?.deck && <div className="deck-recap">
-				<DeckSummary faction={userInfos.deck.faction} cards={userInfos.deck.cards}></DeckSummary>
-			</div>}
+			{userInfos?.deck && (
+				<div className="deck-recap">
+					<DeckSummary
+						faction={userInfos.deck.faction}
+						cards={userInfos.deck.cards}
+					></DeckSummary>
+				</div>
+			)}
 		</div>
 	);
 }

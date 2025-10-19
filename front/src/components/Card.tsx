@@ -2,6 +2,8 @@ import type { JSX } from "react";
 import test from "../assets/test.png";
 import type { ICard } from "../types/game";
 import type { ICardTemplate } from "../types/template";
+import { useGameContext } from "../utils/GameContextProvider";
+import { canAttack } from "../utils/gameRules";
 
 interface ICardProps {
 	card: ICard;
@@ -82,20 +84,12 @@ export const CardTemplate = ({ card }: ICardTemplateProps) => {
 interface ICardMiniatureProps {
 	card: ICard;
 	type?: "attack" | "defense" | "both";
-	handleCardInteract?: (cardId: number) => void;
+	side: "enemy" | "player";
 }
 
-export const CardMiniature = ({
-	card,
-	type,
-	handleCardInteract,
-}: ICardMiniatureProps) => {
+export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 	return (
-		<AttackWrapper
-			handleCardInteract={handleCardInteract}
-			card={card}
-			type={type}
-		>
+		<ActionWrapper side={side} card={card} type={type}>
 			<div className={`card card-miniature untransformed ${type}`}>
 				<div className="card-body">
 					<div className="card-image">
@@ -111,33 +105,61 @@ export const CardMiniature = ({
 					</div>
 				</div>
 			</div>
-		</AttackWrapper>
+		</ActionWrapper>
 	);
 };
 
-interface IAttackWrapperProps {
-	handleCardInteract?: (cardId: number) => void;
+interface IActionWrapperProps {
 	card: ICard;
 	type?: "attack" | "defense" | "both";
+	side: "enemy" | "player";
 	children: JSX.Element;
 }
 
-const AttackWrapper = ({
-	children,
-	handleCardInteract,
-	card,
-}: IAttackWrapperProps) => {
-	if (handleCardInteract) {
-		return (
-			<button
-				className="start-attack-button"
-				type="button"
-				onClick={() => handleCardInteract(card.id)}
-			>
-				{children}
-			</button>
-		);
-	} else {
-		return children;
+const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
+	const {
+		handleTargetSelect,
+		handleAttackStart,
+		selectedAttackingCard,
+		handleUnselectAttackingCard,
+	} = useGameContext();
+
+	if (type) {
+		if (side === "player")
+			if (selectedAttackingCard && selectedAttackingCard === card.id) {
+				return (
+					<button
+						className="start-attack-button"
+						type="button"
+						onClick={() => handleUnselectAttackingCard()}
+					>
+						{children}
+					</button>
+				);
+			}
+		if (!selectedAttackingCard && canAttack(card)) {
+			return (
+				<button
+					className="start-attack-button"
+					type="button"
+					onClick={() => handleAttackStart(card.id)}
+				>
+					{children}
+				</button>
+			);
+		}
+		if (side === "enemy" && selectedAttackingCard) {
+			return (
+				<button
+					className="start-attack-button"
+					type="button"
+					onClick={() => handleTargetSelect(card.id)}
+				>
+					{children}
+				</button>
+			);
+		}
 	}
+
+	return children;
 };

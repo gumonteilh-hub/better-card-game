@@ -1,5 +1,6 @@
-import type { IHeroInfo } from "../types/game";
-import { Card, CardMiniature, type ICard } from "./Card";
+import type { ICard, IHeroInfo } from "../types/game";
+import { useGameContext } from "../utils/GameContextProvider";
+import { Card, CardMiniature } from "./Card";
 import { Draggable, Droppable } from "./DragAndDrop";
 import {
 	CardBack,
@@ -15,8 +16,6 @@ type ICommonProps = {
 	maxMana: number;
 	hero: IHeroInfo;
 	field: Record<number, ICard>;
-	handleCardInteract?: (cardId: number) => void;
-	playableCards?: number[];
 };
 
 type IPlayerBoardAllyProps = ICommonProps & {
@@ -33,18 +32,6 @@ type IPlayerBoardEnemyProps = ICommonProps & {
 
 type IPlayerBoardProps = IPlayerBoardAllyProps | IPlayerBoardEnemyProps;
 
-export const testCard: ICard = {
-	id: 0,
-	attack: 6,
-	cost: 5,
-	defense: 2,
-	description: "Une simple carte de test pour configurer le css de la carte",
-	effects: [],
-	keywords: ["Charge", "Invisible"],
-	name: "Tester",
-	tribut: "Human",
-};
-
 const PlayerBoard = ({
 	side,
 	currentMana,
@@ -53,9 +40,9 @@ const PlayerBoard = ({
 	field,
 	hand,
 	secredCard,
-	handleCardInteract,
-	playableCards,
 }: IPlayerBoardProps) => {
+	const { playableCards } = useGameContext();
+
 	return (
 		<div className={`board ${side}`}>
 			<div className="left-panel">
@@ -67,26 +54,22 @@ const PlayerBoard = ({
 				</div>
 			</div>
 			<div className="middle-panel">
-				<Field
-					field={field}
-					side={side}
-					handleCardInteract={handleCardInteract}
-				/>
+				<Field field={field} side={side} />
 				<div className="hand">
 					{side === "player"
 						? hand.map((c) => (
-								<Draggable
-									key={c.id}
-									id={`card-${c.id}`}
-									cardId={c.id}
-									enabled={playableCards?.includes(c.id) ?? false}
-								>
-									<Card card={c} />
-								</Draggable>
-							))
+							<Draggable
+								key={c.id}
+								id={`card-${c.id}`}
+								cardId={c.id}
+								enabled={playableCards?.includes(c.id) ?? false}
+							>
+								<Card card={c} />
+							</Draggable>
+						))
 						: [...Array(hand).keys()].map((index) => (
-								<CardBack key={index}></CardBack>
-							))}
+							<CardBack key={index}></CardBack>
+						))}
 				</div>
 			</div>
 
@@ -104,76 +87,27 @@ const PlayerBoard = ({
 interface IFieldProps {
 	field: Record<number, ICard>;
 	side: "enemy" | "player";
-	handleCardInteract?: (cardId: number) => void;
 }
-const Field = ({ field, side, handleCardInteract }: IFieldProps) => {
+const Field = ({ field, side }: IFieldProps) => {
 	return (
 		<div className="field">
 			<div className="column">
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="attack"
-					card={field[0]}
-					position={0}
-				/>
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="defense"
-					card={field[1]}
-					position={1}
-				/>
+				<CardWrapper side={side} type="attack" card={field[0]} position={0} />
+				<CardWrapper side={side} type="defense" card={field[1]} position={1} />
 			</div>
 			<div className="column">
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="both"
-					card={field[2]}
-					position={2}
-				/>
+				<CardWrapper side={side} type="both" card={field[2]} position={2} />
 			</div>
 			<div className="column">
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="attack"
-					card={field[3]}
-					position={3}
-				/>
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="defense"
-					card={field[4]}
-					position={4}
-				/>
+				<CardWrapper side={side} type="attack" card={field[3]} position={3} />
+				<CardWrapper side={side} type="defense" card={field[4]} position={4} />
 			</div>
 			<div className="column">
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="both"
-					card={field[5]}
-					position={5}
-				/>
+				<CardWrapper side={side} type="both" card={field[5]} position={5} />
 			</div>
 			<div className="column">
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="attack"
-					card={field[6]}
-					position={6}
-				/>
-				<CardWrapper
-					handleCardInteract={handleCardInteract}
-					side={side}
-					type="defense"
-					card={field[7]}
-					position={7}
-				/>
+				<CardWrapper side={side} type="attack" card={field[6]} position={6} />
+				<CardWrapper side={side} type="defense" card={field[7]} position={7} />
 			</div>
 		</div>
 	);
@@ -183,23 +117,10 @@ interface ICardWrapperProps {
 	type: "attack" | "defense" | "both";
 	side: "enemy" | "player";
 	position: number;
-	handleCardInteract?: (cardId: number) => void;
 }
-const CardWrapper = ({
-	card,
-	type,
-	side,
-	position,
-	handleCardInteract,
-}: ICardWrapperProps) => {
+const CardWrapper = ({ card, type, side, position }: ICardWrapperProps) => {
 	if (card) {
-		return (
-			<CardMiniature
-				handleCardInteract={handleCardInteract}
-				type={type}
-				card={card}
-			/>
-		);
+		return <CardMiniature side={side} type={type} card={card} />;
 	} else {
 		if (side === "player") {
 			return (

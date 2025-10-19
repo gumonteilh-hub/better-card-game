@@ -1,25 +1,27 @@
 import { DndContext } from "@dnd-kit/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import PlayerBoard from "../components/PlayerBoard";
-import { attack, endTurn, playCard } from "../game.service";
-import { useGameEngine } from "../utils/useGameEngine";
+import { endTurn, playCard } from "../game.service";
+import {
+	GameContextProvider,
+	useGameContext,
+} from "../utils/GameContextProvider";
 
 export const Route = createFileRoute("/game")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { isAnimating, gameState, updateGameState } = useGameEngine();
-	const [selectedAttackingCard, setSelectedAttackingCard] = useState<number>();
+	return (
+		<GameContextProvider>
+			<Game></Game>
+		</GameContextProvider>
+	);
+}
 
-	const playableCards = useMemo(() => {
-		if (!gameState || isAnimating) return [];
-
-		return gameState.player.hand
-			.filter((card) => card.template.cost <= gameState.player.currentMana)
-			.map((c) => c.id);
-	}, [gameState, isAnimating]);
+const Game = () => {
+	const { gameState, isAnimating, updateGameState } = useGameContext();
 
 	// biome-ignore lint/suspicious/noExplicitAny: <type inherited from dnd-kit>
 	const handleDragEnd = (event: any) => {
@@ -39,43 +41,15 @@ function RouteComponent() {
 	function handleEndTurn(): void {
 		if (isAnimating || !gameState) return;
 
-		setSelectedAttackingCard(undefined);
 		endTurn(gameState?.gameId).then((res) => {
 			updateGameState(res);
 		});
-	}
-
-	const handleAttackStart = useCallback(
-		(cardId: number) => {
-			if (!gameState || isAnimating) return;
-			setSelectedAttackingCard(cardId);
-		},
-		[gameState, isAnimating],
-	);
-
-	const handleTargetSelect = useCallback(
-		(cardId: number) => {
-			if (!gameState || isAnimating || !selectedAttackingCard) return;
-
-			attack(gameState.gameId, selectedAttackingCard, cardId).then((res) => {
-				updateGameState(res);
-			});
-			setSelectedAttackingCard(undefined);
-		},
-		[gameState, isAnimating, selectedAttackingCard, updateGameState],
-	);
-
-	if (!gameState) {
-		return <>Loading</>;
 	}
 
 	return (
 		<div className="main">
 			<DndContext autoScroll={false} onDragEnd={handleDragEnd}>
 				<PlayerBoard
-					handleCardInteract={
-						selectedAttackingCard ? handleTargetSelect : undefined
-					}
 					side="enemy"
 					secredCard={gameState.enemy.secretCard}
 					field={gameState.enemy.field}
@@ -90,10 +64,6 @@ function RouteComponent() {
 					</button>
 				</div>
 				<PlayerBoard
-					handleCardInteract={
-						!selectedAttackingCard ? handleAttackStart : undefined
-					}
-					playableCards={playableCards}
 					side="player"
 					secredCard={gameState.player.secretCard}
 					field={gameState.player.field}
@@ -105,4 +75,4 @@ function RouteComponent() {
 			</DndContext>
 		</div>
 	);
-}
+};

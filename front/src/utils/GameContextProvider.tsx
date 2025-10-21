@@ -1,27 +1,9 @@
-import {
-	createContext,
-	type JSX,
-	useCallback,
-	useContext,
-	useMemo,
-	useState,
-} from "react";
+import { type JSX, useCallback, useMemo, useState } from "react";
 import { attack } from "../game.service";
-import type { IGameState, IGameUpdate } from "../types/game";
+import { GameContext } from "./useGameContext";
 import { useGameEngine } from "./useGameEngine";
 
-interface IGameContext {
-	gameState: IGameState;
-	selectedAttackingCard?: number;
-	isAnimating: boolean;
-	updateGameState: (newState: IGameUpdate) => void;
-	handleTargetSelect: (cardId: number) => void;
-	playableCards: number[];
-	handleAttackStart: (cardId: number) => void;
-	handleUnselectAttackingCard: () => void;
-}
-
-const GameContext = createContext<IGameContext | null>(null);
+const defensePositions = [1, 2, 4, 5, 7];
 
 export const GameContextProvider = ({
 	children,
@@ -30,6 +12,18 @@ export const GameContextProvider = ({
 }) => {
 	const { isAnimating, gameState, updateGameState } = useGameEngine();
 	const [selectedAttackingCard, setSelectedAttackingCard] = useState<number>();
+
+	const canAttackPlayer = useMemo(() => {
+		if (!gameState || !selectedAttackingCard || isAnimating) return false;
+
+		for (const pos of defensePositions) {
+			if (gameState.enemy.field[pos] !== undefined) {
+				return false;
+			}
+		}
+
+		return true;
+	}, [gameState, selectedAttackingCard, isAnimating]);
 
 	const playableCards = useMemo(() => {
 		if (!gameState || isAnimating) return [];
@@ -52,7 +46,7 @@ export const GameContextProvider = ({
 	}, []);
 
 	const handleTargetSelect = useCallback(
-		(cardId: number) => {
+		(cardId: number | string) => {
 			if (!gameState || isAnimating || !selectedAttackingCard) return;
 
 			attack(gameState.gameId, selectedAttackingCard, cardId).then((res) => {
@@ -78,18 +72,10 @@ export const GameContextProvider = ({
 				playableCards,
 				handleAttackStart,
 				handleUnselectAttackingCard,
+				canAttackPlayer,
 			}}
 		>
 			{children}
 		</GameContext>
 	);
-};
-
-export const useGameContext = () => {
-	const gameContext = useContext(GameContext);
-	if (!gameContext) {
-		throw new Error("gameContext should not be null");
-	}
-
-	return gameContext;
 };

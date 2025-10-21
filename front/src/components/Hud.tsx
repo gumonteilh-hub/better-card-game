@@ -1,11 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, type JSX } from "react";
 import demon from "../assets/hero-demon.png";
 import dragon from "../assets/hero-dragon.png";
 import human from "../assets/hero-human.png";
 import shield from "../assets/shield.svg";
 import sword from "../assets/sword.svg";
-import type { IHeroInfo } from "../types/game";
-import { CardMiniature, type ICard } from "./Card";
+import type { ICard, IHeroInfo } from "../types/game";
+import { CardMiniature } from "./Card";
+import { useGameContext } from "../utils/useGameContext";
 
 export const CardBack = () => {
 	return (
@@ -35,8 +36,11 @@ export const Deck = () => {
 
 interface IHeroPortraitProps {
 	hero: IHeroInfo;
+	side: "enemy" | "player";
 }
-export const HeroPortrait = ({ hero }: IHeroPortraitProps) => {
+export const HeroPortrait = ({ hero, side }: IHeroPortraitProps) => {
+	const { canAttackPlayer } = useGameContext();
+
 	const imgSrc = useMemo(() => {
 		switch (hero.faction) {
 			case "HUMAN":
@@ -51,9 +55,14 @@ export const HeroPortrait = ({ hero }: IHeroPortraitProps) => {
 	}, [hero.faction]);
 
 	return (
-		<div className="hero-portrait ">
+		<div className="hero-portrait">
 			<div className="hero-image-slot untransformed">
-				<img src={imgSrc} alt="the hero of the player" />
+				<TargetWrapper
+					active={side === "enemy" && canAttackPlayer}
+					id={hero.id}
+				>
+					<img src={imgSrc} alt="the hero of the player" />
+				</TargetWrapper>
 				<div className="player-hp">
 					<HeartIcon className="heart-icon" />
 					<span className="hp-value ">{hero.hp}</span>
@@ -63,6 +72,31 @@ export const HeroPortrait = ({ hero }: IHeroPortraitProps) => {
 				<p>{hero.name}</p>
 			</div>
 		</div>
+	);
+};
+
+interface ITargetWrapperProps {
+	active: boolean;
+	children: JSX.Element;
+	id: number | string;
+}
+
+export const TargetWrapper = ({
+	active,
+	children,
+	id,
+}: ITargetWrapperProps) => {
+	const { handleTargetSelect } = useGameContext();
+	if (!active) return children;
+
+	return (
+		<button
+			type="button"
+			className="select-target-button"
+			onClick={() => handleTargetSelect(id)}
+		>
+			{children}
+		</button>
 	);
 };
 
@@ -78,7 +112,7 @@ export const TrapCardSlot = ({ side, card }: ITrapCardSlotEnemyProps) => {
 	if (side === "player") {
 		return (
 			<div className="trap-card-placeholder">
-				<CardMiniature card={card as ICard} />
+				<CardMiniature side={side} card={card as ICard} />
 			</div>
 		);
 	}

@@ -2,8 +2,9 @@ import type { JSX } from "react";
 import test from "../assets/test.png";
 import type { ICard } from "../types/game";
 import type { ICardTemplate } from "../types/template";
-import { useGameContext } from "../utils/GameContextProvider";
 import { canAttack } from "../utils/gameRules";
+import { useGameContext } from "../utils/useGameContext";
+import { TargetWrapper } from "./Hud";
 
 interface ICardProps {
 	card: ICard;
@@ -118,7 +119,6 @@ interface IActionWrapperProps {
 
 const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
 	const {
-		handleTargetSelect,
 		handleAttackStart,
 		selectedAttackingCard,
 		handleUnselectAttackingCard,
@@ -148,15 +148,14 @@ const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
 				</button>
 			);
 		}
-		if (side === "enemy" && selectedAttackingCard) {
+		if (side === "enemy") {
 			return (
-				<button
-					className="start-attack-button"
-					type="button"
-					onClick={() => handleTargetSelect(card.id)}
+				<TargetWrapper
+					active={selectedAttackingCard !== undefined}
+					id={card.id}
 				>
 					{children}
-				</button>
+				</TargetWrapper>
 			);
 		}
 	}

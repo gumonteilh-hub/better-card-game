@@ -70,7 +70,7 @@ export const endTurn = async (gameId: string): Promise<IGameUpdate> => {
 export const attack = async (
 	gameId: string,
 	cardId: number,
-	targetId: number,
+	targetId: number | string,
 ): Promise<IGameUpdate> => {
 	try {
 		const response = await fetch(

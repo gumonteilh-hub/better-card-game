@@ -1,5 +1,5 @@
 import type { ICard, IHeroInfo } from "../types/game";
-import { useGameContext } from "../utils/GameContextProvider";
+import { useGameContext } from "../utils/useGameContext";
 import { Card, CardMiniature } from "./Card";
 import { Draggable, Droppable } from "./DragAndDrop";
 import {
@@ -50,7 +50,7 @@ const PlayerBoard = ({
 					<ManaHud current={currentMana} max={maxMana} />
 				</div>
 				<div className="hero-slot">
-					<HeroPortrait hero={hero} />
+					<HeroPortrait hero={hero} side={side} />
 				</div>
 			</div>
 			<div className="middle-panel">

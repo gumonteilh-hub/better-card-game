@@ -1,12 +1,9 @@
 import { DndContext } from "@dnd-kit/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
 import PlayerBoard from "../components/PlayerBoard";
 import { endTurn, playCard } from "../game.service";
-import {
-	GameContextProvider,
-	useGameContext,
-} from "../utils/GameContextProvider";
+import { GameContextProvider } from "../utils/GameContextProvider";
+import { useGameContext } from "../utils/useGameContext";
 
 export const Route = createFileRoute("/game")({
 	component: RouteComponent,

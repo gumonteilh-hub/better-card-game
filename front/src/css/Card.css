@@ -47,11 +47,8 @@
 			background: #0b486b;
 			--_m: #0000 0 calc(2 * atan(0.5)), #000 0 50%;
 			mask:
-				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m))
-				calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100%
-				intersect,
-				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m))
-				calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
+				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m)) calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100% intersect,
+				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m)) calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
 
 			img {
 				width: 100%;
@@ -104,11 +101,9 @@
 	}
 
 	&.both {
-		background: linear-gradient(
-			180deg,
-			var(--attack-color) 25%,
-			var(--defense-color) 75%
-		);
+		background: linear-gradient(180deg,
+				var(--attack-color) 25%,
+				var(--defense-color) 75%);
 	}
 
 	.card-body {
@@ -129,11 +124,8 @@
 			background: #0b486b;
 			--_m: #0000 0 calc(2 * atan(0.5)), #000 0 50%;
 			mask:
-				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m))
-				calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100%
-				intersect,
-				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m))
-				calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
+				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m)) calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100% intersect,
+				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m)) calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
 
 			img {
 				width: 100%;
@@ -167,30 +159,21 @@
 	aspect-ratio: 1;
 	border-radius: 50%;
 	background:
-		repeating-radial-gradient(
-			calc(2 * var(--b)) at top,
+		repeating-radial-gradient(calc(2 * var(--b)) at top,
 			#0000 -1px,
 			var(--c) 0 calc(50% - 1px),
-			#0000 50% calc(100% - 1px)
-		)
-		calc(50% + var(--b)) 100%,
-		repeating-radial-gradient(
-			calc(2 * var(--b)) at bottom,
+			#0000 50% calc(100% - 1px)) calc(50% + var(--b)) 100%,
+		repeating-radial-gradient(calc(2 * var(--b)) at bottom,
 			var(--c) -1px,
 			#0000 0 calc(50% - 1px),
-			var(--c) 50% calc(100% - 1px)
-		)
-		50% 0;
+			var(--c) 50% calc(100% - 1px)) 50% 0;
 	background-size: 150% 50%;
 	background-repeat: no-repeat;
 	mask:
-		radial-gradient(
-			calc(1.5 * var(--b)) at calc(100% - var(--b) / 2) 0,
+		radial-gradient(calc(1.5 * var(--b)) at calc(100% - var(--b) / 2) 0,
 			#0000 calc(100% / 3),
 			#000 calc(100% / 3 + 1px) 110%,
-			#0000 0
-		)
-		calc(50% + var(--b) / 2) 100% / calc(3 * var(--b)) 50% exclude no-repeat,
+			#0000 0) calc(50% + var(--b) / 2) 100% / calc(3 * var(--b)) 50% exclude no-repeat,
 		conic-gradient(#000 0 0);
 }
 
@@ -253,6 +236,7 @@
 }
 
 @keyframes pulseGlow {
+
 	0%,
 	100% {
 		opacity: 0.8;
@@ -262,6 +246,7 @@
 			0 0 60px 12px rgba(255, 215, 0, 0.2),
 			inset 0 0 20px 2px rgba(255, 215, 0, 0.3);
 	}
+
 	50% {
 		opacity: 1;
 		box-shadow:
@@ -269,5 +254,67 @@
 			0 0 50px 12px rgba(255, 215, 0, 0.6),
 			0 0 80px 16px rgba(255, 215, 0, 0.4),
 			inset 0 0 25px 3px rgba(255, 215, 0, 0.4);
+	}
+}
+
+.select-target-button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.3s ease;
+	padding: 0;
+	margin: 0;
+	display: inline-block;
+	line-height: 0;
+}
+
+.select-target-button:before {
+	content: "";
+	position: absolute;
+	inset: -0px;
+	border-radius: 5%;
+	background: transparent;
+	box-shadow:
+		0 0 20px 4px rgba(255, 0, 0, 0.6),
+		0 0 40px 8px rgba(255, 0, 0, 0.4),
+		0 0 60px 12px rgba(255, 0, 0, 0.2),
+		inset 0 0 20px 2px rgba(255, 0, 0, 0.3);
+	pointer-events: none;
+	animation: redPulseGlow 2s ease-in-out infinite;
+	z-index: -1;
+}
+
+.select-target-button:hover {
+	transform: translateY(-4px) scale(1.02);
+}
+
+.select-target-button:hover::before {
+	box-shadow:
+		0 0 30px 6px rgba(255, 215, 0, 0.8),
+		0 0 50px 10px rgba(255, 215, 0, 0.6),
+		0 0 80px 16px rgba(255, 215, 0, 0.3),
+		inset 0 0 25px 3px rgba(255, 215, 0, 0.4);
+}
+
+@keyframes redPulseGlow {
+
+	0%,
+	100% {
+		opacity: 0.8;
+		box-shadow:
+			0 0 20px 4px rgba(255, 0, 0, 0.6),
+			0 0 40px 8px rgba(255, 0, 0, 0.4),
+			0 0 60px 12px rgba(255, 0, 0, 0.2),
+			inset 0 0 20px 2px rgba(255, 0, 0, 0.3);
+	}
+
+	50% {
+		opacity: 1;
+		box-shadow:
+			0 0 30px 6px rgba(255, 0, 0, 0.8),
+			0 0 50px 12px rgba(255, 0, 0, 0.6),
+			0 0 80px 16px rgba(255, 0, 0, 0.4),
+			inset 0 0 25px 3px rgba(255, 0, 0, 0.4);
 	}
 }

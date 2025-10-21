@@ -11,8 +11,6 @@
 			width: 100%;
 			aspect-ratio: 1;
 			border: outset 3px grey;
-			border-top-right-radius: 20%;
-			border-top-left-radius: 20%;
 		}
 	}
 

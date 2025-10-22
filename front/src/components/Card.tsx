@@ -90,23 +90,28 @@ interface ICardMiniatureProps {
 
 export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 	return (
-		<ActionWrapper side={side} card={card} type={type}>
-			<div className={`card card-miniature untransformed ${type}`}>
-				<div className="card-body">
-					<div className="card-image">
-						<img src={test} alt="card" />
+		<div className="card-miniature-container">
+			<ActionWrapper side={side} card={card} type={type}>
+				<div className={`card card-miniature untransformed ${type}`}>
+					<div className="card-body">
+						<div className="card-image">
+							<img src={test} alt="card" />
+						</div>
+					</div>
+					<div className="card-footer">
+						<div className="card-attack">
+							<span>{card.attack}</span>
+						</div>
+						<div className="card-defense">
+							<span>{card.defense}</span>
+						</div>
 					</div>
 				</div>
-				<div className="card-footer">
-					<div className="card-attack">
-						<span>{card.attack}</span>
-					</div>
-					<div className="card-defense">
-						<span>{card.defense}</span>
-					</div>
-				</div>
+			</ActionWrapper>
+			<div className={`card-overview untransformed`}>
+				<Card card={card} />
 			</div>
-		</ActionWrapper>
+		</div>
 	);
 };
 

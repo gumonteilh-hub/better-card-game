@@ -6,11 +6,17 @@ import "./css/Home.css";
 import "./css/Collection.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { Toaster } from "sonner";
 
 const router = createRouter({ routeTree });
 
 function App() {
-	return <RouterProvider router={router}></RouterProvider>;
+	return (
+		<>
+			<Toaster position="top-center" richColors />
+			<RouterProvider router={router}></RouterProvider>
+		</>
+	);
 }
 
 export default App;

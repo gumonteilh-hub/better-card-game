@@ -1,17 +1,13 @@
 import type { IGameUpdate } from "./types/game";
 import type { Faction, ICardTemplate, IDeck } from "./types/template";
+import { apiFetch } from "./utils/api";
 
 export const getCollection = async (
 	faction: Faction,
 ): Promise<ICardTemplate[]> => {
-	const response = await fetch(`api/collection/${faction}`, {
+	return apiFetch<ICardTemplate[]>(`api/collection/${faction}`, {
 		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		},
 	});
-	const json = await response.json();
-	return json as ICardTemplate[];
 };
 
 export const startGame = async (deck: IDeck): Promise<IGameUpdate> => {
@@ -19,15 +15,10 @@ export const startGame = async (deck: IDeck): Promise<IGameUpdate> => {
 		faction: deck.faction,
 		cards: deck.cards.map((c) => c.id),
 	};
-	const response = await fetch("api/game/start", {
+	return apiFetch<IGameUpdate>("api/game/start", {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
 		body: JSON.stringify(body),
 	});
-	const json = await response.json();
-	return json as IGameUpdate;
 };
 
 export const playCard = async (
@@ -35,36 +26,18 @@ export const playCard = async (
 	cardId: number,
 	position: number,
 ): Promise<IGameUpdate> => {
-	try {
-		const response = await fetch(
-			`api/game/${gameId}/play_card/${cardId}/${position}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			},
-		);
-		const json = await response.json();
-		return json as IGameUpdate;
-	} catch (error) {
-		return Promise.reject(error);
-	}
+	return apiFetch<IGameUpdate>(
+		`api/game/${gameId}/play_card/${cardId}/${position}`,
+		{
+			method: "POST",
+		},
+	);
 };
 
 export const endTurn = async (gameId: string): Promise<IGameUpdate> => {
-	try {
-		const response = await fetch(`api/game/${gameId}/end_turn`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-		const json = await response.json();
-		return json as IGameUpdate;
-	} catch (error) {
-		return Promise.reject(error);
-	}
+	return apiFetch<IGameUpdate>(`api/game/${gameId}/end_turn`, {
+		method: "POST",
+	});
 };
 
 export const attack = async (
@@ -72,19 +45,10 @@ export const attack = async (
 	cardId: number,
 	targetId: number | string,
 ): Promise<IGameUpdate> => {
-	try {
-		const response = await fetch(
-			`api/game/${gameId}/attack/${cardId}/${targetId}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			},
-		);
-		const json = await response.json();
-		return json as IGameUpdate;
-	} catch (error) {
-		return Promise.reject(error);
-	}
+	return apiFetch<IGameUpdate>(
+		`api/game/${gameId}/attack/${cardId}/${targetId}`,
+		{
+			method: "POST",
+		},
+	);
 };

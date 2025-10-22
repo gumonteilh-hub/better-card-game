@@ -34,10 +34,22 @@ impl fmt::Display for Error {
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let status = match &self {
-            Error::Game(_) => StatusCode::BAD_REQUEST,
-            Error::MutexPoisoned => StatusCode::INTERNAL_SERVER_ERROR,
-            Error::Json(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Error::GameNotStarted => StatusCode::CONFLICT,
+            Error::Game(_) => {
+                tracing::warn!("Game rule violation: {}", self);
+                StatusCode::BAD_REQUEST
+            }
+            Error::MutexPoisoned => {
+                tracing::error!("Mutex poisoned: {}", self);
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
+            Error::Json(_) => {
+                tracing::error!("JSON error: {}", self);
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
+            Error::GameNotStarted => {
+                tracing::warn!("Game not started: {}", self);
+                StatusCode::CONFLICT
+            }
         };
 
         let body = Json(serde_json::json!({

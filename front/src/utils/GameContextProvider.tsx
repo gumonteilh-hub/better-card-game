@@ -3,7 +3,8 @@ import { attack } from "../game.service";
 import { GameContext } from "./useGameContext";
 import { useGameEngine } from "./useGameEngine";
 
-const defensePositions = [1, 2, 4, 5, 7];
+export const defensePositions = [1, 2, 4, 5, 7];
+export const attackPositions = [0, 2, 3, 5, 6];
 
 export const GameContextProvider = ({
 	children,

@@ -1,12 +1,12 @@
-import { useMemo, type JSX } from "react";
+import { type JSX, useMemo } from "react";
 import demon from "../assets/hero-demon.png";
 import dragon from "../assets/hero-dragon.png";
 import human from "../assets/hero-human.png";
 import shield from "../assets/shield.svg";
 import sword from "../assets/sword.svg";
 import type { ICard, IHeroInfo } from "../types/game";
-import { CardMiniature } from "./Card";
 import { useGameContext } from "../utils/useGameContext";
+import { CardMiniature } from "./Card";
 
 export const CardBack = () => {
 	return (

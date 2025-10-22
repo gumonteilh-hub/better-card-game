@@ -1,14 +1,14 @@
 use crate::{
     error::{Error, Result},
     game::{
+        ATTACK_POSITIONS, DEFENSE_POSITIONS, Game,
         action::Action,
         card::{CardInstance, Keyword},
         types::{EntityId, PlayerId},
-        Game,
     },
     ia::{
-        get_opponent_id, IaBehavior, CREATURE_VALUE_ATK_WEIGHT, CREATURE_VALUE_HP_WEIGHT,
-        FACE_DAMAGE_VALUE, MIN_ACCEPTABLE_TRADE_SCORE, SURVIVAL_BONUS, WOUNDED_ATTACKER_BONUS,
+        CREATURE_VALUE_ATK_WEIGHT, CREATURE_VALUE_HP_WEIGHT, FACE_DAMAGE_VALUE, IaBehavior,
+        MIN_ACCEPTABLE_TRADE_SCORE, SURVIVAL_BONUS, WOUNDED_ATTACKER_BONUS, get_opponent_id,
     },
 };
 
@@ -21,27 +21,23 @@ pub fn ai_attack_sequence(
 }
 
 fn get_available_attackers(game: &Game, player_id: PlayerId) -> Vec<EntityId> {
-    game.get_field(player_id)
-        .into_iter()
-        .filter(|(_, creature)| {
+    game.get_field_with_position(player_id)
+        .iter()
+        .filter(|(pos, creature)| {
+            if !ATTACK_POSITIONS.contains(pos) {
+                return false;
+            }
             if creature.asleep {
                 return false;
             }
-
             if creature.template.keywords.contains(&Keyword::Windfury) {
                 creature.attack_count < 2
             } else {
                 creature.attack_count < 1
             }
         })
-        .map(|(id, _)| *id)
+        .map(|(_, c)| c.id)
         .collect()
-}
-
-fn has_taunt_on_field(game: &Game, player_id: PlayerId) -> bool {
-    game.get_field(player_id)
-        .values()
-        .any(|creature| creature.template.keywords.contains(&Keyword::Taunt))
 }
 
 fn evaluate_attack_control(attacker: &CardInstance, target: &CardInstance) -> f32 {
@@ -130,14 +126,18 @@ fn find_best_attack(
     }
 
     let enemy_field = game.get_field(opponent_id);
-    let has_taunt = has_taunt_on_field(game, opponent_id);
 
     let mut best_attack: Option<(EntityId, EntityId, f32)> = None;
+
+    let has_defender = game
+        .get_field_with_position(opponent_id)
+        .iter()
+        .any(|(pos, _)| DEFENSE_POSITIONS.contains(pos));
 
     for attacker_id in attackers {
         let attacker = game.get_entity(attacker_id)?;
 
-        if !has_taunt {
+        if !has_defender {
             let score = match mode {
                 IaBehavior::Control => {
                     let threat = calculate_threat_level(game, player_id)?;
@@ -157,10 +157,6 @@ fn find_best_attack(
         }
 
         for enemy in enemy_field.values() {
-            if has_taunt && !enemy.template.keywords.contains(&Keyword::Taunt) {
-                continue;
-            }
-
             let score = match mode {
                 IaBehavior::Control => evaluate_attack_control(attacker, enemy),
                 IaBehavior::Survival => evaluate_attack_survival(attacker, enemy),

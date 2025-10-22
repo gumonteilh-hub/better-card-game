@@ -142,7 +142,11 @@ const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
 					</button>
 				);
 			}
-		if (!selectedAttackingCard && canAttack(card)) {
+		if (
+			!selectedAttackingCard &&
+			(type === "attack" || type === "both") &&
+			canAttack(card)
+		) {
 			return (
 				<button
 					className="start-attack-button"

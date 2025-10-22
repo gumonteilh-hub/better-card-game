@@ -47,8 +47,11 @@
 			background: #0b486b;
 			--_m: #0000 0 calc(2 * atan(0.5)), #000 0 50%;
 			mask:
-				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m)) calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100% intersect,
-				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m)) calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
+				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m))
+				calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100%
+				intersect,
+				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m))
+				calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
 
 			img {
 				width: 100%;
@@ -101,9 +104,11 @@
 	}
 
 	&.both {
-		background: linear-gradient(180deg,
-				var(--attack-color) 25%,
-				var(--defense-color) 75%);
+		background: linear-gradient(
+			180deg,
+			var(--attack-color) 25%,
+			var(--defense-color) 75%
+		);
 	}
 
 	.card-body {
@@ -124,8 +129,11 @@
 			background: #0b486b;
 			--_m: #0000 0 calc(2 * atan(0.5)), #000 0 50%;
 			mask:
-				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m)) calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100% intersect,
-				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m)) calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
+				repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m))
+				calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100%
+				intersect,
+				repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m))
+				calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
 
 			img {
 				width: 100%;
@@ -159,21 +167,30 @@
 	aspect-ratio: 1;
 	border-radius: 50%;
 	background:
-		repeating-radial-gradient(calc(2 * var(--b)) at top,
+		repeating-radial-gradient(
+			calc(2 * var(--b)) at top,
 			#0000 -1px,
 			var(--c) 0 calc(50% - 1px),
-			#0000 50% calc(100% - 1px)) calc(50% + var(--b)) 100%,
-		repeating-radial-gradient(calc(2 * var(--b)) at bottom,
+			#0000 50% calc(100% - 1px)
+		)
+		calc(50% + var(--b)) 100%,
+		repeating-radial-gradient(
+			calc(2 * var(--b)) at bottom,
 			var(--c) -1px,
 			#0000 0 calc(50% - 1px),
-			var(--c) 50% calc(100% - 1px)) 50% 0;
+			var(--c) 50% calc(100% - 1px)
+		)
+		50% 0;
 	background-size: 150% 50%;
 	background-repeat: no-repeat;
 	mask:
-		radial-gradient(calc(1.5 * var(--b)) at calc(100% - var(--b) / 2) 0,
+		radial-gradient(
+			calc(1.5 * var(--b)) at calc(100% - var(--b) / 2) 0,
 			#0000 calc(100% / 3),
 			#000 calc(100% / 3 + 1px) 110%,
-			#0000 0) calc(50% + var(--b) / 2) 100% / calc(3 * var(--b)) 50% exclude no-repeat,
+			#0000 0
+		)
+		calc(50% + var(--b) / 2) 100% / calc(3 * var(--b)) 50% exclude no-repeat,
 		conic-gradient(#000 0 0);
 }
 
@@ -236,7 +253,6 @@
 }
 
 @keyframes pulseGlow {
-
 	0%,
 	100% {
 		opacity: 0.8;
@@ -298,7 +314,6 @@
 }
 
 @keyframes redPulseGlow {
-
 	0%,
 	100% {
 		opacity: 0.8;
@@ -338,5 +353,5 @@
 .card-miniature-container:hover .card-overview {
 	opacity: 1;
 	pointer-events: auto;
-	transition: opacity 0.1s ease-in 0.5s;
+	transition: opacity 0.1s ease-in 1s;
 }

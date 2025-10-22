@@ -30,9 +30,11 @@ export const useGameEngine = () => {
 			}
 
 			const intermediateState = { ...gameState };
+			/*
 			for (const action of group) {
-				//intermediateState = applyAction(intermediateState, action);
+				intermediateState = applyAction(intermediateState, action);
 			}
+			*/
 
 			setGameState(intermediateState);
 			setActionQueue(
@@ -58,7 +60,7 @@ export const useGameEngine = () => {
 
 	return { isAnimating, gameState, updateGameState };
 };
-
+/*
 const getAnimationDuration = (actionType: ActionType): number => {
 	switch (actionType) {
 		case "BurnCard":
@@ -75,10 +77,11 @@ const getAnimationDuration = (actionType: ActionType): number => {
 		case ActionType.TRIGGER_ON_DEATH:
 		case ActionType.TRIGGER_ON_PLAY:
 		case ActionType.TRIGGER_ON_ATTACK:
-			return 800;*/
+			return 800;
 		default:
 			return 500;
 	}
 };
 
 const animationBefore: ActionType[] = ["Destroy", "Win"];
+*/

@@ -58,18 +58,18 @@ const PlayerBoard = ({
 				<div className="hand">
 					{side === "player"
 						? hand.map((c) => (
-							<Draggable
-								key={c.id}
-								id={`card-${c.id}`}
-								cardId={c.id}
-								enabled={playableCards?.includes(c.id) ?? false}
-							>
-								<Card card={c} />
-							</Draggable>
-						))
+								<Draggable
+									key={c.id}
+									id={`card-${c.id}`}
+									cardId={c.id}
+									enabled={playableCards?.includes(c.id) ?? false}
+								>
+									<Card card={c} />
+								</Draggable>
+							))
 						: [...Array(hand).keys()].map((index) => (
-							<CardBack key={index}></CardBack>
-						))}
+								<CardBack key={index}></CardBack>
+							))}
 				</div>
 			</div>
 

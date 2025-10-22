@@ -108,7 +108,7 @@ static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
         4,
         Faction::COMMON,
     )
-    .keywords(vec![Keyword::Taunt])
+    .keywords(vec![])
     .build()
 });
 
@@ -163,7 +163,7 @@ static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
         7,
         Faction::COMMON,
     )
-    .keywords(vec![Keyword::Taunt])
+    .keywords(vec![])
     .build()
 });
 
@@ -250,7 +250,7 @@ static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
         4,
         Faction::COMMON,
     )
-    .keywords(vec![Keyword::Taunt])
+    .keywords(vec![])
     .on_play(vec![heal(TemplateTarget::Player, 5)])
     .build()
 });
@@ -321,7 +321,7 @@ static PALADIN: Lazy<CardTemplate> = Lazy::new(|| {
         6,
         Faction::COMMON,
     )
-    .keywords(vec![Keyword::Taunt])
+    .keywords(vec![])
     .on_play(vec![heal(TemplateTarget::Allies, 4)])
     .build()
 });

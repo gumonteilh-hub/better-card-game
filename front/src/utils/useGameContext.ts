@@ -1,7 +1,6 @@
 import { createContext, useContext } from "react";
 import type { IGameState, IGameUpdate } from "../types/game";
 
-
 interface IGameContext {
 	gameState: IGameState;
 	selectedAttackingCard?: number;
@@ -15,8 +14,6 @@ interface IGameContext {
 }
 
 export const GameContext = createContext<IGameContext | null>(null);
-
-
 
 export const useGameContext = () => {
 	const gameContext = useContext(GameContext);

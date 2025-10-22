@@ -1,6 +1,6 @@
+/*
 import type { IAction } from "../types/action";
 import type { IGameState } from "../types/game";
-/*
 export const applyAction = (state: IGameState, action: IAction): IGameState => {
 	switch (action.type) {
 		case "Summon":

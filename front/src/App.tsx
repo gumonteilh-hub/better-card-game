@@ -5,8 +5,8 @@ import "./css/Board.css";
 import "./css/Home.css";
 import "./css/Collection.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
 import { Toaster } from "sonner";
+import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({ routeTree });
 

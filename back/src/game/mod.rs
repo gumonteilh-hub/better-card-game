@@ -8,6 +8,7 @@ pub mod types;
 pub mod view;
 
 use std::collections::{HashMap, VecDeque};
+use std::usize;
 
 use crate::error::{Error, Result};
 use crate::game::action::Action;
@@ -21,6 +22,9 @@ use self::card::CardInstance;
 use self::events::EventManager;
 use self::player::PlayerInstance;
 use self::types::{EntityId, PlayerId};
+
+pub const DEFENSE_POSITIONS: [usize; 5] = [1, 2, 4, 5, 7];
+pub const ATTACK_POSITIONS: [usize; 5] = [0, 2, 3, 5, 6];
 
 #[derive(Debug, Clone)]
 pub struct Game {
@@ -216,15 +220,13 @@ impl Game {
                 return Err(Error::Game("You can't attack your own player".into()));
             }
             if self
-                .get_field(target_id)
+                .get_field_with_position(target_id)
                 .iter()
-                .filter(|c| c.1.template.keywords.contains(&card::Keyword::Taunt))
-                .count()
-                > 0
+                .any(|(pos, _)| DEFENSE_POSITIONS.contains(pos))
             {
                 return Err(Error::Game(
-                "You must destroy all Taunt enemy monsters first before attacking the enemy Heros".into(),
-            ));
+                    "You can't attack the enemy player if he has a monster in defense".into(),
+                ));
             }
         } else {
             let target = self
@@ -235,24 +237,27 @@ impl Game {
             if initiator.owner == target.owner {
                 return Err(Error::Game("You can't attack your own monster".into()));
             }
-            if !target.template.keywords.contains(&Keyword::Taunt)
-                && self
-                    .get_field(target.owner)
-                    .iter()
-                    .filter(|c| c.1.template.keywords.contains(&card::Keyword::Taunt))
-                    .count()
-                    > 0
-            {
-                return Err(Error::Game(
-                    "You must focus Taunt monsters before attacking other monsters".into(),
-                ));
-            }
         }
         if initiator.asleep {
             return Err(Error::Game(
                 "This monster can't attack on his first turn".into(),
             ));
         }
+
+        match initiator.location {
+            Location::Field(pos) => {
+                if !ATTACK_POSITIONS.contains(&pos) {
+                    return Err(Error::Game(
+                        "This monster must be on an attack slot to attack".into(),
+                    ));
+                }
+            }
+            _ => {
+                return Err(Error::Game(
+                    "This monster must be on the field to attack".into(),
+                ));
+            }
+        };
 
         if initiator.template.keywords.contains(&Keyword::Windfury) {
             if initiator.attack_count > 1 {
@@ -307,6 +312,22 @@ impl Game {
             .get_mut(&entity_id)
             .ok_or_else(|| Error::Game(format!("Card with id {} not found", entity_id)))?;
         Ok(entity)
+    }
+
+    pub fn get_field_with_position(&self, player_id: PlayerId) -> HashMap<usize, &CardInstance> {
+        let mut result: HashMap<usize, &CardInstance> = HashMap::new();
+
+        self.entities
+            .iter()
+            .filter(|(_, e)| e.owner == player_id && matches!(e.location, Location::Field(_)))
+            .for_each(|(_, c)| {
+                match c.location {
+                    Location::Field(pos) => result.insert(pos, c),
+                    _ => todo!(),
+                };
+            });
+
+        result
     }
 
     pub fn get_field(&self, player_id: PlayerId) -> HashMap<&EntityId, &CardInstance> {

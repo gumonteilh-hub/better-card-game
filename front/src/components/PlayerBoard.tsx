@@ -57,19 +57,20 @@ const PlayerBoard = ({
 				<Field field={field} side={side} />
 				<div className="hand">
 					{side === "player"
-						? hand.map((c) => (
-								<Draggable
-									key={c.id}
-									id={`card-${c.id}`}
-									cardId={c.id}
-									enabled={playableCards?.includes(c.id) ?? false}
-								>
-									<Card card={c} />
-								</Draggable>
-							))
-						: [...Array(hand).keys()].map((index) => (
-								<CardBack key={index}></CardBack>
-							))}
+						? hand.map((c, index) => (
+							<Draggable
+								key={c.id}
+								id={`card-${c.id}`}
+								cardId={c.id}
+								enabled={playableCards?.includes(c.id) ?? false}
+								style={{ zIndex: index }}
+							>
+								<Card card={c} />
+							</Draggable>
+						))
+						: hand > 0 && [...Array(hand).keys()].map((index) => (
+							<CardBack key={index}></CardBack>
+						))}
 				</div>
 			</div>
 

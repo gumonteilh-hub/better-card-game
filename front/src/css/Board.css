@@ -98,6 +98,100 @@
 			width: 100%;
 			display: flex;
 			justify-content: center;
+			gap: 5px
+		}
+
+		.is-playable-highlight {
+			cursor: pointer;
+			position: relative;
+			height: fit-content;
+		}
+
+		.is-playable-highlight::before {
+			content: "";
+			position: absolute;
+			inset: -0px;
+			border-radius: 10%;
+			background: transparent;
+			box-shadow:
+				0 0 20px 4px rgba(255, 215, 0, 0.6),
+				0 0 40px 8px rgba(255, 215, 0, 0.4),
+				0 0 60px 12px rgba(255, 215, 0, 0.2),
+				inset 0 0 20px 2px rgba(255, 215, 0, 0.3);
+			pointer-events: none;
+			animation: pulseGlow 2s ease-in-out infinite;
+			z-index: -1;
+		}
+
+		.hand>* {
+			position: relative;
+		}
+
+		.hand>*:hover:has(.card) {
+			transform: translateY(calc(var(--card-heigh) * -0.7)) scale(1.1);
+			/* biome-ignore lint/complexity/noImportantStyles: needed to override React style */
+			z-index: 100 !important;
+		}
+
+		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8))) {
+			gap: 0;
+		}
+
+		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8)))>* {
+			margin-left: -45px;
+		}
+
+		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8)))>*:first-child {
+			margin-left: 0;
+		}
+
+		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8))) {
+			gap: 0;
+		}
+
+		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8)))>* {
+			margin-left: -65px;
+		}
+
+		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8)))>*:first-child {
+			margin-left: 0;
+		}
+
+		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9))) {
+			gap: 0;
+		}
+
+		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9)))>* {
+			margin-left: -85px;
+		}
+
+		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9)))>*:first-child {
+			margin-left: 0;
+		}
+
+		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10))) {
+			gap: 0;
+		}
+
+		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10)))>* {
+			margin-left: -95px;
+		}
+
+		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10)))>*:first-child {
+			margin-left: 0;
+		}
+
+		.hand:has(> *:nth-child(10)) {
+			gap: 0;
+		}
+
+		.hand:has(> *:nth-child(10))>* {
+			margin-left: -105px;
+		}
+
+		/* biome-ignore lint/style/noDescendingSpecificity: useless rule */
+		.player-hand:has(> *:nth-child(10))>*:first-child {
+			margin-left: 0;
 		}
 	}
 }

@@ -49,16 +49,16 @@ export function Draggable({
 	});
 	const style = transform
 		? {
-				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-				...externalStyle,
-			}
+			transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+			...externalStyle,
+		}
 		: externalStyle;
 
 	return (
 		<div
 			ref={setNodeRef}
 			style={style}
-			className="is-playable-highlight"
+			className={enabled ? "is-playable-highlight" : ""}
 			{...listeners}
 			{...attributes}
 		>

@@ -37,6 +37,7 @@ pub enum Action {
     },
     Summon {
         source: Location,
+        destination: usize,
         target: CardInstance,
         owner: PlayerId,
     },

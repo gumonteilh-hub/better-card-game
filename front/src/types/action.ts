@@ -1,4 +1,4 @@
-import type { ICard } from "../components/Card";
+import type { ICard, Location } from "./game";
 
 export type IAction =
 	| BurnAction
@@ -30,8 +30,8 @@ export type ActionType =
 	| "IncreaseMaxMana"
 	| "RefreshMana";
 
-type EntityId = number;
-type PlayerId = string;
+export type EntityId = number;
+export type PlayerId = number;
 
 type BurnAction = {
 	type: "BurnCard";
@@ -67,7 +67,7 @@ type DestroyAction = {
 type ReceiveDamageAction = {
 	type: "ReceiveDamage";
 	value: {
-		target: EntityId;
+		target: EntityId | PlayerId;
 		amount: number;
 	};
 };
@@ -76,6 +76,7 @@ type SummonAction = {
 	type: "Summon";
 	value: {
 		source: Location;
+		destination: number;
 		target: ICard;
 		owner: PlayerId;
 	};

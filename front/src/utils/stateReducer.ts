@@ -1,4 +1,3 @@
-/*
 import type { IAction } from "../types/action";
 import type { IGameState } from "../types/game";
 export const applyAction = (state: IGameState, action: IAction): IGameState => {
@@ -36,59 +35,133 @@ const applySummon = (
 		if (action.value.source.type === "Hand") {
 			newState = {
 				...newState,
-				hand: state.hand.filter((c) => c.id != action.value.target.id),
-				mana: newState.mana - action.value.target.template.cost,
-				field: [...newState.field, action.value.target],
-			};
-		}
-		newState = { ...newState, field: [...newState.field, action.value.target] };
-	} else {
-		if (action.value.source.type === "Hand") {
-			newState = {
-				...newState,
-				ennemy_hand_size: newState.ennemy_hand_size - 1,
-				ennemy_mana: newState.ennemy_mana - action.value.target.template.cost,
+				player: {
+					...newState.player,
+					hand: state.player.hand.filter(
+						(c) => c.id !== action.value.target.id,
+					),
+					currentMana:
+						newState.player.currentMana - action.value.target.template.cost,
+				},
 			};
 		}
 		newState = {
 			...newState,
-			ennemy_field: [...newState.ennemy_field, action.value.target],
+			player: {
+				...newState.player,
+				field: {
+					...newState.player.field,
+					[action.value.destination]: action.value.target,
+				},
+			},
+		};
+	} else {
+		if (action.value.source.type === "Hand") {
+			newState = {
+				...newState,
+				enemy: {
+					...newState.enemy,
+					hand: newState.enemy.hand - 1,
+					currentMana:
+						newState.enemy.currentMana - action.value.target.template.cost,
+				},
+			};
+		}
+		newState = {
+			...newState,
+			enemy: {
+				...newState.enemy,
+				field: {
+					...newState.enemy.field,
+					[action.value.destination]: action.value.target,
+				},
+			},
 		};
 	}
+	console.log(newState);
 	return newState;
 };
 
 const applyAttack = (
 	state: IGameState,
-	_action: Extract<IAction, { type: "Attack" }>,
+	action: Extract<IAction, { type: "Attack" }>,
 ): IGameState => {
-	return state;
+	return {
+		...state,
+		player: {
+			...state.player,
+			field: Object.fromEntries(
+				Object.entries(state.player.field).map(([key, value]) => {
+					if (value.id === action.value.initiator) {
+						return [key, { ...value, attackCount: value.attackCount + 1 }];
+					} else {
+						return [key, value];
+					}
+				}),
+			),
+		},
+	};
 };
 
 const applyReceiveDamage = (
 	state: IGameState,
 	action: Extract<IAction, { type: "ReceiveDamage" }>,
 ): IGameState => {
+	if (action.value.target === state.player.hero.id) {
+		return {
+			...state,
+			player: {
+				...state.player,
+				hero: {
+					...state.player.hero,
+					hp: Math.max(state.player.hero.hp - action.value.amount, 0),
+				},
+			},
+		};
+	}
+	if (action.value.target === state.enemy.hero.id) {
+		return {
+			...state,
+			enemy: {
+				...state.enemy,
+				hero: {
+					...state.enemy.hero,
+					hp: Math.max(state.enemy.hero.hp - action.value.amount, 0),
+				},
+			},
+		};
+	}
+
 	return {
 		...state,
-		field: state.field.map((c) => {
-			if (c.id === action.value.target) {
-				if (c.hp <= action.value.amount) {
-					return { ...c, hp: 0 };
-				}
-				return { ...c, hp: c.hp - action.value.amount };
-			}
-			return c;
-		}),
-		ennemy_field: state.ennemy_field.map((c) => {
-			if (c.id === action.value.target) {
-				if (c.hp <= action.value.amount) {
-					return { ...c, hp: 0 };
-				}
-				return { ...c, hp: c.hp - action.value.amount };
-			}
-			return c;
-		}),
+		player: {
+			...state.player,
+			field: Object.fromEntries(
+				Object.entries(state.player.field).map(([key, c]) => {
+					if (c.id === action.value.target) {
+						if (c.defense <= action.value.amount) {
+							return [key, { ...c, defense: 0 }];
+						}
+						return [key, { ...c, defense: c.defense - action.value.amount }];
+					}
+					return [key, c];
+				}),
+			),
+		},
+		enemy: {
+			...state.enemy,
+			field: Object.fromEntries(
+				Object.entries(state.enemy.field).map(([key, c]) => {
+					if (c.id === action.value.target) {
+						if (c.defense <= action.value.amount) {
+							return [key, { ...c, defense: 0 }];
+						}
+						return [key, { ...c, defense: c.defense - action.value.amount }];
+					}
+					return [key, c];
+				}),
+			),
+		},
 	};
 };
 
@@ -98,8 +171,22 @@ const applyDestroy = (
 ): IGameState => {
 	return {
 		...state,
-		ennemy_field: state.ennemy_field.filter((c) => c.id != action.value.target),
-		field: state.field.filter((c) => c.id != action.value.target),
+		player: {
+			...state.player,
+			field: Object.fromEntries(
+				Object.entries(state.player.field).filter(
+					([_, c]) => c.id !== action.value.target,
+				),
+			),
+		},
+		enemy: {
+			...state.enemy,
+			field: Object.fromEntries(
+				Object.entries(state.enemy.field).filter(
+					([_, c]) => c.id !== action.value.target,
+				),
+			),
+		},
 	};
 };
 
@@ -108,10 +195,22 @@ const applyDraw = (
 	action: Extract<IAction, { type: "Draw" }>,
 ): IGameState => {
 	let newState = { ...state };
-	if (action.value.player === state.player_info.id) {
-		newState = { ...newState, hand: [...newState.hand, action.value.card] };
+	if (action.value.player === state.player.hero.id) {
+		newState = {
+			...newState,
+			player: {
+				...newState.player,
+				hand: [...newState.player.hand, action.value.card],
+			},
+		};
 	} else {
-		newState = { ...newState, ennemy_hand_size: newState.ennemy_hand_size + 1 };
+		newState = {
+			...newState,
+			enemy: {
+				...newState.enemy,
+				hand: newState.enemy.hand + 1,
+			},
+		};
 	}
 	return newState;
 };
@@ -122,26 +221,36 @@ const applyHeal = (
 ): IGameState => {
 	return {
 		...state,
-		field: state.field.map((c) => {
-			if (c.id === action.value.target) {
-				const healedHp = c.hp + action.value.amount;
-				if (c.template.base_hp > healedHp) {
-					return { ...c, hp: c.template.base_hp };
-				}
-				return { ...c, hp: healedHp };
-			}
-			return c;
-		}),
-		ennemy_field: state.ennemy_field.map((c) => {
-			if (c.id === action.value.target) {
-				const healedHp = c.hp + action.value.amount;
-				if (c.template.base_hp > healedHp) {
-					return { ...c, hp: c.template.base_hp };
-				}
-				return { ...c, hp: healedHp };
-			}
-			return c;
-		}),
+		player: {
+			...state.player,
+			field: Object.fromEntries(
+				Object.entries(state.player.field).map(([key, c]) => {
+					if (c.id === action.value.target) {
+						const healedDefense = c.defense + action.value.amount;
+						if (c.template.defense > healedDefense) {
+							return [key, { ...c, defense: c.template.defense }];
+						}
+						return [key, { ...c, defense: healedDefense }];
+					}
+					return [key, c];
+				}),
+			),
+		},
+		enemy: {
+			...state.enemy,
+			field: Object.fromEntries(
+				Object.entries(state.enemy.field).map(([key, c]) => {
+					if (c.id === action.value.target) {
+						const healedDefense = c.defense + action.value.amount;
+						if (c.template.defense > healedDefense) {
+							return [key, { ...c, defense: c.template.defense }];
+						}
+						return [key, { ...c, defense: healedDefense }];
+					}
+					return [key, c];
+				}),
+			),
+		},
 	};
 };
 
@@ -149,12 +258,21 @@ function applyIncreaseMaxMana(
 	state: IGameState,
 	action: Extract<IAction, { type: "IncreaseMaxMana" }>,
 ): IGameState {
-	if (action.value.player === state.player_info.id) {
-		return { ...state, base_mana: state.base_mana + action.value.amount };
+	if (action.value.player === state.player.hero.id) {
+		return {
+			...state,
+			player: {
+				...state.player,
+				maxMana: state.player.maxMana + action.value.amount,
+			},
+		};
 	} else {
 		return {
 			...state,
-			ennemy_base_mana: state.ennemy_base_mana + action.value.amount,
+			enemy: {
+				...state.enemy,
+				maxMana: state.enemy.maxMana + action.value.amount,
+			},
 		};
 	}
 }
@@ -163,10 +281,22 @@ function applyRefreshMana(
 	state: IGameState,
 	action: Extract<IAction, { type: "RefreshMana" }>,
 ): IGameState {
-	if (action.value.player === state.player_info.id) {
-		return { ...state, mana: state.mana + action.value.amount };
+	if (action.value.player === state.player.hero.id) {
+		return {
+			...state,
+			player: {
+				...state.player,
+				currentMana: state.player.currentMana + action.value.amount,
+			},
+		};
 	} else {
-		return { ...state, ennemy_mana: state.ennemy_mana + action.value.amount };
+		return {
+			...state,
+			enemy: {
+				...state.enemy,
+				currentMana: state.enemy.currentMana + action.value.amount,
+			},
+		};
 	}
 }
 
@@ -174,6 +304,5 @@ function applyWin(
 	state: IGameState,
 	action: Extract<IAction, { type: "Win" }>,
 ): IGameState {
-	return { ...state, winner_id: action.value };
+	return { ...state, winnerId: action.value };
 }
-*/

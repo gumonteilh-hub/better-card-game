@@ -1,4 +1,4 @@
-import type { IAction } from "./action";
+import type { IAction, PlayerId } from "./action";
 import type { Faction, ICardTemplate } from "./template";
 
 export interface IGameUpdate {
@@ -10,7 +10,7 @@ export interface IGameState {
 	gameId: string;
 	playerId: string;
 	turn: number;
-	winnerId?: string;
+	winnerId?: PlayerId;
 	enemy: IEnemyInfo;
 	player: IPlayerInfo;
 }
@@ -36,7 +36,7 @@ export interface IEnemyInfo {
 }
 
 export interface IHeroInfo {
-	id: string;
+	id: number;
 	name: string;
 	hp: number;
 	faction: Faction;
@@ -48,5 +48,21 @@ export interface ICard {
 	attackCount: number;
 	attack: number;
 	defense: number;
+	location: Location;
 	template: ICardTemplate;
 }
+
+export type Location =
+	| {
+			type: "Hand";
+	  }
+	| {
+			type: "Field";
+			value: number;
+	  }
+	| {
+			type: "Deck";
+	  }
+	| {
+			type: "Graveyard";
+	  };

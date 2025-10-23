@@ -11,7 +11,8 @@ export const GameContextProvider = ({
 }: {
 	children: JSX.Element;
 }) => {
-	const { isAnimating, gameState, updateGameState } = useGameEngine();
+	const { isAnimating, gameState, updateGameState, animationMap } =
+		useGameEngine();
 	const [selectedAttackingCard, setSelectedAttackingCard] = useState<number>();
 
 	const canAttackPlayer = useMemo(() => {
@@ -50,10 +51,10 @@ export const GameContextProvider = ({
 		(cardId: number | string) => {
 			if (!gameState || isAnimating || !selectedAttackingCard) return;
 
+			setSelectedAttackingCard(undefined);
 			attack(gameState.gameId, selectedAttackingCard, cardId).then((res) => {
 				updateGameState(res);
 			});
-			setSelectedAttackingCard(undefined);
 		},
 		[gameState, isAnimating, selectedAttackingCard, updateGameState],
 	);
@@ -74,6 +75,7 @@ export const GameContextProvider = ({
 				handleAttackStart,
 				handleUnselectAttackingCard,
 				canAttackPlayer,
+				animationMap,
 			}}
 		>
 			{children}

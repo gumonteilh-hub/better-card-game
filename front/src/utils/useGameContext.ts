@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import type { IGameState, IGameUpdate } from "../types/game";
+import type { AnimationState } from "./useGameEngine";
 
 interface IGameContext {
 	gameState: IGameState;
@@ -11,6 +12,7 @@ interface IGameContext {
 	handleAttackStart: (cardId: number) => void;
 	handleUnselectAttackingCard: () => void;
 	canAttackPlayer: boolean;
+	animationMap: Map<number, AnimationState>;
 }
 
 export const GameContext = createContext<IGameContext | null>(null);

@@ -1,10 +1,10 @@
 use crate::{
     error::{Error, Result},
     game::{
+        Game,
         action::Action,
         effects::{Effect, PlayerTarget, Target},
         types::{EntityId, Location, PlayerId},
-        Game,
     },
     template::convert_to_effect,
 };
@@ -154,9 +154,13 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     entity_id
                 ))
             })?;
+
+            let base_location = entity.location.clone();
+
             entity.location = Location::Field(*position);
             actions.push(Action::Summon {
-                source: entity.location.clone(),
+                source: base_location,
+                destination: *position,
                 target: entity.clone(),
                 owner: entity.owner,
             });

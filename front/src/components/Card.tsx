@@ -1,7 +1,9 @@
-import type { JSX } from "react";
+import { motion } from "framer-motion";
+import { type JSX, useMemo } from "react";
 import test from "../assets/test.png";
 import type { ICard } from "../types/game";
 import type { ICardTemplate } from "../types/template";
+import { cardVariants } from "../utils/cardVariants";
 import { canAttack } from "../utils/gameRules";
 import { useGameContext } from "../utils/useGameContext";
 import { TargetWrapper } from "./Hud";
@@ -89,10 +91,22 @@ interface ICardMiniatureProps {
 }
 
 export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
+	const { animationMap } = useGameContext();
+	const animationState = useMemo(
+		() => animationMap.get(card.id) ?? "idle",
+		[animationMap, card.id],
+	);
 	return (
 		<div className="card-miniature-container">
 			<ActionWrapper side={side} card={card} type={type}>
-				<div className={`card card-miniature untransformed ${type}`}>
+				<motion.div
+					className={`card card-miniature untransformed ${type}`}
+					variants={cardVariants}
+					animate={animationState}
+					style={{ willChange: "transform, opacity, filter" }}
+					layout
+					layoutId={`card-${card.id}`}
+				>
 					<div className="card-body">
 						<div className="card-image">
 							<img src={test} alt="card" />
@@ -106,7 +120,7 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 							<span>{card.defense}</span>
 						</div>
 					</div>
-				</div>
+				</motion.div>
 			</ActionWrapper>
 			<div className={`card-overview untransformed`}>
 				<Card card={card} />
@@ -127,7 +141,12 @@ const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
 		handleAttackStart,
 		selectedAttackingCard,
 		handleUnselectAttackingCard,
+		isAnimating,
 	} = useGameContext();
+
+	if (isAnimating) {
+		return children;
+	}
 
 	if (type) {
 		if (side === "player")

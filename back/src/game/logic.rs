@@ -74,8 +74,8 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let entity_targets = resolve_field_target(*initiator, target, context)?;
             for target_id in entity_targets {
                 let target = context.get_mut_entity(target_id)?;
-                target.defense = target.defense.saturating_sub(*amount);
-                if target.defense == 0 {
+                target.hp = target.hp.saturating_sub(*amount);
+                if target.hp == 0 {
                     context.effect_queue.push_back(Effect::Destroy {
                         initiator: *initiator,
                         target: Target::Id(target_id),
@@ -131,10 +131,10 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let entity_targets = resolve_field_target(*initiator, target, context)?;
             for target_id in entity_targets {
                 let entity = context.get_mut_entity(target_id)?;
-                let max_hp = entity.template.defense;
-                let old_hp = entity.defense;
-                entity.defense = (entity.defense + *amount).min(max_hp);
-                let effective_heal = entity.defense - old_hp;
+                let max_hp = entity.template.hp;
+                let old_hp = entity.hp;
+                entity.hp = (entity.hp + *amount).min(max_hp);
+                let effective_heal = entity.hp - old_hp;
 
                 if effective_heal > 0 {
                     actions.push(Action::Heal {

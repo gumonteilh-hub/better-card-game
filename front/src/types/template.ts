@@ -13,7 +13,7 @@ export interface ICardTemplate {
 	description: string;
 	cost: number;
 	attack: number;
-	defense: number;
+	hp: number;
 	keywords?: Keywords[];
 	faction: Faction;
 }

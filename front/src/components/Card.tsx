@@ -38,8 +38,8 @@ export const Card = ({ card }: ICardProps) => {
 					<span>{card.attack}</span>
 				</div>
 				<div className="tribut">{card.template.faction}</div>
-				<div className="card-defense">
-					<span>{card.defense}</span>
+				<div className="card-hp">
+					<span>{card.hp}</span>
 				</div>
 			</div>
 		</div>
@@ -76,8 +76,8 @@ export const CardTemplate = ({ card }: ICardTemplateProps) => {
 					<span>{card.attack}</span>
 				</div>
 				<div className="tribut">{card.faction}</div>
-				<div className="card-defense">
-					<span>{card.defense}</span>
+				<div className="card-hp">
+					<span>{card.hp}</span>
 				</div>
 			</div>
 		</div>
@@ -99,28 +99,30 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 	return (
 		<div className="card-miniature-container">
 			<ActionWrapper side={side} card={card} type={type}>
-				<motion.div
-					className={`card card-miniature untransformed ${type}`}
-					variants={cardVariants}
-					animate={animationState}
-					style={{ willChange: "transform, opacity, filter" }}
-					layout
-					layoutId={`card-${card.id}`}
-				>
-					<div className="card-body">
-						<div className="card-image">
-							<img src={test} alt="card" />
+				<div className="untransformed">
+					<motion.div
+						className={`card card-miniature  ${type}`}
+						variants={cardVariants}
+						animate={animationState}
+						style={{ willChange: "transform, opacity, filter" }}
+						layout
+						layoutId={`card-${card.id}`}
+					>
+						<div className="card-body">
+							<div className="card-image">
+								<img src={test} alt="card" />
+							</div>
 						</div>
-					</div>
-					<div className="card-footer">
-						<div className="card-attack">
-							<span>{card.attack}</span>
+						<div className="card-footer">
+							<div className="card-attack">
+								<span>{card.attack}</span>
+							</div>
+							<div className="card-hp">
+								<span>{card.hp}</span>
+							</div>
 						</div>
-						<div className="card-defense">
-							<span>{card.defense}</span>
-						</div>
-					</div>
-				</motion.div>
+					</motion.div>
+				</div>
 			</ActionWrapper>
 			<div className={`card-overview untransformed`}>
 				<Card card={card} />

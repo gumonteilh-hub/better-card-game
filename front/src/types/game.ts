@@ -47,7 +47,7 @@ export interface ICard {
 	asleep: boolean;
 	attackCount: number;
 	attack: number;
-	defense: number;
+	hp: number;
 	location: Location;
 	template: ICardTemplate;
 }

@@ -43,23 +43,23 @@ fn get_available_attackers(game: &Game, player_id: PlayerId) -> Vec<EntityId> {
 fn evaluate_attack_control(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.attack.min(target.defense);
+    let damage_dealt = attacker.attack.min(target.hp);
     score += damage_dealt as f32 * CREATURE_VALUE_HP_WEIGHT;
 
-    if damage_dealt >= target.defense {
+    if damage_dealt >= target.hp {
         score += target.attack as f32 * CREATURE_VALUE_ATK_WEIGHT;
     }
 
-    let damage_received = target.attack.min(attacker.defense);
+    let damage_received = target.attack.min(attacker.hp);
     score -= damage_received as f32 * CREATURE_VALUE_HP_WEIGHT;
 
-    if damage_received >= attacker.defense {
+    if damage_received >= attacker.hp {
         score -= attacker.attack as f32 * CREATURE_VALUE_ATK_WEIGHT;
     } else {
         score += SURVIVAL_BONUS;
     }
 
-    let attacker_missing_hp = attacker.template.defense.saturating_sub(attacker.defense);
+    let attacker_missing_hp = attacker.template.hp.saturating_sub(attacker.hp);
     if attacker_missing_hp > 0 {
         score += WOUNDED_ATTACKER_BONUS * attacker_missing_hp as f32;
     }
@@ -70,10 +70,10 @@ fn evaluate_attack_control(attacker: &CardInstance, target: &CardInstance) -> f3
 fn evaluate_attack_survival(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.attack.min(target.defense);
+    let damage_dealt = attacker.attack.min(target.hp);
     score += damage_dealt as f32 * 10.0;
 
-    if damage_dealt >= target.defense {
+    if damage_dealt >= target.hp {
         score += 100.0;
         score += target.attack as f32 * 5.0;
     }
@@ -84,15 +84,15 @@ fn evaluate_attack_survival(attacker: &CardInstance, target: &CardInstance) -> f
 fn evaluate_attack_aggressive(attacker: &CardInstance, target: &CardInstance) -> f32 {
     let mut score = 0.0;
 
-    let damage_dealt = attacker.attack.min(target.defense);
+    let damage_dealt = attacker.attack.min(target.hp);
 
-    if damage_dealt >= target.defense {
+    if damage_dealt >= target.hp {
         score += 50.0;
     } else {
         score += damage_dealt as f32;
     }
 
-    let overkill = attacker.attack.saturating_sub(target.defense);
+    let overkill = attacker.attack.saturating_sub(target.hp);
     score -= overkill as f32 * 0.5;
 
     score

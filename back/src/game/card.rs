@@ -18,7 +18,7 @@ pub struct CardTemplate {
     pub name: String,
     pub description: String,
     pub attack: usize,
-    pub defense: usize,
+    pub hp: usize,
     pub keywords: Vec<Keyword>,
     pub faction: Faction,
     #[serde(default)]
@@ -39,7 +39,7 @@ pub struct CardInstance {
     pub owner: PlayerId,
     pub location: Location,
     pub attack: usize,
-    pub defense: usize,
+    pub hp: usize,
     pub asleep: bool,
     pub attack_count: usize,
 }
@@ -51,7 +51,7 @@ impl CardInstance {
             owner: player_id,
             location: Location::Deck,
             attack: card.attack,
-            defense: card.defense,
+            hp: card.hp,
             asleep: !card.keywords.contains(&Keyword::Charge),
             attack_count: 0,
         }

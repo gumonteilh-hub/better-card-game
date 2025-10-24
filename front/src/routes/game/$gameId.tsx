@@ -1,17 +1,18 @@
 import { DndContext } from "@dnd-kit/core";
 import { createFileRoute } from "@tanstack/react-router";
-import PlayerBoard from "../components/PlayerBoard";
-import { endTurn, playCard } from "../game.service";
-import { GameContextProvider } from "../utils/GameContextProvider";
-import { useGameContext } from "../utils/useGameContext";
+import PlayerBoard from "../../components/PlayerBoard";
+import { endTurn, playCard } from "../../game.service";
+import { useGameContext } from "../../utils/useGameContext";
+import { GameContextProvider } from "../../utils/GameContextProvider";
 
-export const Route = createFileRoute("/game")({
+export const Route = createFileRoute("/game/$gameId")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const { gameId } = Route.useParams();
 	return (
-		<GameContextProvider>
+		<GameContextProvider gameId={gameId}>
 			<Game></Game>
 		</GameContextProvider>
 	);

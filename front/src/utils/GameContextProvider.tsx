@@ -7,12 +7,14 @@ export const defensePositions = [1, 2, 4, 5, 7];
 export const attackPositions = [0, 2, 3, 5, 6];
 
 export const GameContextProvider = ({
+	gameId,
 	children,
 }: {
+	gameId: string;
 	children: JSX.Element;
 }) => {
 	const { isAnimating, gameState, updateGameState, animationMap } =
-		useGameEngine();
+		useGameEngine(gameId);
 	const [selectedAttackingCard, setSelectedAttackingCard] = useState<number>();
 
 	const canAttackPlayer = useMemo(() => {

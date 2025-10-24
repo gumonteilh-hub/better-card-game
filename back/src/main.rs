@@ -35,13 +35,14 @@ async fn main() {
     });
 
     let api = Router::new()
-        .route("/start", post(start_game))
+        .route("/{game_id}", get(game_state))
         .route("/{game_id}/attack/{initiator_id}/{target_id}", post(attack))
         .route("/{game_id}/play_card/{card_id}/{position}", post(play_card))
         .route("/{game_id}/end_turn", post(end_turn));
 
     let app = Router::new()
         .route("/collection/{faction}", get(collection))
+        .route("/start", post(start_game))
         .nest("/game", api)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
@@ -68,16 +69,17 @@ async fn collection(
 async fn start_game(
     State(state): State<Arc<AppState>>,
     LoggedJson(payload): LoggedJson<back::UserDeck>,
-) -> ApiResult<Json<back::GameViewResponse>> {
+) -> ApiResult<Json<String>> {
     tracing::info!("Received start_game request with deck: {:?}", payload);
-    let (game_view, game_state) = back::start_game(payload)?;
+    let game_state = back::start_game(payload)?;
+    let game_id = game_state.game_id.to_string();
     state
         .game_states
         .lock()
         .await
         .insert(game_state.game_id, game_state);
     tracing::info!("Game started successfully");
-    return Ok(Json(game_view));
+    return Ok(Json(game_id));
 }
 
 #[debug_handler]
@@ -95,6 +97,21 @@ async fn play_card(
         Some(mut game) => {
             let game_view = back::play_card(&mut game, card_id, position)?;
             tracing::info!("Play card performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
+}
+
+#[debug_handler]
+async fn game_state(
+    State(state): State<Arc<AppState>>,
+    Path(game_id): Path<Uuid>,
+) -> ApiResult<Json<back::PublicGameState>> {
+    tracing::info!("Received get game_state  request for game: {}", game_id);
+    match state.game_states.lock().await.get(&game_id) {
+        Some(game) => {
+            let game_view = back::PublicGameState::new(game)?;
             Ok(Json(game_view))
         }
         None => Err(back::error::Error::GameNotStarted),

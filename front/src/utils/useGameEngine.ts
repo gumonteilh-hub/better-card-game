@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { startGame } from "../game.service";
+import { getGameInfo } from "../game.service";
 import type { ActionType, IAction } from "../types/action";
 import type { IGameState, IGameUpdate } from "../types/game";
 import { getAnimationDuration } from "./cardVariants";
 import { applyAction } from "./stateReducer";
-import { useUserInfo } from "./useUserInfo";
 
 const animationBefore: ActionType[] = ["Destroy", "Win"];
 
-export const useGameEngine = () => {
-	const { userInfos } = useUserInfo();
+export const useGameEngine = (gameId: string) => {
 	const [gameState, setGameState] = useState<IGameState>();
 	const [finalGameState, setFinalGameState] = useState<IGameState>();
 	const [actionQueue, setActionQueue] = useState<IAction[]>([]);
@@ -17,6 +15,13 @@ export const useGameEngine = () => {
 	const [animationMap, setAnimationMap] = useState<Map<number, AnimationState>>(
 		new Map(),
 	);
+
+	useEffect(() => {
+		getGameInfo(gameId).then((res) => {
+			setGameState(res);
+			setFinalGameState(res);
+		});
+	}, [gameId]);
 
 	const updateGameState = useCallback((newState: IGameUpdate) => {
 		setActionQueue(newState.actions);
@@ -67,15 +72,6 @@ export const useGameEngine = () => {
 			}
 		}
 	}, [actionQueue, gameState, isAnimating, finalGameState]);
-
-	useEffect(() => {
-		if (userInfos?.deck) {
-			startGame(userInfos.deck).then((res) => {
-				setGameState(res.gameView);
-				setFinalGameState(res.gameView);
-			});
-		}
-	}, [userInfos]);
 
 	return { isAnimating, gameState, updateGameState, animationMap };
 };

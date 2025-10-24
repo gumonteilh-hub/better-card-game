@@ -4,7 +4,7 @@
 pub use crate::collection::Faction;
 pub use crate::game::Game;
 pub use crate::game::card::CardTemplate;
-use crate::game::view::PublicGameState;
+pub use crate::game::view::PublicGameState;
 use crate::game::{action::Action, types::TemplateId};
 
 mod collection;
@@ -33,7 +33,7 @@ pub fn get_collection(faction: Faction) -> Vec<CardTemplate> {
     collection::get_collection(faction)
 }
 
-pub fn start_game(deck: UserDeck) -> Result<(GameViewResponse, Game)> {
+pub fn start_game(deck: UserDeck) -> Result<Game> {
     let ia_deck = collection::get_ia_deck();
     let ia_faction = ia_deck.faction;
     let player_faction = deck.faction;
@@ -44,10 +44,9 @@ pub fn start_game(deck: UserDeck) -> Result<(GameViewResponse, Game)> {
         get_collection(ia_faction),
     )?;
 
-    let actions = game_state.compute_commands()?;
-    let game_view = PublicGameState::new(&game_state)?;
+    game_state.compute_commands()?;
 
-    Ok((GameViewResponse { actions, game_view }, game_state))
+    Ok(game_state)
 }
 
 pub fn play_card(

@@ -25,7 +25,6 @@ Plateau:
     - Il faut pouvoir payer le cout du sort pour l’activer.
     - Si le sort est joué alors son coût sera déduis du prochain tour de jeu de son propriétaire.
     - Le sort peut être repris en main au prochain tour et joué normalement s’il n’a pas été utilisé.
-- 1 cimetière
 
 Tour de jeu:
 

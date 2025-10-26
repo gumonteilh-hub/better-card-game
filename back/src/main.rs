@@ -37,6 +37,7 @@ async fn main() {
     let api = Router::new()
         .route("/{game_id}", get(game_state))
         .route("/{game_id}/attack/{initiator_id}/{target_id}", post(attack))
+        .route("/{game_id}/move/{card_id}/{target_pos}", post(move_card))
         .route("/{game_id}/play_card/{card_id}/{position}", post(play_card))
         .route("/{game_id}/end_turn", post(end_turn));
 
@@ -133,6 +134,27 @@ async fn attack(
         Some(mut game) => {
             let game_view = back::attack(&mut game, initiator_id, target_id)?;
             tracing::info!("Attack performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
+}
+
+#[debug_handler]
+async fn move_card(
+    State(state): State<Arc<AppState>>,
+    Path((game_id, card_id, target_pos)): Path<(Uuid, usize, usize)>,
+) -> ApiResult<Json<back::GameViewResponse>> {
+    tracing::info!(
+        "Received move_card request for game: {}, with card: {}, moving to position: {}",
+        game_id,
+        card_id,
+        target_pos
+    );
+    match state.game_states.lock().await.get_mut(&game_id) {
+        Some(mut game) => {
+            let game_view = back::move_card(&mut game, card_id, target_pos)?;
+            tracing::info!("Move performed successfully");
             Ok(Json(game_view))
         }
         None => Err(back::error::Error::GameNotStarted),

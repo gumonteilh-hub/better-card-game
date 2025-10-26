@@ -1,10 +1,23 @@
 import { type JSX, useCallback, useMemo, useState } from "react";
-import { attack } from "../game.service";
+import { attack, move } from "../game.service";
 import { GameContext } from "./useGameContext";
 import { useGameEngine } from "./useGameEngine";
 
-export const defensePositions = [1, 2, 4, 5, 7];
 export const attackPositions = [0, 2, 3, 5, 6];
+export const defensePositions = [1, 2, 4, 5, 7];
+
+export type IInputMode = "attack" | "move";
+
+const linkedPositions = [
+	[1, 2],
+	[0, 2],
+	[0, 1, 3, 4],
+	[2, 4, 5],
+	[2, 3, 5],
+	[3, 4, 6, 7],
+	[5, 7],
+	[5, 6],
+];
 
 export const GameContextProvider = ({
 	gameId,
@@ -15,10 +28,12 @@ export const GameContextProvider = ({
 }) => {
 	const { isAnimating, gameState, updateGameState, animationMap } =
 		useGameEngine(gameId);
-	const [selectedAttackingCard, setSelectedAttackingCard] = useState<number>();
+	const [selectedCard, setSelectedCard] = useState<number>();
+	const [inputMode, setInputMode] = useState<IInputMode>("attack");
 
 	const canAttackPlayer = useMemo(() => {
-		if (!gameState || !selectedAttackingCard || isAnimating) return false;
+		if (!gameState || !selectedCard || isAnimating || inputMode !== "attack")
+			return false;
 
 		for (const pos of defensePositions) {
 			if (gameState.enemy.field[pos] !== undefined) {
@@ -27,7 +42,21 @@ export const GameContextProvider = ({
 		}
 
 		return true;
-	}, [gameState, selectedAttackingCard, isAnimating]);
+	}, [gameState, selectedCard, isAnimating, inputMode]);
+
+	const moveTargets = useMemo(() => {
+		if (!gameState || isAnimating || inputMode !== "move" || !selectedCard)
+			return [];
+
+		const card = Object.entries(gameState?.player.field).find(
+			([_, value]) => value.id === selectedCard,
+		);
+		if (!card) return [];
+
+		const [startingPosition, _] = card;
+
+		return linkedPositions[parseInt(startingPosition, 10)];
+	}, [gameState, inputMode, isAnimating, selectedCard]);
 
 	const playableCards = useMemo(() => {
 		if (!gameState || isAnimating) return [];
@@ -37,29 +66,46 @@ export const GameContextProvider = ({
 			.map((c) => c.id);
 	}, [gameState, isAnimating]);
 
-	const handleAttackStart = useCallback(
+	const handleSelectCard = useCallback(
 		(cardId: number) => {
 			if (!gameState || isAnimating) return;
-			setSelectedAttackingCard(cardId);
+			if (cardId === selectedCard) {
+				setSelectedCard(undefined);
+			} else {
+				setSelectedCard(cardId);
+			}
 		},
-		[gameState, isAnimating],
+		[gameState, isAnimating, selectedCard],
 	);
 
-	const handleUnselectAttackingCard = useCallback(() => {
-		setSelectedAttackingCard(undefined);
-	}, []);
+	const handleMoveSelect = useCallback(
+		(pos: number) => {
+			if (!gameState || isAnimating || !selectedCard) return;
 
-	const handleTargetSelect = useCallback(
-		(cardId: number | string) => {
-			if (!gameState || isAnimating || !selectedAttackingCard) return;
-
-			setSelectedAttackingCard(undefined);
-			attack(gameState.gameId, selectedAttackingCard, cardId).then((res) => {
+			setSelectedCard(undefined);
+			move(gameState.gameId, selectedCard, pos).then((res) => {
 				updateGameState(res);
 			});
 		},
-		[gameState, isAnimating, selectedAttackingCard, updateGameState],
+		[gameState, isAnimating, selectedCard, updateGameState],
 	);
+
+	const handleTargetSelect = useCallback(
+		(cardId: number | string) => {
+			if (!gameState || isAnimating || !selectedCard) return;
+
+			setSelectedCard(undefined);
+			attack(gameState.gameId, selectedCard, cardId).then((res) => {
+				updateGameState(res);
+			});
+		},
+		[gameState, isAnimating, selectedCard, updateGameState],
+	);
+
+	const handleSetInputMode = useCallback((inputMode: IInputMode) => {
+		setSelectedCard(undefined);
+		setInputMode(inputMode);
+	}, []);
 
 	if (!gameState) {
 		return <>Loading</>;
@@ -70,14 +116,17 @@ export const GameContextProvider = ({
 			value={{
 				gameState,
 				isAnimating,
-				selectedAttackingCard,
+				selectedCard,
 				updateGameState,
 				handleTargetSelect,
+				handleMoveSelect,
 				playableCards,
-				handleAttackStart,
-				handleUnselectAttackingCard,
+				handleSelectCard,
 				canAttackPlayer,
 				animationMap,
+				inputMode,
+				handleSetInputMode,
+				moveTargets,
 			}}
 		>
 			{children}

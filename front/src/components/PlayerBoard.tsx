@@ -7,7 +7,7 @@ import {
 	Deck,
 	FieldSlot,
 	HeroPortrait,
-	ManaHud,
+	Hud,
 	TrapCardSlot,
 } from "./Hud";
 
@@ -47,7 +47,7 @@ const PlayerBoard = ({
 		<div className={`board ${side}`}>
 			<div className="left-panel">
 				<div className="hud-slot">
-					<ManaHud current={currentMana} max={maxMana} />
+					<Hud side={side} currentMana={currentMana} maxMana={maxMana} />
 				</div>
 				<div className="hero-slot">
 					<HeroPortrait hero={hero} side={side} />
@@ -58,19 +58,20 @@ const PlayerBoard = ({
 				<div className="hand">
 					{side === "player"
 						? hand.map((c, index) => (
-							<Draggable
-								key={c.id}
-								id={`card-${c.id}`}
-								cardId={c.id}
-								enabled={playableCards?.includes(c.id) ?? false}
-								style={{ zIndex: index }}
-							>
-								<Card card={c} />
-							</Draggable>
-						))
-						: hand > 0 && [...Array(hand).keys()].map((index) => (
-							<CardBack key={index}></CardBack>
-						))}
+								<Draggable
+									key={c.id}
+									id={`card-${c.id}`}
+									cardId={c.id}
+									enabled={playableCards?.includes(c.id) ?? false}
+									style={{ zIndex: index }}
+								>
+									<Card card={c} />
+								</Draggable>
+							))
+						: hand > 0 &&
+							[...Array(hand).keys()].map((index) => (
+								<CardBack key={index}></CardBack>
+							))}
 				</div>
 			</div>
 
@@ -126,11 +127,11 @@ const CardWrapper = ({ card, type, side, position }: ICardWrapperProps) => {
 		if (side === "player") {
 			return (
 				<Droppable id={`field-${position}`} position={position}>
-					<FieldSlot type={type} />
+					<FieldSlot side={side} position={position} type={type} />
 				</Droppable>
 			);
 		} else {
-			return <FieldSlot type={type} />;
+			return <FieldSlot side={side} position={position} type={type} />;
 		}
 	}
 };

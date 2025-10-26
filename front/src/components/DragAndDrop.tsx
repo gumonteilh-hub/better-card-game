@@ -49,9 +49,9 @@ export function Draggable({
 	});
 	const style = transform
 		? {
-			transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-			...externalStyle,
-		}
+				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+				...externalStyle,
+			}
 		: externalStyle;
 
 	return (

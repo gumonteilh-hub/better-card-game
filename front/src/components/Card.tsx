@@ -4,7 +4,7 @@ import test from "../assets/test.png";
 import type { ICard } from "../types/game";
 import type { ICardTemplate } from "../types/template";
 import { cardVariants } from "../utils/cardVariants";
-import { canAttack } from "../utils/gameRules";
+import { attackReady } from "../utils/gameRules";
 import { useGameContext } from "../utils/useGameContext";
 import { TargetWrapper } from "./Hud";
 
@@ -139,55 +139,54 @@ interface IActionWrapperProps {
 }
 
 const ActionWrapper = ({ children, type, side, card }: IActionWrapperProps) => {
-	const {
-		handleAttackStart,
-		selectedAttackingCard,
-		handleUnselectAttackingCard,
-		isAnimating,
-	} = useGameContext();
+	const { handleSelectCard, selectedCard, isAnimating, inputMode, gameState } =
+		useGameContext();
+
+	const canMove = useMemo(
+		() =>
+			gameState.player.moveCount > 0 &&
+			(!selectedCard || selectedCard === card.id),
+		[card.id, selectedCard, gameState.player.moveCount],
+	);
+
+	const canAttack = useMemo(
+		() =>
+			(!selectedCard || selectedCard === card.id) &&
+			(type === "attack" || type === "both") &&
+			attackReady(card),
+		[card.id, selectedCard, type, card],
+	);
+
+	const canBeAttacked = useMemo(
+		() => inputMode === "attack" && selectedCard,
+		[inputMode, selectedCard],
+	);
 
 	if (isAnimating) {
 		return children;
 	}
 
-	if (type) {
-		if (side === "player")
-			if (selectedAttackingCard && selectedAttackingCard === card.id) {
-				return (
-					<button
-						className="start-attack-button"
-						type="button"
-						onClick={() => handleUnselectAttackingCard()}
-					>
-						{children}
-					</button>
-				);
-			}
+	if (side === "player") {
 		if (
-			!selectedAttackingCard &&
-			(type === "attack" || type === "both") &&
-			canAttack(card)
+			(inputMode === "move" && canMove) ||
+			(inputMode === "attack" && canAttack)
 		) {
 			return (
 				<button
 					className="start-attack-button"
 					type="button"
-					onClick={() => handleAttackStart(card.id)}
+					onClick={() => handleSelectCard(card.id)}
 				>
 					{children}
 				</button>
 			);
 		}
-		if (side === "enemy") {
-			return (
-				<TargetWrapper
-					active={selectedAttackingCard !== undefined}
-					id={card.id}
-				>
-					{children}
-				</TargetWrapper>
-			);
-		}
+	} else {
+		return (
+			<TargetWrapper active={!!canBeAttacked} id={card.id}>
+				{children}
+			</TargetWrapper>
+		);
 	}
 
 	return children;

@@ -50,31 +50,39 @@ pub fn start_game(deck: UserDeck) -> Result<Game> {
 }
 
 pub fn play_card(
-    game_sate: &mut Game,
+    game_state: &mut Game,
     card_id: usize,
     position: usize,
 ) -> Result<GameViewResponse> {
-    game_sate.play_card(card_id, position)?;
-    let actions = game_sate.compute_commands()?;
-    let game_view = PublicGameState::new(game_sate)?;
+    game_state.play_card(card_id, position)?;
+    let actions = game_state.compute_commands()?;
+    let game_view = PublicGameState::new(game_state)?;
 
     let response = GameViewResponse { actions, game_view };
     Ok(response)
 }
 
-pub fn end_turn(game_sate: &mut Game) -> Result<GameViewResponse> {
-    let mut actions = game_sate.next_turn()?;
-    let mut other_actions = game_sate.compute_commands()?;
+pub fn end_turn(game_state: &mut Game) -> Result<GameViewResponse> {
+    let mut actions = game_state.next_turn()?;
+    let mut other_actions = game_state.compute_commands()?;
     actions.append(&mut other_actions);
-    let game_view = PublicGameState::new(game_sate)?;
+    let game_view = PublicGameState::new(game_state)?;
 
     Ok(GameViewResponse { actions, game_view })
 }
 
-pub fn attack(game_sate: &mut Game, initiator: usize, target: usize) -> Result<GameViewResponse> {
-    game_sate.attack(initiator, target)?;
-    let actions = game_sate.compute_commands()?;
-    let game_view = PublicGameState::new(game_sate)?;
+pub fn attack(game_state: &mut Game, initiator: usize, target: usize) -> Result<GameViewResponse> {
+    game_state.attack(initiator, target)?;
+    let actions = game_state.compute_commands()?;
+    let game_view = PublicGameState::new(game_state)?;
 
     Ok(GameViewResponse { actions, game_view })
+}
+
+pub fn move_card(game_state: &mut Game, card_id: usize, position: usize) -> Result<GameViewResponse> {
+    game_state.move_card(card_id, position)?;
+    let actions = game_state.compute_commands()?;
+    let game_view = PublicGameState::new(game_state)?;
+
+    Ok(GameViewResponse { actions: actions, game_view: game_view })
 }

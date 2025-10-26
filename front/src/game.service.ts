@@ -58,3 +58,16 @@ export const attack = async (
 		},
 	);
 };
+
+export const move = async (
+	gameId: string,
+	cardId: number,
+	targetPosition: number,
+): Promise<IGameUpdate> => {
+	return apiFetch<IGameUpdate>(
+		`/api/game/${gameId}/move/${cardId}/${targetPosition}`,
+		{
+			method: "POST",
+		},
+	);
+};

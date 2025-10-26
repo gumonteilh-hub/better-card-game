@@ -26,6 +26,20 @@ use self::types::{EntityId, PlayerId};
 pub const DEFENSE_POSITIONS: [usize; 5] = [1, 2, 4, 5, 7];
 pub const ATTACK_POSITIONS: [usize; 5] = [0, 2, 3, 5, 6];
 
+fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
+    match position {
+        0 => Ok(vec![1, 2]),
+        1 => Ok(vec![0, 2]),
+        2 => Ok(vec![0, 1, 3, 4]),
+        3 => Ok(vec![2, 4, 5]),
+        4 => Ok(vec![2, 3, 5]),
+        5 => Ok(vec![3, 4, 6, 7]),
+        6 => Ok(vec![5, 7]),
+        7 => Ok(vec![5, 6]),
+        _ => Err(Error::Game("Invalid starting position".into())),
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Game {
     pub game_id: uuid::Uuid,
@@ -111,6 +125,47 @@ impl Game {
         })
     }
 
+    pub fn move_card(&mut self, card_id: EntityId, position: usize) -> Result<()> {
+        let card = self
+            .entities
+            .get(&card_id)
+            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?;
+
+        if card.owner != self.current_player {
+            return Err(Error::Game("You can only move your monsters".into()));
+        }
+
+        let starting_position = match card.location {
+            Location::Field(pos) => pos,
+            _ => return Err(Error::Game("Card must be on the field".into())),
+        };
+
+        if !get_linked_positions(starting_position)?.contains(&position) {
+            return Err(Error::Game("Target position is not valid".into()));
+        }
+
+        match self.get_field(card.owner).get(&position) {
+            Some(_) => return Err(Error::Game("You can't move to a position not empty".into())),
+            None => (),
+        }
+
+        if self.get_player(self.current_player)?.move_count <= 0 {
+            return Err(Error::Game("You don't have any move left".into()));
+        }
+
+        let owner = self.get_mut_player(self.current_player)?;
+        owner.move_count -= 1;
+
+        let card = self
+            .entities
+            .get_mut(&card_id)
+            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?;
+
+        card.location = Location::Field(position);
+
+        Ok(())
+    }
+
     pub fn play_card(&mut self, card_id: EntityId, position: usize) -> Result<()> {
         let owner = self
             .entities
@@ -177,12 +232,14 @@ impl Game {
             });
         }
 
-        let base_mana = self.get_mut_player(self.current_player)?.base_mana;
+        let base_mana = self.get_player(self.current_player)?.base_mana;
         self.effect_queue.push_back(Effect::RefreshMana {
             initiator: self.current_player,
             player: effects::PlayerTarget::Player,
             amount: base_mana + 1,
         });
+
+        self.get_mut_player(self.current_player)?.move_count = 3;
 
         for (_, monster) in self.get_mut_field(self.current_player) {
             monster.attack_count = 0;

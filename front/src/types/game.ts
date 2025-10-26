@@ -20,6 +20,8 @@ export interface IPlayerInfo {
 	field: Record<number, ICard>;
 	maxMana: number;
 	currentMana: number;
+	moveCount: number;
+	maxMove: number;
 	hand: ICard[];
 	hero: IHeroInfo;
 	deckSize: number;

@@ -36,7 +36,7 @@
 
 		.hud-slot {
 			height: 40%;
-			width: 70%;
+			width: 100%;
 			display: flex;
 			align-items: flex-end;
 			justify-content: flex-start;
@@ -44,7 +44,7 @@
 
 		.hero-slot {
 			width: 90%;
-			height: 60%;
+			height: 55%;
 		}
 	}
 
@@ -98,7 +98,7 @@
 			width: 100%;
 			display: flex;
 			justify-content: center;
-			gap: 5px
+			gap: 5px;
 		}
 
 		.is-playable-highlight {
@@ -123,11 +123,11 @@
 			z-index: -1;
 		}
 
-		.hand>* {
+		.hand > * {
 			position: relative;
 		}
 
-		.hand>*:hover:has(.card) {
+		.hand > *:hover:has(.card) {
 			transform: translateY(calc(var(--card-heigh) * -0.7)) scale(1.1);
 			/* biome-ignore lint/complexity/noImportantStyles: needed to override React style */
 			z-index: 100 !important;
@@ -137,11 +137,11 @@
 			gap: 0;
 		}
 
-		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8)))>* {
+		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8))) > * {
 			margin-left: -45px;
 		}
 
-		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8)))>*:first-child {
+		.hand:has(> *:nth-child(6)):not(:has(> *:nth-child(8))) > *:first-child {
 			margin-left: 0;
 		}
 
@@ -149,11 +149,11 @@
 			gap: 0;
 		}
 
-		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8)))>* {
+		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8))) > * {
 			margin-left: -65px;
 		}
 
-		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8)))>*:first-child {
+		.hand:has(> *:nth-child(7)):not(:has(> *:nth-child(8))) > *:first-child {
 			margin-left: 0;
 		}
 
@@ -161,11 +161,11 @@
 			gap: 0;
 		}
 
-		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9)))>* {
+		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9))) > * {
 			margin-left: -85px;
 		}
 
-		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9)))>*:first-child {
+		.hand:has(> *:nth-child(8)):not(:has(> *:nth-child(9))) > *:first-child {
 			margin-left: 0;
 		}
 
@@ -173,11 +173,11 @@
 			gap: 0;
 		}
 
-		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10)))>* {
+		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10))) > * {
 			margin-left: -95px;
 		}
 
-		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10)))>*:first-child {
+		.hand:has(> *:nth-child(9)):not(:has(> *:nth-child(10))) > *:first-child {
 			margin-left: 0;
 		}
 
@@ -185,12 +185,12 @@
 			gap: 0;
 		}
 
-		.hand:has(> *:nth-child(10))>* {
+		.hand:has(> *:nth-child(10)) > * {
 			margin-left: -105px;
 		}
 
 		/* biome-ignore lint/style/noDescendingSpecificity: useless rule */
-		.player-hand:has(> *:nth-child(10))>*:first-child {
+		.player-hand:has(> *:nth-child(10)) > *:first-child {
 			margin-left: 0;
 		}
 	}

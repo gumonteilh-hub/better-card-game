@@ -1,7 +1,9 @@
 import { type JSX, useMemo } from "react";
+import attack from "../assets/attack_button.png";
 import demon from "../assets/hero-demon.png";
 import dragon from "../assets/hero-dragon.png";
 import human from "../assets/hero-human.png";
+import move from "../assets/move_button.png";
 import shield from "../assets/shield.svg";
 import sword from "../assets/sword.svg";
 import type { ICard, IHeroInfo } from "../types/game";
@@ -138,22 +140,52 @@ export const ManaHud = ({ current, max }: IManaHudProps) => {
 
 interface IFieldSlotProps {
 	type: "attack" | "defense" | "both";
+	side: "enemy" | "player";
+	position: number;
 }
 
-export const FieldSlot = ({ type }: IFieldSlotProps) => {
+export const FieldSlot = ({ type, position, side }: IFieldSlotProps) => {
+	const { moveTargets } = useGameContext();
+
 	return (
-		<div className={`field-slot ${type}`}>
-			{(type === "defense" || type === "both") && (
-				<img className="shield" src={shield} aria-hidden />
-			)}
-			{(type === "attack" || type === "both") && (
-				<img className="sword" src={sword} aria-hidden />
-			)}
-		</div>
+		<MoveWrapper
+			active={moveTargets.includes(position) && side === "player"}
+			id={position}
+		>
+			<div className={`field-slot ${type}`}>
+				{(type === "defense" || type === "both") && (
+					<img className="shield" src={shield} aria-hidden />
+				)}
+				{(type === "attack" || type === "both") && (
+					<img className="sword" src={sword} aria-hidden />
+				)}
+			</div>
+		</MoveWrapper>
 	);
 };
 
-const HeartIcon = (props: React.SVGProps<SVGSVGElement>) => {
+interface IMoveWrapperProps {
+	active: boolean;
+	children: JSX.Element;
+	id: number;
+}
+
+export const MoveWrapper = ({ active, children, id }: IMoveWrapperProps) => {
+	const { handleMoveSelect } = useGameContext();
+	if (!active) return children;
+
+	return (
+		<button
+			type="button"
+			className="select-move-button"
+			onClick={() => handleMoveSelect(id)}
+		>
+			{children}
+		</button>
+	);
+};
+
+export const HeartIcon = (props: React.SVGProps<SVGSVGElement>) => {
 	return (
 		<svg
 			xmlns="http://www.w.org/2000/svg"
@@ -167,4 +199,69 @@ const HeartIcon = (props: React.SVGProps<SVGSVGElement>) => {
 	);
 };
 
-export default HeartIcon;
+interface IHudProps {
+	currentMana: number;
+	maxMana: number;
+	side: "player" | "enemy";
+}
+export const Hud = ({ currentMana, maxMana, side }: IHudProps) => {
+	return (
+		<div className="hud">
+			<div className="hud-left-side">
+				<ManaHud current={currentMana} max={maxMana} />
+			</div>
+			<div className="hud-right-side">
+				<AttackModeButton side={side} />
+				<MoveModeButton side={side} />
+			</div>
+		</div>
+	);
+};
+
+interface IActionButtonProps {
+	side: "player" | "enemy";
+}
+const AttackModeButton = ({ side }: IActionButtonProps) => {
+	const { inputMode, handleSetInputMode } = useGameContext();
+	if (side === "player") {
+		const status = inputMode === "attack" ? "active" : "";
+		return (
+			<button
+				type="button"
+				onClick={() => handleSetInputMode("attack")}
+				className={`action-button ${status}`}
+			>
+				<img className="action-mode-img" src={attack} alt="attack" />
+			</button>
+		);
+	}
+	return (
+		<div className="action-container">
+			<img className="action-mode-img" src={attack} alt="attack" />
+		</div>
+	);
+};
+
+const MoveModeButton = ({ side }: IActionButtonProps) => {
+	const { inputMode, handleSetInputMode, gameState } = useGameContext();
+	if (side === "player") {
+		const status = inputMode === "move" ? "active" : "";
+		return (
+			<button
+				type="button"
+				onClick={() => handleSetInputMode("move")}
+				className={`action-button ${status}`}
+			>
+				<span className="move-counter">
+					{gameState.player.moveCount} /{gameState.player.maxMove}
+				</span>
+				<img className="action-mode-img" src={move} alt="move" />
+			</button>
+		);
+	}
+	return (
+		<div className="action-container">
+			<img className="action-mode-img" src={move} alt="move" />
+		</div>
+	);
+};

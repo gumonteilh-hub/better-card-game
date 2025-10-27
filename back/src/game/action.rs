@@ -8,6 +8,11 @@ use crate::game::{
 #[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum Action {
+    Boost {
+        target: EntityId,
+        attack: usize,
+        hp: usize,
+    },
     IncreaseMaxMana {
         player: PlayerId,
         amount: usize,

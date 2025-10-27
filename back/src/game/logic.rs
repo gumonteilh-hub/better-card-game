@@ -282,6 +282,26 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 });
             }
         }
+        Effect::Boost {
+            initiator,
+            attack,
+            hp,
+            target,
+        } => {
+            let targets = resolve_field_target(*initiator, target, context)?;
+
+            for target_id in targets {
+                let target = context.get_mut_entity(target_id)?;
+                target.attack += attack;
+                target.hp += hp;
+
+                actions.push(Action::Boost {
+                    target: target_id,
+                    attack: *attack,
+                    hp: *hp,
+                });
+            }
+        }
     }
 
     Ok(actions)

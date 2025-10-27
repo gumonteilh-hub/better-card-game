@@ -51,6 +51,10 @@ pub fn heal(target: TemplateTarget, amount: usize) -> TemplateEffect {
     TemplateEffect::Heal { target, amount }
 }
 
+pub fn boost(target: TemplateTarget, attack: usize, hp: usize) -> TemplateEffect {
+    TemplateEffect::Boost { target, attack, hp }
+}
+
 struct CardTemplateBuilder {
     id: TemplateId,
     cost: usize,

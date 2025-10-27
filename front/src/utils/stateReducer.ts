@@ -20,6 +20,8 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 			return applyRefreshMana(state, action);
 		case "Win":
 			return applyWin(state, action);
+		case "Boost":
+			return applyBoost(state, action);
 		default:
 			return state;
 	}
@@ -305,4 +307,49 @@ function applyWin(
 	action: Extract<IAction, { type: "Win" }>,
 ): IGameState {
 	return { ...state, winnerId: action.value };
+}
+
+function applyBoost(
+	state: IGameState,
+	action: Extract<IAction, { type: "Boost" }>,
+): IGameState {
+	return {
+		...state,
+		player: {
+			...state.player,
+			field: Object.fromEntries(
+				Object.entries(state.player.field).map(([key, value]) => {
+					if (value.id === action.value.target) {
+						return [
+							key,
+							{
+								...value,
+								hp: value.hp + action.value.hp,
+								attack: value.attack + action.value.attack,
+							},
+						];
+					}
+					return [key, value];
+				}),
+			),
+		},
+		enemy: {
+			...state.enemy,
+			field: Object.fromEntries(
+				Object.entries(state.enemy.field).map(([key, value]) => {
+					if (value.id === action.value.target) {
+						return [
+							key,
+							{
+								...value,
+								hp: value.hp + action.value.hp,
+								attack: value.attack + action.value.attack,
+							},
+						];
+					}
+					return [key, value];
+				}),
+			),
+		},
+	};
 }

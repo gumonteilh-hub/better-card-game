@@ -15,6 +15,8 @@ export const getAnimationDuration = (actionType: ActionType): number => {
 			return 700;
 		case "Attack":
 			return 800;
+		case "Boost":
+			return 300;
 		case "Win":
 		case "TriggerOnDeath":
 		case "TriggerOnPlay":
@@ -135,6 +137,23 @@ export const cardVariants: Variants = {
 			duration: 0.9,
 			times: [0, 0.3, 1],
 			ease: "easeIn",
+		},
+	},
+
+	boosted: {
+		y: [0, -12, -5, 0],
+		scale: [1, 1.12, 1.08, 1.03],
+		rotate: [0, -3, 2, 0],
+		filter: [
+			"brightness(1) saturate(1)",
+			"brightness(1.4) saturate(1.3)",
+			"brightness(1.2) saturate(1.15)",
+			"brightness(1) saturate(1)",
+		],
+		transition: {
+			duration: 0.3,
+			times: [0, 0.3, 0.6, 1],
+			ease: "easeOut",
 		},
 	},
 };

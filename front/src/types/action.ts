@@ -13,6 +13,7 @@ export type IAction =
 	| TriggerOnPlayAction
 	| TriggerOnDeathAction
 	| RefreshManaAction
+	| BoostAction
 	| IncreaseMaxManaAction;
 
 export type ActionType =
@@ -28,10 +29,20 @@ export type ActionType =
 	| "TriggerOnPlay"
 	| "TriggerOnAttack"
 	| "IncreaseMaxMana"
+	| "Boost"
 	| "RefreshMana";
 
 export type EntityId = number;
 export type PlayerId = number;
+
+type BoostAction = {
+	type: "Boost";
+	value: {
+		target: number;
+		attack: number;
+		hp: number;
+	};
+};
 
 type BurnAction = {
 	type: "BurnCard";

@@ -27,6 +27,11 @@ pub enum PlayerTemplateTarget {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum TemplateEffect {
+    Boost {
+        target: TemplateTarget,
+        attack: usize,
+        hp: usize,
+    },
     MakeDraw {
         player: PlayerTemplateTarget,
         amount: usize,
@@ -86,10 +91,15 @@ pub fn convert_to_effect(teff: &TemplateEffect, initiator: &CardInstance) -> Eff
             target: convert_template_target(target),
             amount: *amount,
         },
-        // TemplateEffect::Custom(s) => Effect::Custom(s.clone()),
         TemplateEffect::Attack { target } => Effect::Attack {
             initiator: initiator.id,
             target: convert_template_target(target),
+        },
+        TemplateEffect::Boost { target, attack, hp } => Effect::Boost {
+            initiator: initiator.id,
+            target: convert_template_target(target),
+            attack: *attack,
+            hp: *hp,
         },
     }
 }

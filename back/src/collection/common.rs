@@ -1,7 +1,10 @@
 use crate::{
-    collection::{card, deal_damage, draw, heal, Faction},
-    game::card::{CardTemplate, Keyword},
-    template::{PlayerTemplateTarget, TemplateTarget}, UserDeck,
+    UserDeck,
+    collection::{Faction, boost, card, deal_damage, draw, heal},
+    game::{
+        card::{CardTemplate, Keyword},
+    },
+    template::{PlayerTemplateTarget, TemplateTarget},
 };
 use once_cell::sync::Lazy;
 
@@ -27,6 +30,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
         SORCIERE.clone(),
         VAMPIRE.clone(),
         PALADIN.clone(),
+        BOOSTER_TEST.clone(),
     ]
 }
 
@@ -70,6 +74,20 @@ pub fn get_ia_deck() -> UserDeck {
 
 static RECRUE: Lazy<CardTemplate> =
     Lazy::new(|| card(100, 1, "Recrue", "Une simple recrue", 1, 1, Faction::COMMON).build());
+
+static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
+    card(
+        213456789677,
+        1,
+        "Booster Test",
+        "On play : boost the cards on the field +1/+1",
+        1,
+        1,
+        Faction::COMMON,
+    )
+    .on_play(vec![boost(TemplateTarget::Allies, 1, 1)])
+    .build()
+});
 
 static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
     card(

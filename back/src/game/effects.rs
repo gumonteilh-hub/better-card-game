@@ -70,6 +70,12 @@ pub enum Effect {
         initiator: EntityId,
         target: Target,
     },
+    Boost {
+        initiator: EntityId,
+        attack: usize,
+        hp: usize,
+        target: Target,
+    },
     Win(PlayerId),
 }
 

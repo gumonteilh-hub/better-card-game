@@ -83,6 +83,7 @@ export type AnimationState =
 	| "healed"
 	| "dying"
 	| "damaged"
+	| "boosted"
 	| "drawed";
 
 const computeAnimationState = (actions: IAction[]) => {
@@ -114,6 +115,9 @@ const computeAnimationState = (actions: IAction[]) => {
 				animationMap.set(action.value.initiator, "attacking");
 				animationMap.set(action.value.target, "attacked");
 				break;
+			}
+			case "Boost": {
+				animationMap.set(action.value.target, "boosted");
 			}
 		}
 	}

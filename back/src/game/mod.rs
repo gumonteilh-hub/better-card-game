@@ -8,7 +8,6 @@ pub mod types;
 pub mod view;
 
 use std::collections::{HashMap, VecDeque};
-use std::usize;
 
 use crate::error::{Error, Result};
 use crate::game::action::Action;
@@ -144,12 +143,11 @@ impl Game {
             return Err(Error::Game("Target position is not valid".into()));
         }
 
-        match self.get_field(card.owner).get(&position) {
-            Some(_) => return Err(Error::Game("You can't move to a position not empty".into())),
-            None => (),
+        if self.get_field(card.owner).contains_key(&position) {
+            return Err(Error::Game("You can't move to a position not empty".into()));
         }
 
-        if self.get_player(self.current_player)?.move_count <= 0 {
+        if self.get_player(self.current_player)?.move_count == 0 {
             return Err(Error::Game("You don't have any move left".into()));
         }
 
@@ -178,7 +176,9 @@ impl Game {
             .iter()
             .any(|(_, c)| c.location == Location::Field(position))
         {
-            return Err(Error::Game(format!("This place on the field is not empty")));
+            return Err(Error::Game(
+                "This place on the field is not empty".to_string(),
+            ));
         }
 
         if self.get_field(owner).len() >= 7 {
@@ -204,7 +204,7 @@ impl Game {
 
         self.effect_queue.push_back(Effect::SummonFromHand {
             entity_id: card_id,
-            position: position,
+            position,
         });
         Ok(())
     }
@@ -322,12 +322,10 @@ impl Game {
                     "This monster has already attacked this turn".into(),
                 ));
             }
-        } else {
-            if initiator.attack_count > 0 {
-                return Err(Error::Game(
-                    "This monster has already attacked this turn".into(),
-                ));
-            }
+        } else if initiator.attack_count > 0 {
+            return Err(Error::Game(
+                "This monster has already attacked this turn".into(),
+            ));
         }
 
         self.effect_queue.push_back(Effect::Attack {

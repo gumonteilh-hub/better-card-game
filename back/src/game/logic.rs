@@ -94,7 +94,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     Error::Game(format!("Entity with id {} not found for destroy", target))
                 })?;
                 target_entity.location = Location::Graveyard;
-                if target_entity.template.on_death.len() > 0 {
+                if !target_entity.template.on_death.is_empty() {
                     actions.push(Action::TriggerOnDeath(target));
                     context.effect_queue.extend(
                         target_entity
@@ -104,7 +104,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                             .map(|teff| convert_to_effect(teff, target_entity)),
                     );
                 }
-                actions.push(Action::Destroy { target: target });
+                actions.push(Action::Destroy { target });
             }
         }
         Effect::Heal {
@@ -148,7 +148,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             entity_id,
             position,
         } => {
-            let entity = context.entities.get_mut(&entity_id).ok_or_else(|| {
+            let entity = context.entities.get_mut(entity_id).ok_or_else(|| {
                 Error::Game(format!(
                     "Entity with id {} not found for summon from hand",
                     entity_id
@@ -164,7 +164,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 target: entity.clone(),
                 owner: entity.owner,
             });
-            if entity.template.on_play.len() > 0 {
+            if !entity.template.on_play.is_empty() {
                 actions.push(Action::TriggerOnPlay(*entity_id));
                 context.effect_queue.extend(
                     entity
@@ -178,10 +178,10 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
         Effect::Attack { initiator, target } => {
             let targets = resolve_target(*initiator, target, context)?;
             for target_id in targets {
-                let initiator_entity = context.entities.get_mut(&initiator).ok_or_else(|| {
+                let initiator_entity = context.entities.get_mut(initiator).ok_or_else(|| {
                     Error::Game(format!("Entity with id {} not found for attack", initiator))
                 })?;
-                if initiator_entity.template.on_attack.len() > 0 {
+                if !initiator_entity.template.on_attack.is_empty() {
                     actions.push(Action::TriggerOnAttack(initiator_entity.id));
                     context.effect_queue.extend(
                         initiator_entity
@@ -325,12 +325,11 @@ fn resolve_target_player_only(
     target: &Target,
     context: &Game,
 ) -> Result<Vec<PlayerId>> {
-    let player_side;
-    if is_player_id(initiator) {
-        player_side = initiator;
+    let player_side = if is_player_id(initiator) {
+        initiator
     } else {
-        player_side = context.get_entity(initiator)?.owner;
-    }
+        context.get_entity(initiator)?.owner
+    };
 
     let opponent_id = get_opponent_player_id(player_side, context)?;
     let targets = match target {
@@ -354,12 +353,11 @@ fn resolve_player_target(
     target: &PlayerTarget,
     context: &Game,
 ) -> Result<Vec<PlayerId>> {
-    let player_side;
-    if is_player_id(initiator) {
-        player_side = initiator;
+    let player_side = if is_player_id(initiator) {
+        initiator
     } else {
-        player_side = context.get_entity(initiator)?.owner;
-    }
+        context.get_entity(initiator)?.owner
+    };
 
     let opponent_id = get_opponent_player_id(player_side, context)?;
     let targets = match target {
@@ -396,12 +394,11 @@ fn resolve_field_target(
     target: &Target,
     context: &Game,
 ) -> Result<Vec<EntityId>> {
-    let player_side;
-    if is_player_id(initiator) {
-        player_side = initiator;
+    let player_side = if is_player_id(initiator) {
+        initiator
     } else {
-        player_side = context.get_entity(initiator)?.owner;
-    }
+        context.get_entity(initiator)?.owner
+    };
 
     let opponent_id = get_opponent_player_id(player_side, context)?;
     let targets = match target {

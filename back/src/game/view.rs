@@ -89,21 +89,15 @@ impl PublicGameState {
 
         let mut player_field = HashMap::new();
         for entity in player_entities.clone() {
-            match entity.location {
-                Location::Field(pos) => {
-                    player_field.insert(pos, entity.clone());
-                }
-                _ => (),
+            if let Location::Field(pos) = entity.location {
+                player_field.insert(pos, entity.clone());
             }
         }
 
         let mut enemy_field = HashMap::new();
         for entity in enemy_entities.clone() {
-            match entity.location {
-                Location::Field(pos) => {
-                    enemy_field.insert(pos, entity.clone());
-                }
-                _ => (),
+            if let Location::Field(pos) = entity.location {
+                enemy_field.insert(pos, entity.clone());
             }
         }
 

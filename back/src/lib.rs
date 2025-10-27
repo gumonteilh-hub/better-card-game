@@ -84,5 +84,5 @@ pub fn move_card(game_state: &mut Game, card_id: usize, position: usize) -> Resu
     let actions = game_state.compute_commands()?;
     let game_view = PublicGameState::new(game_state)?;
 
-    Ok(GameViewResponse { actions: actions, game_view: game_view })
+    Ok(GameViewResponse { actions, game_view })
 }

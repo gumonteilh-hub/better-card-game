@@ -141,10 +141,10 @@ const applyReceiveDamage = (
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, c]) => {
 					if (c.id === action.value.target) {
-						if (c.defense <= action.value.amount) {
+						if (c.hp <= action.value.amount) {
 							return [key, { ...c, defense: 0 }];
 						}
-						return [key, { ...c, defense: c.defense - action.value.amount }];
+						return [key, { ...c, defense: c.hp - action.value.amount }];
 					}
 					return [key, c];
 				}),
@@ -155,10 +155,10 @@ const applyReceiveDamage = (
 			field: Object.fromEntries(
 				Object.entries(state.enemy.field).map(([key, c]) => {
 					if (c.id === action.value.target) {
-						if (c.defense <= action.value.amount) {
+						if (c.hp <= action.value.amount) {
 							return [key, { ...c, defense: 0 }];
 						}
-						return [key, { ...c, defense: c.defense - action.value.amount }];
+						return [key, { ...c, defense: c.hp - action.value.amount }];
 					}
 					return [key, c];
 				}),
@@ -228,9 +228,9 @@ const applyHeal = (
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, c]) => {
 					if (c.id === action.value.target) {
-						const healedDefense = c.defense + action.value.amount;
-						if (c.template.defense > healedDefense) {
-							return [key, { ...c, defense: c.template.defense }];
+						const healedDefense = c.hp + action.value.amount;
+						if (c.template.hp > healedDefense) {
+							return [key, { ...c, defense: c.template.hp }];
 						}
 						return [key, { ...c, defense: healedDefense }];
 					}
@@ -243,9 +243,9 @@ const applyHeal = (
 			field: Object.fromEntries(
 				Object.entries(state.enemy.field).map(([key, c]) => {
 					if (c.id === action.value.target) {
-						const healedDefense = c.defense + action.value.amount;
-						if (c.template.defense > healedDefense) {
-							return [key, { ...c, defense: c.template.defense }];
+						const healedDefense = c.hp + action.value.amount;
+						if (c.template.hp > healedDefense) {
+							return [key, { ...c, defense: c.template.hp }];
 						}
 						return [key, { ...c, defense: healedDefense }];
 					}

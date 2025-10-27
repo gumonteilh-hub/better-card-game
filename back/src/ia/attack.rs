@@ -169,11 +169,10 @@ fn find_best_attack(
         }
     }
 
-    if let Some((_, _, score)) = best_attack {
-        if mode == IaBehavior::Control && score < MIN_ACCEPTABLE_TRADE_SCORE {
+    if let Some((_, _, score)) = best_attack
+        && mode == IaBehavior::Control && score < MIN_ACCEPTABLE_TRADE_SCORE {
             return Ok(None);
         }
-    }
 
     Ok(best_attack)
 }

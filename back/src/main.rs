@@ -63,7 +63,7 @@ async fn collection(
         "Received get_collection request with faction: {:?}",
         faction
     );
-    return Ok(Json(back::get_collection(faction)));
+    Ok(Json(back::get_collection(faction)))
 }
 
 #[debug_handler]
@@ -80,7 +80,7 @@ async fn start_game(
         .await
         .insert(game_state.game_id, game_state);
     tracing::info!("Game started successfully");
-    return Ok(Json(game_id));
+    Ok(Json(game_id))
 }
 
 #[debug_handler]
@@ -95,8 +95,8 @@ async fn play_card(
         position
     );
     match state.game_states.lock().await.get_mut(&game_id) {
-        Some(mut game) => {
-            let game_view = back::play_card(&mut game, card_id, position)?;
+        Some(game) => {
+            let game_view = back::play_card(game, card_id, position)?;
             tracing::info!("Play card performed successfully");
             Ok(Json(game_view))
         }
@@ -131,8 +131,8 @@ async fn attack(
         target_id
     );
     match state.game_states.lock().await.get_mut(&game_id) {
-        Some(mut game) => {
-            let game_view = back::attack(&mut game, initiator_id, target_id)?;
+        Some(game) => {
+            let game_view = back::attack(game, initiator_id, target_id)?;
             tracing::info!("Attack performed successfully");
             Ok(Json(game_view))
         }
@@ -152,8 +152,8 @@ async fn move_card(
         target_pos
     );
     match state.game_states.lock().await.get_mut(&game_id) {
-        Some(mut game) => {
-            let game_view = back::move_card(&mut game, card_id, target_pos)?;
+        Some(game) => {
+            let game_view = back::move_card(game, card_id, target_pos)?;
             tracing::info!("Move performed successfully");
             Ok(Json(game_view))
         }
@@ -168,8 +168,8 @@ async fn end_turn(
 ) -> ApiResult<Json<back::GameViewResponse>> {
     tracing::info!("Received end turn request for game: {}", game_id,);
     match state.game_states.lock().await.get_mut(&game_id) {
-        Some(mut game) => {
-            let game_view = back::end_turn(&mut game)?;
+        Some(game) => {
+            let game_view = back::end_turn(game)?;
             tracing::info!("End turn performed successfully");
             Ok(Json(game_view))
         }

@@ -24,7 +24,7 @@ enum IaBehavior {
 
 pub fn ai_play_turn(game_state: &mut Game, player_id: PlayerId) -> Result<Vec<Action>> {
     let mut all_actions = Vec::new();
-    let behavior = determine_game_mode(&game_state, player_id)?;
+    let behavior = determine_game_mode(game_state, player_id)?;
 
     let mut attack_actions_1 = attack::ai_attack_sequence(game_state, player_id, behavior)?;
     all_actions.append(&mut attack_actions_1);

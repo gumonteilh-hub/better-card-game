@@ -1,10 +1,10 @@
 use crate::{
     UserDeck,
-    collection::{Faction, boost, card, deal_damage, draw, heal},
-    game::{
-        card::{CardTemplate, Keyword},
+    collection::{
+        Faction, boost, deal_damage, draw, heal, monster,
+        types::{CardTemplate, PlayerTemplateTarget, TemplateTarget},
     },
-    template::{PlayerTemplateTarget, TemplateTarget},
+    game::card::Keyword,
 };
 use once_cell::sync::Lazy;
 
@@ -73,10 +73,10 @@ pub fn get_ia_deck() -> UserDeck {
 }
 
 static RECRUE: Lazy<CardTemplate> =
-    Lazy::new(|| card(100, 1, "Recrue", "Une simple recrue", 1, 1, Faction::COMMON).build());
+    Lazy::new(|| monster(100, 1, "Recrue", "Une simple recrue", 1, 1, Faction::COMMON).build());
 
 static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         213456789677,
         1,
         "Booster Test",
@@ -90,7 +90,7 @@ static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         101,
         2,
         "Guerrier",
@@ -103,7 +103,7 @@ static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static ECLAIREUR: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         102,
         1,
         "Éclaireur",
@@ -117,7 +117,7 @@ static ECLAIREUR: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         103,
         3,
         "Chevalier",
@@ -131,7 +131,7 @@ static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static CAVALIER: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         104,
         3,
         "Cavalier",
@@ -145,7 +145,7 @@ static CAVALIER: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static CHAMPION: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         105,
         4,
         "Champion",
@@ -158,7 +158,7 @@ static CHAMPION: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static BERSERKER: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         106,
         4,
         "Berserker",
@@ -172,7 +172,7 @@ static BERSERKER: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         107,
         5,
         "Gardien",
@@ -186,10 +186,10 @@ static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static GEANT: Lazy<CardTemplate> =
-    Lazy::new(|| card(108, 6, "Géant", "Un géant imposant", 6, 6, Faction::COMMON).build());
+    Lazy::new(|| monster(108, 6, "Géant", "Un géant imposant", 6, 6, Faction::COMMON).build());
 
 static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         109,
         7,
         "Dragon",
@@ -203,7 +203,7 @@ static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         110,
         2,
         "Apprenti Mage",
@@ -217,7 +217,7 @@ static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         111,
         3,
         "Clerc",
@@ -231,7 +231,7 @@ static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         112,
         4,
         "Pyromancien",
@@ -245,7 +245,7 @@ static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         113,
         5,
         "Arcaniste",
@@ -259,7 +259,7 @@ static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         114,
         4,
         "Ange Gardien",
@@ -274,7 +274,7 @@ static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         115,
         1,
         "Kamikaze",
@@ -288,7 +288,7 @@ static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         116,
         5,
         "Nécromancien",
@@ -302,7 +302,7 @@ static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         117,
         3,
         "Sorcière",
@@ -316,7 +316,7 @@ static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         118,
         4,
         "Vampire",
@@ -330,7 +330,7 @@ static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
 });
 
 static PALADIN: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         119,
         6,
         "Paladin",

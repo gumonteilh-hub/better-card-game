@@ -1,7 +1,6 @@
-use crate::{
-    collection::{card, deal_damage, Faction},
-    game::card::CardTemplate,
-    template::TemplateTarget,
+use crate::collection::{
+    Faction, deal_damage, monster,
+    types::{CardTemplate, TemplateTarget},
 };
 use once_cell::sync::Lazy;
 
@@ -10,7 +9,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
 }
 
 static INDICIBLE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         3,
         1,
         "Indicible",

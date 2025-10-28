@@ -1,10 +1,11 @@
-import type { ICard } from "../types/game";
+import type { ICardInstance } from "../types/game";
 
-export const attackReady = (card: ICard) => {
+export const attackReady = (card: ICardInstance) => {
+	if (card.cardType.type !== "monster") return false;
 	let maxAttackPerTurn = 1;
-	if (card.template.keywords?.includes("CHARGE")) {
+	if (card.cardType.keywords?.includes("WINDFURRY")) {
 		maxAttackPerTurn = 2;
 	}
 
-	return !card.asleep && card.attackCount < maxAttackPerTurn;
+	return !card.cardType.asleep && card.cardType.attackCount < maxAttackPerTurn;
 };

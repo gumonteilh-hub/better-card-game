@@ -9,18 +9,18 @@ pub mod view;
 
 use std::collections::{HashMap, VecDeque};
 
+use crate::collection::types::CardTemplate;
 use crate::error::{Error, Result};
 use crate::game::action::Action;
-use crate::game::card::Keyword;
+use crate::game::card::{CardInstance, Keyword};
 use crate::game::effects::{Effect, Target};
 use crate::game::logic::execute_effect;
 use crate::game::types::Location;
-use crate::{CardTemplate, UserDeck, ia};
+use crate::{UserDeck, ia};
 
-use self::card::CardInstance;
 use self::events::EventManager;
 use self::player::PlayerInstance;
-use self::types::{EntityId, PlayerId};
+use self::types::{InstanceId, PlayerId};
 
 pub const DEFENSE_POSITIONS: [usize; 5] = [1, 2, 4, 5, 7];
 pub const ATTACK_POSITIONS: [usize; 5] = [0, 2, 3, 5, 6];
@@ -44,7 +44,7 @@ pub struct Game {
     pub game_id: uuid::Uuid,
     pub player_id_a: usize,
     pub player_id_b: usize, //IA
-    pub entities: HashMap<EntityId, CardInstance>,
+    pub entities: HashMap<InstanceId, CardInstance>,
     pub effect_queue: VecDeque<Effect>,
     pub players: HashMap<PlayerId, PlayerInstance>,
     pub turn: usize,
@@ -124,7 +124,7 @@ impl Game {
         })
     }
 
-    pub fn move_card(&mut self, card_id: EntityId, position: usize) -> Result<()> {
+    pub fn move_card(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
         let card = self
             .entities
             .get(&card_id)
@@ -164,7 +164,7 @@ impl Game {
         Ok(())
     }
 
-    pub fn play_card(&mut self, card_id: EntityId, position: usize) -> Result<()> {
+    pub fn play_card(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
         let owner = self
             .entities
             .get(&card_id)
@@ -187,7 +187,7 @@ impl Game {
 
         let card = self.get_entity(card_id)?;
 
-        let card_cost = card.template.cost;
+        let card_cost = card.cost;
 
         let player = self
             .players
@@ -242,8 +242,15 @@ impl Game {
         self.get_mut_player(self.current_player)?.move_count = 3;
 
         for (_, monster) in self.get_mut_field(self.current_player) {
-            monster.attack_count = 0;
-            monster.asleep = false;
+            match &mut monster.card_type {
+                card::CardTypeInstance::Monster(monster_instance) => {
+                    monster_instance.attack_count = 0;
+                    monster_instance.asleep = false;
+                }
+                card::CardTypeInstance::Spell(spell_instance) => {
+                    return Err(Error::Game("There shouldn't be spell on the field".into()));
+                }
+            }
         }
 
         let mut reset_turn_actions = self.compute_commands()?;
@@ -266,7 +273,7 @@ impl Game {
         Ok(all_actions)
     }
 
-    pub fn attack(&mut self, initiator_id: EntityId, target_id: EntityId) -> Result<()> {
+    pub fn attack(&mut self, initiator_id: InstanceId, target_id: InstanceId) -> Result<()> {
         let initiator = self
             .entities
             .get(&initiator_id)
@@ -295,12 +302,6 @@ impl Game {
                 return Err(Error::Game("You can't attack your own monster".into()));
             }
         }
-        if initiator.asleep {
-            return Err(Error::Game(
-                "This monster can't attack on his first turn".into(),
-            ));
-        }
-
         match initiator.location {
             Location::Field(pos) => {
                 if !ATTACK_POSITIONS.contains(&pos) {
@@ -315,30 +316,43 @@ impl Game {
                 ));
             }
         };
-
-        if initiator.template.keywords.contains(&Keyword::Windfury) {
-            if initiator.attack_count > 1 {
-                return Err(Error::Game(
-                    "This monster has already attacked this turn".into(),
-                ));
-            }
-        } else if initiator.attack_count > 0 {
-            return Err(Error::Game(
-                "This monster has already attacked this turn".into(),
-            ));
-        }
-
-        self.effect_queue.push_back(Effect::Attack {
-            initiator: initiator.id,
-            target: Target::Id(target_id),
-        });
-
-        self.entities
+        let initiator = self
+            .entities
             .get_mut(&initiator_id)
-            .ok_or_else(|| Error::Game(format!("Attacker with id {} not found", initiator_id)))?
-            .attack_count += 1;
+            .ok_or_else(|| Error::Game(format!("Attacker with id {} not found", initiator_id)))?;
 
-        Ok(())
+        match &mut initiator.card_type {
+            card::CardTypeInstance::Monster(monster_instance) => {
+                if monster_instance.asleep {
+                    return Err(Error::Game(
+                        "This monster can't attack on his first turn".into(),
+                    ));
+                }
+
+                if monster_instance.keywords.contains(&Keyword::Windfury) {
+                    if monster_instance.attack_count > 1 {
+                        return Err(Error::Game(
+                            "This monster has already attacked this turn".into(),
+                        ));
+                    }
+                } else if monster_instance.attack_count > 0 {
+                    return Err(Error::Game(
+                        "This monster has already attacked this turn".into(),
+                    ));
+                }
+
+                self.effect_queue.push_back(Effect::Attack {
+                    initiator: initiator_id,
+                    target: Target::Id(target_id),
+                });
+                monster_instance.attack_count += 1;
+
+                Ok(())
+            }
+            card::CardTypeInstance::Spell(spell_instance) => {
+                Err(Error::Game("A spell can not attack".into()))
+            }
+        }
     }
 
     pub fn get_mut_player(&mut self, player_id: PlayerId) -> Result<&mut PlayerInstance> {
@@ -353,7 +367,7 @@ impl Game {
             .ok_or_else(|| Error::Game(format!("Player with id {} not found", player_id)))
     }
 
-    pub fn get_entity(&self, entity_id: EntityId) -> Result<&CardInstance> {
+    pub fn get_entity(&self, entity_id: InstanceId) -> Result<&CardInstance> {
         let entity = self
             .entities
             .get(&entity_id)
@@ -361,7 +375,7 @@ impl Game {
         Ok(entity)
     }
 
-    pub fn get_mut_entity(&mut self, entity_id: EntityId) -> Result<&mut CardInstance> {
+    pub fn get_mut_entity(&mut self, entity_id: InstanceId) -> Result<&mut CardInstance> {
         let entity = self
             .entities
             .get_mut(&entity_id)
@@ -385,21 +399,24 @@ impl Game {
         result
     }
 
-    pub fn get_field(&self, player_id: PlayerId) -> HashMap<&EntityId, &CardInstance> {
+    pub fn get_field(&self, player_id: PlayerId) -> HashMap<&InstanceId, &CardInstance> {
         self.entities
             .iter()
             .filter(|(_, e)| e.owner == player_id && matches!(e.location, Location::Field(_)))
             .collect()
     }
 
-    pub fn get_mut_field(&mut self, player_id: PlayerId) -> HashMap<&EntityId, &mut CardInstance> {
+    pub fn get_mut_field(
+        &mut self,
+        player_id: PlayerId,
+    ) -> HashMap<&InstanceId, &mut CardInstance> {
         self.entities
             .iter_mut()
             .filter(|(_, e)| e.owner == player_id && matches!(e.location, Location::Field(_)))
             .collect()
     }
 
-    pub fn get_hand(&self, player_id: PlayerId) -> HashMap<&EntityId, &CardInstance> {
+    pub fn get_hand(&self, player_id: PlayerId) -> HashMap<&InstanceId, &CardInstance> {
         self.entities
             .iter()
             .filter(|(_, e)| e.owner == player_id && e.location == Location::Hand)

@@ -1,4 +1,4 @@
-import type { ICard, IHeroInfo } from "../types/game";
+import type { ICardInstance, IHeroInfo } from "../types/game";
 import { useGameContext } from "../utils/useGameContext";
 import { Card, CardMiniature } from "./Card";
 import { Draggable, Droppable } from "./DragAndDrop";
@@ -15,13 +15,13 @@ type ICommonProps = {
 	currentMana: number;
 	maxMana: number;
 	hero: IHeroInfo;
-	field: Record<number, ICard>;
+	field: Record<number, ICardInstance>;
 };
 
 type IPlayerBoardAllyProps = ICommonProps & {
 	side: "player";
-	hand: ICard[];
-	secredCard?: ICard;
+	hand: ICardInstance[];
+	secredCard?: ICardInstance;
 };
 
 type IPlayerBoardEnemyProps = ICommonProps & {
@@ -87,7 +87,7 @@ const PlayerBoard = ({
 	);
 };
 interface IFieldProps {
-	field: Record<number, ICard>;
+	field: Record<number, ICardInstance>;
 	side: "enemy" | "player";
 }
 const Field = ({ field, side }: IFieldProps) => {
@@ -115,7 +115,7 @@ const Field = ({ field, side }: IFieldProps) => {
 	);
 };
 interface ICardWrapperProps {
-	card?: ICard;
+	card?: ICardInstance;
 	type: "attack" | "defense" | "both";
 	side: "enemy" | "player";
 	position: number;

@@ -1,7 +1,6 @@
-use crate::{
-    collection::{card, heal, Faction},
-    game::card::CardTemplate,
-    template::TemplateTarget,
+use crate::collection::{
+    Faction, heal, monster,
+    types::{CardTemplate, TemplateTarget},
 };
 use once_cell::sync::Lazy;
 
@@ -10,7 +9,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
 }
 
 static FEERIQUE: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         2001,
         5,
         "Féérique",

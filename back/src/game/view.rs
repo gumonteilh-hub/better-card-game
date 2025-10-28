@@ -4,11 +4,11 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use super::Game;
-use super::card::CardInstance;
 use super::types::Location;
 use crate::{
     collection::Faction,
     error::{Error, Result},
+    game::card::CardInstance,
 };
 
 #[derive(Serialize)]

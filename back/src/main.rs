@@ -58,7 +58,7 @@ async fn main() {
 #[debug_handler]
 async fn collection(
     Path(faction): Path<back::Faction>,
-) -> ApiResult<Json<Vec<back::CardTemplate>>> {
+) -> ApiResult<Json<Vec<back::collection::types::CardTemplate>>> {
     tracing::info!(
         "Received get_collection request with faction: {:?}",
         faction

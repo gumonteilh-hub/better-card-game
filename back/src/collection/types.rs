@@ -1,9 +1,53 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::{
-    card::CardInstance,
-    effects::{Effect, PlayerTarget, Target},
+use crate::{
+    Faction,
+    game::{
+        card::Keyword,
+        effects::{Effect, PlayerTarget, Target},
+        types::InstanceId,
+    },
 };
+
+pub type TemplateId = usize;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct SpellTemplate {
+    pub effect: Vec<TemplateEffect>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CardTemplate {
+    pub id: TemplateId,
+    pub cost: usize,
+    pub name: String,
+    pub description: String,
+    pub faction: Faction,
+    pub card_type: CardTypeTemplate,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "type")]
+#[serde(rename_all = "camelCase")]
+pub enum CardTypeTemplate {
+    Monster(MonsterTemplate),
+    Spell(SpellTemplate),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MonsterTemplate {
+    pub attack: usize,
+    pub hp: usize,
+    pub keywords: Vec<Keyword>,
+    #[serde(default)]
+    pub on_play: Vec<TemplateEffect>,
+    #[serde(default)]
+    pub on_attack: Vec<TemplateEffect>,
+    #[serde(default)]
+    pub on_death: Vec<TemplateEffect>,
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TemplateTarget {
@@ -66,10 +110,10 @@ fn convert_template_target(target: &TemplateTarget) -> Target {
     }
 }
 
-pub fn convert_to_effect(teff: &TemplateEffect, initiator: &CardInstance) -> Effect {
+pub fn convert_to_effect(teff: &TemplateEffect, initiator_id: InstanceId) -> Effect {
     match teff {
         TemplateEffect::MakeDraw { player, amount } => Effect::MakeDraw {
-            initiator: initiator.id,
+            initiator: initiator_id,
             player: match player {
                 PlayerTemplateTarget::EnnemyPlayer => PlayerTarget::EnnemyPlayer,
                 PlayerTemplateTarget::Player => PlayerTarget::Player,
@@ -78,25 +122,25 @@ pub fn convert_to_effect(teff: &TemplateEffect, initiator: &CardInstance) -> Eff
             amount: *amount,
         },
         TemplateEffect::Heal { target, amount } => Effect::Heal {
-            initiator: initiator.id,
+            initiator: initiator_id,
             target: convert_template_target(target),
             amount: *amount,
         },
         TemplateEffect::Destroy { target } => Effect::Destroy {
-            initiator: initiator.id,
+            initiator: initiator_id,
             target: convert_template_target(target),
         },
         TemplateEffect::DealDamage { target, amount } => Effect::DealDamage {
-            initiator: initiator.id,
+            initiator: initiator_id,
             target: convert_template_target(target),
             amount: *amount,
         },
         TemplateEffect::Attack { target } => Effect::Attack {
-            initiator: initiator.id,
+            initiator: initiator_id,
             target: convert_template_target(target),
         },
         TemplateEffect::Boost { target, attack, hp } => Effect::Boost {
-            initiator: initiator.id,
+            initiator: initiator_id,
             target: convert_template_target(target),
             attack: *attack,
             hp: *hp,

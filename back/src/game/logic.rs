@@ -4,9 +4,8 @@ use crate::{
         Game,
         action::Action,
         effects::{Effect, PlayerTarget, Target},
-        types::{EntityId, Location, PlayerId},
+        types::{InstanceId, Location, PlayerId},
     },
-    template::convert_to_effect,
 };
 
 pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>> {
@@ -74,17 +73,24 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let entity_targets = resolve_field_target(*initiator, target, context)?;
             for target_id in entity_targets {
                 let target = context.get_mut_entity(target_id)?;
-                target.hp = target.hp.saturating_sub(*amount);
-                if target.hp == 0 {
-                    context.effect_queue.push_back(Effect::Destroy {
-                        initiator: *initiator,
-                        target: Target::Id(target_id),
-                    });
+                match &mut target.card_type {
+                    super::card::CardTypeInstance::Monster(monster_instance) => {
+                        monster_instance.hp = monster_instance.hp.saturating_sub(*amount);
+                        if monster_instance.hp == 0 {
+                            context.effect_queue.push_back(Effect::Destroy {
+                                initiator: *initiator,
+                                target: Target::Id(target_id),
+                            });
+                        }
+                        actions.push(Action::ReceiveDamage {
+                            target: target_id,
+                            amount: *amount,
+                        });
+                    }
+                    super::card::CardTypeInstance::Spell(spell_instance) => {
+                        return Err(Error::Game("Can't deal damage to a spell".into()));
+                    }
                 }
-                actions.push(Action::ReceiveDamage {
-                    target: target_id,
-                    amount: *amount,
-                });
             }
         }
         Effect::Destroy { initiator, target } => {
@@ -94,17 +100,20 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     Error::Game(format!("Entity with id {} not found for destroy", target))
                 })?;
                 target_entity.location = Location::Graveyard;
-                if !target_entity.template.on_death.is_empty() {
-                    actions.push(Action::TriggerOnDeath(target));
-                    context.effect_queue.extend(
-                        target_entity
-                            .template
-                            .on_death
-                            .iter()
-                            .map(|teff| convert_to_effect(teff, target_entity)),
-                    );
+                match &target_entity.card_type {
+                    super::card::CardTypeInstance::Monster(monster_instance) => {
+                        if !monster_instance.on_death.is_empty() {
+                            actions.push(Action::TriggerOnDeath(target));
+                            context
+                                .effect_queue
+                                .extend(monster_instance.on_death.clone());
+                        }
+                        actions.push(Action::Destroy { target });
+                    }
+                    super::card::CardTypeInstance::Spell(spell_instance) => {
+                        return Err(Error::Game("Can't destroy a spell".into()));
+                    }
                 }
-                actions.push(Action::Destroy { target });
             }
         }
         Effect::Heal {
@@ -131,16 +140,23 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let entity_targets = resolve_field_target(*initiator, target, context)?;
             for target_id in entity_targets {
                 let entity = context.get_mut_entity(target_id)?;
-                let max_hp = entity.template.hp;
-                let old_hp = entity.hp;
-                entity.hp = (entity.hp + *amount).min(max_hp);
-                let effective_heal = entity.hp - old_hp;
+                match &mut entity.card_type {
+                    super::card::CardTypeInstance::Monster(monster_instance) => {
+                        let max_hp = monster_instance.hp;
+                        let old_hp = monster_instance.hp;
+                        monster_instance.hp = (monster_instance.hp + *amount).min(max_hp);
+                        let effective_heal = monster_instance.hp - old_hp;
 
-                if effective_heal > 0 {
-                    actions.push(Action::Heal {
-                        target: target_id,
-                        amount: effective_heal,
-                    });
+                        if effective_heal > 0 {
+                            actions.push(Action::Heal {
+                                target: target_id,
+                                amount: effective_heal,
+                            });
+                        }
+                    }
+                    super::card::CardTypeInstance::Spell(spell_instance) => {
+                        return Err(Error::Game("Can't heal a spell".into()));
+                    }
                 }
             }
         }
@@ -164,15 +180,18 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 target: entity.clone(),
                 owner: entity.owner,
             });
-            if !entity.template.on_play.is_empty() {
-                actions.push(Action::TriggerOnPlay(*entity_id));
-                context.effect_queue.extend(
-                    entity
-                        .template
-                        .on_play
-                        .iter()
-                        .map(|teff| convert_to_effect(teff, entity)),
-                );
+            match &entity.card_type {
+                super::card::CardTypeInstance::Monster(monster_instance) => {
+                    if !monster_instance.on_play.is_empty() {
+                        actions.push(Action::TriggerOnPlay(*entity_id));
+                        context
+                            .effect_queue
+                            .extend(monster_instance.on_play.clone());
+                    }
+                }
+                super::card::CardTypeInstance::Spell(spell_instance) => {
+                    return Err(Error::Game("Can't summon a spell".into()));
+                }
             }
         }
         Effect::Attack { initiator, target } => {
@@ -181,30 +200,39 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 let initiator_entity = context.entities.get_mut(initiator).ok_or_else(|| {
                     Error::Game(format!("Entity with id {} not found for attack", initiator))
                 })?;
-                if !initiator_entity.template.on_attack.is_empty() {
-                    actions.push(Action::TriggerOnAttack(initiator_entity.id));
-                    context.effect_queue.extend(
-                        initiator_entity
-                            .template
-                            .on_attack
-                            .iter()
-                            .map(|teff| convert_to_effect(teff, initiator_entity)),
-                    );
+                match &initiator_entity.card_type {
+                    super::card::CardTypeInstance::Monster(monster_instance) => {
+                        if !monster_instance.on_attack.is_empty() {
+                            actions.push(Action::TriggerOnAttack(initiator_entity.id));
+                            context
+                                .effect_queue
+                                .extend(monster_instance.on_attack.clone());
+                        }
+                        context.effect_queue.push_back(Effect::DealDamage {
+                            initiator: *initiator,
+                            target: Target::Id(target_id),
+                            amount: monster_instance.attack,
+                        });
+                    }
+                    super::card::CardTypeInstance::Spell(spell_instance) => {
+                        return Err(Error::Game("Can't attack with a spell".into()));
+                    }
                 }
-                context.effect_queue.push_back(Effect::DealDamage {
-                    initiator: *initiator,
-                    target: Target::Id(target_id),
-                    amount: initiator_entity.attack,
-                });
 
                 if !is_player_id(target_id) {
-                    // attack on a monster
                     let target_entity = context.get_entity(target_id)?;
-                    context.effect_queue.push_back(Effect::DealDamage {
-                        initiator: target_id,
-                        target: Target::Id(*initiator),
-                        amount: target_entity.attack,
-                    });
+                    match &target_entity.card_type {
+                        super::card::CardTypeInstance::Monster(monster_instance) => {
+                            context.effect_queue.push_back(Effect::DealDamage {
+                                initiator: target_id,
+                                target: Target::Id(*initiator),
+                                amount: monster_instance.attack,
+                            });
+                        }
+                        super::card::CardTypeInstance::Spell(spell_instance) => {
+                            return Err(Error::Game("Can't attack a spell".into()));
+                        }
+                    }
                 }
                 actions.push(Action::Attack {
                     initiator: *initiator,
@@ -292,14 +320,21 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
 
             for target_id in targets {
                 let target = context.get_mut_entity(target_id)?;
-                target.attack += attack;
-                target.hp += hp;
+                match &mut target.card_type {
+                    super::card::CardTypeInstance::Monster(monster_instance) => {
+                        monster_instance.attack += attack;
+                        monster_instance.hp += hp;
 
-                actions.push(Action::Boost {
-                    target: target_id,
-                    attack: *attack,
-                    hp: *hp,
-                });
+                        actions.push(Action::Boost {
+                            target: target_id,
+                            attack: *attack,
+                            hp: *hp,
+                        });
+                    }
+                    super::card::CardTypeInstance::Spell(spell_instance) => {
+                        return Err(Error::Game("Can't boost a spell".into()));
+                    }
+                }
             }
         }
     }
@@ -311,7 +346,11 @@ fn is_player_id(id: usize) -> bool {
     id < 2
 }
 
-fn resolve_target(initiator: EntityId, target: &Target, context: &Game) -> Result<Vec<EntityId>> {
+fn resolve_target(
+    initiator: InstanceId,
+    target: &Target,
+    context: &Game,
+) -> Result<Vec<InstanceId>> {
     let mut targets = Vec::new();
     let mut player_targets = resolve_target_player_only(initiator, target, context)?;
     targets.append(&mut player_targets);
@@ -321,7 +360,7 @@ fn resolve_target(initiator: EntityId, target: &Target, context: &Game) -> Resul
     Ok(targets)
 }
 fn resolve_target_player_only(
-    initiator: EntityId,
+    initiator: InstanceId,
     target: &Target,
     context: &Game,
 ) -> Result<Vec<PlayerId>> {
@@ -349,7 +388,7 @@ fn resolve_target_player_only(
 }
 
 fn resolve_player_target(
-    initiator: EntityId,
+    initiator: InstanceId,
     target: &PlayerTarget,
     context: &Game,
 ) -> Result<Vec<PlayerId>> {
@@ -390,10 +429,10 @@ fn get_opponent_player_id(player_id: PlayerId, context: &Game) -> Result<PlayerI
 }
 
 fn resolve_field_target(
-    initiator: EntityId,
+    initiator: InstanceId,
     target: &Target,
     context: &Game,
-) -> Result<Vec<EntityId>> {
+) -> Result<Vec<InstanceId>> {
     let player_side = if is_player_id(initiator) {
         initiator
     } else {

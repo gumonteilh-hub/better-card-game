@@ -62,7 +62,7 @@ export const GameContextProvider = ({
 		if (!gameState || isAnimating) return [];
 
 		return gameState.player.hand
-			.filter((card) => card.template.cost <= gameState.player.currentMana)
+			.filter((card) => card.cost <= gameState.player.currentMana)
 			.map((c) => c.id);
 	}, [gameState, isAnimating]);
 

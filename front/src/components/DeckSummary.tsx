@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import type { Faction, ICardTemplate } from "../types/template";
+import type { Faction, ICardTemplate, TemplateId } from "../types/template";
 
 interface DeckSummaryProps {
 	cards: ICardTemplate[];
 	faction: Faction;
-	onCardClick?: (cardId: string) => void;
+	onCardClick?: (cardId: TemplateId) => void;
 	showTitle?: boolean;
 }
 export const DeckSummary = ({
@@ -14,7 +14,10 @@ export const DeckSummary = ({
 	showTitle = true,
 }: DeckSummaryProps) => {
 	const deckSummary = useMemo(() => {
-		const summary = new Map<string, { card: ICardTemplate; count: number }>();
+		const summary = new Map<
+			TemplateId,
+			{ card: ICardTemplate; count: number }
+		>();
 		cards.forEach((card) => {
 			const existing = summary.get(card.id);
 			if (existing) {

@@ -1,12 +1,10 @@
 use std::vec;
 
 use crate::{
-    game::{
-        card::{CardTemplate, Keyword},
-        effects::TriggeredEffect,
-        types::TemplateId,
+    collection::types::{
+        CardTemplate, PlayerTemplateTarget, TemplateEffect, TemplateId, TemplateTarget,
     },
-    template::{PlayerTemplateTarget, TemplateEffect, TemplateTarget},
+    game::card::Keyword,
 };
 
 pub use common::get_ia_deck;
@@ -16,6 +14,7 @@ mod common;
 mod demon;
 mod dragon;
 mod human;
+pub mod types;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Copy)]
 pub enum Faction {
@@ -55,7 +54,7 @@ pub fn boost(target: TemplateTarget, attack: usize, hp: usize) -> TemplateEffect
     TemplateEffect::Boost { target, attack, hp }
 }
 
-struct CardTemplateBuilder {
+struct MonsterTemplateBuilder {
     id: TemplateId,
     cost: usize,
     name: String,
@@ -66,10 +65,9 @@ struct CardTemplateBuilder {
     on_play: Vec<TemplateEffect>,
     on_attack: Vec<TemplateEffect>,
     on_death: Vec<TemplateEffect>,
-    triggered_effects: Vec<TriggeredEffect>,
     faction: Faction,
 }
-impl CardTemplateBuilder {
+impl MonsterTemplateBuilder {
     fn new(
         id: TemplateId,
         cost: usize,
@@ -79,7 +77,7 @@ impl CardTemplateBuilder {
         hp: usize,
         faction: Faction,
     ) -> Self {
-        CardTemplateBuilder {
+        MonsterTemplateBuilder {
             id,
             cost,
             name: name.into(),
@@ -87,7 +85,6 @@ impl CardTemplateBuilder {
             atk,
             hp,
             keywords: vec![],
-            triggered_effects: vec![],
             on_attack: vec![],
             on_play: vec![],
             on_death: vec![],
@@ -95,7 +92,7 @@ impl CardTemplateBuilder {
         }
     }
 
-    fn keywords(mut self, keywords: Vec<Keyword>) -> CardTemplateBuilder {
+    fn keywords(mut self, keywords: Vec<Keyword>) -> MonsterTemplateBuilder {
         self.keywords = keywords;
         self
     }
@@ -115,8 +112,59 @@ impl CardTemplateBuilder {
         self
     }
 
-    fn triggered_effects(mut self, effects: Vec<TriggeredEffect>) -> Self {
-        self.triggered_effects = effects;
+    fn build(self) -> CardTemplate {
+        CardTemplate {
+            id: self.id,
+            cost: self.cost,
+            name: self.name,
+            description: self.desc,
+            faction: self.faction,
+            card_type: types::CardTypeTemplate::Monster(types::MonsterTemplate {
+                attack: self.atk,
+                hp: self.hp,
+                keywords: self.keywords,
+                on_play: self.on_play,
+                on_attack: self.on_attack,
+                on_death: self.on_death,
+            }),
+        }
+    }
+}
+
+fn monster(
+    id: TemplateId,
+    cost: usize,
+    name: &str,
+    desc: &str,
+    atk: usize,
+    hp: usize,
+    faction: Faction,
+) -> MonsterTemplateBuilder {
+    MonsterTemplateBuilder::new(id, cost, name, desc, atk, hp, faction)
+}
+
+struct SpellTemplateBuilder {
+    id: TemplateId,
+    cost: usize,
+    name: String,
+    desc: String,
+    faction: Faction,
+    effect: Vec<TemplateEffect>,
+}
+impl SpellTemplateBuilder {
+    fn new(id: TemplateId, cost: usize, name: &str, desc: &str, faction: Faction) -> Self {
+        SpellTemplateBuilder {
+            id,
+            cost,
+            name: name.into(),
+            desc: desc.into(),
+            faction,
+            effect: vec![],
+        }
+    }
+
+    fn effect(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.effect = effects;
         self
     }
 
@@ -126,26 +174,20 @@ impl CardTemplateBuilder {
             cost: self.cost,
             name: self.name,
             description: self.desc,
-            attack: self.atk,
-            hp: self.hp,
-            keywords: self.keywords,
-            on_play: self.on_play,
-            on_attack: self.on_attack,
-            triggered_effects: self.triggered_effects,
-            on_death: self.on_death,
             faction: self.faction,
+            card_type: types::CardTypeTemplate::Spell(types::SpellTemplate {
+                effect: self.effect,
+            }),
         }
     }
 }
 
-fn card(
+fn spell(
     id: TemplateId,
     cost: usize,
     name: &str,
     desc: &str,
-    atk: usize,
-    hp: usize,
     faction: Faction,
-) -> CardTemplateBuilder {
-    CardTemplateBuilder::new(id, cost, name, desc, atk, hp, faction)
+) -> SpellTemplateBuilder {
+    SpellTemplateBuilder::new(id, cost, name, desc, faction)
 }

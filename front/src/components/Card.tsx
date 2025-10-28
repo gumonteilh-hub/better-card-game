@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { type JSX, useMemo } from "react";
 import test from "../assets/test.png";
-import type { ICard } from "../types/game";
+import type { ICardInstance } from "../types/game";
 import type { ICardTemplate } from "../types/template";
 import { cardVariants } from "../utils/cardVariants";
 import { attackReady } from "../utils/gameRules";
@@ -9,15 +9,15 @@ import { useGameContext } from "../utils/useGameContext";
 import { TargetWrapper } from "./Hud";
 
 interface ICardProps {
-	card: ICard;
+	card: ICardInstance;
 }
 
 export const Card = ({ card }: ICardProps) => {
 	return (
 		<div className="card">
 			<div className="card-header">
-				<div className="card-cost">{card.template.cost}</div>
-				<div className="card-name">{card.template.name}</div>
+				<div className="card-cost">{card.cost}</div>
+				<div className="card-name">{card.name}</div>
 			</div>
 			<div className="card-body">
 				<div className="card-image">
@@ -25,22 +25,25 @@ export const Card = ({ card }: ICardProps) => {
 				</div>
 				<div className="card-description">
 					<p>
-						{card.template.keywords?.map((k) => (
-							<strong key={k}>{k} </strong>
-						))}
+						{card.cardType.type === "monster" &&
+							card.cardType.keywords?.map((k) => <strong key={k}>{k} </strong>)}
 						<br />
-						{card.template.description}
+						{card.description}
 					</p>
 				</div>
 			</div>
 			<div className="card-footer">
-				<div className="card-attack">
-					<span>{card.attack}</span>
-				</div>
-				<div className="tribut">{card.template.faction}</div>
-				<div className="card-hp">
-					<span>{card.hp}</span>
-				</div>
+				{card.cardType.type === "monster" && (
+					<div className="card-attack">
+						<span>{card.cardType.attack}</span>
+					</div>
+				)}
+				<div className="tribut">{card.faction}</div>
+				{card.cardType.type === "monster" && (
+					<div className="card-hp">
+						<span>{card.cardType.hp}</span>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -63,29 +66,32 @@ export const CardTemplate = ({ card }: ICardTemplateProps) => {
 				</div>
 				<div className="card-description">
 					<p>
-						{card.keywords?.map((k) => (
-							<strong key={k}>{k} </strong>
-						))}
+						{card.cardType.type === "monster" &&
+							card.cardType.keywords?.map((k) => <strong key={k}>{k} </strong>)}
 						<br />
 						{card.description}
 					</p>
 				</div>
 			</div>
 			<div className="card-footer">
-				<div className="card-attack">
-					<span>{card.attack}</span>
-				</div>
+				{card.cardType.type === "monster" && (
+					<div className="card-attack">
+						<span>{card.cardType.attack}</span>
+					</div>
+				)}
 				<div className="tribut">{card.faction}</div>
-				<div className="card-hp">
-					<span>{card.hp}</span>
-				</div>
+				{card.cardType.type === "monster" && (
+					<div className="card-hp">
+						<span>{card.cardType.hp}</span>
+					</div>
+				)}
 			</div>
 		</div>
 	);
 };
 
 interface ICardMiniatureProps {
-	card: ICard;
+	card: ICardInstance;
 	type?: "attack" | "defense" | "both";
 	side: "enemy" | "player";
 }
@@ -96,6 +102,11 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 		() => animationMap.get(card.id) ?? "idle",
 		[animationMap, card.id],
 	);
+
+	if (card.cardType.type !== "monster") {
+		throw new Error("only monster can be in miniature");
+	}
+
 	return (
 		<div className="card-miniature-container">
 			<ActionWrapper side={side} card={card} type={type}>
@@ -115,10 +126,10 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 						</div>
 						<div className="card-footer">
 							<div className="card-attack">
-								<span>{card.attack}</span>
+								<span>{card.cardType.attack}</span>
 							</div>
 							<div className="card-hp">
-								<span>{card.hp}</span>
+								<span>{card.cardType.hp}</span>
 							</div>
 						</div>
 					</motion.div>
@@ -132,7 +143,7 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 };
 
 interface IActionWrapperProps {
-	card: ICard;
+	card: ICardInstance;
 	type?: "attack" | "defense" | "both";
 	side: "enemy" | "player";
 	children: JSX.Element;

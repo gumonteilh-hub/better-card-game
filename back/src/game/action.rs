@@ -2,14 +2,14 @@ use ::serde::Serialize;
 
 use crate::game::{
     card::CardInstance,
-    types::{EntityId, Location, PlayerId},
+    types::{InstanceId, Location, PlayerId},
 };
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum Action {
     Boost {
-        target: EntityId,
+        target: InstanceId,
         attack: usize,
         hp: usize,
     },
@@ -23,21 +23,21 @@ pub enum Action {
     },
     BurnCard {
         player: PlayerId,
-        card: EntityId,
+        card: InstanceId,
     },
     Draw {
         player: PlayerId,
         card: CardInstance,
     },
     Heal {
-        target: EntityId, // or PLayerId, todo update logic to make EntityId and PlayerId the same
+        target: InstanceId, // or PLayerId, todo update logic to make EntityId and PlayerId the same
         amount: usize,
     },
     Destroy {
-        target: EntityId,
+        target: InstanceId,
     },
     ReceiveDamage {
-        target: EntityId,
+        target: InstanceId,
         amount: usize,
     },
     Summon {
@@ -47,11 +47,11 @@ pub enum Action {
         owner: PlayerId,
     },
     Attack {
-        initiator: EntityId,
-        target: EntityId,
+        initiator: InstanceId,
+        target: InstanceId,
     },
-    TriggerOnDeath(EntityId),
-    TriggerOnPlay(EntityId),
-    TriggerOnAttack(EntityId),
+    TriggerOnDeath(InstanceId),
+    TriggerOnPlay(InstanceId),
+    TriggerOnAttack(InstanceId),
     Win(PlayerId),
 }

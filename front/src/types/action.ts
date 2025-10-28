@@ -1,4 +1,4 @@
-import type { ICard, Location } from "./game";
+import type { ICardInstance, Location } from "./game";
 
 export type IAction =
 	| BurnAction
@@ -56,7 +56,7 @@ type DrawAction = {
 	type: "Draw";
 	value: {
 		player: PlayerId;
-		card: ICard;
+		card: ICardInstance;
 	};
 };
 
@@ -88,7 +88,7 @@ type SummonAction = {
 	value: {
 		source: Location;
 		destination: number;
-		target: ICard;
+		target: ICardInstance;
 		owner: PlayerId;
 	};
 };

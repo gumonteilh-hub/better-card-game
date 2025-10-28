@@ -1,19 +1,38 @@
-use crate::{
-    collection::{card, draw, Faction},
-    game::card::CardTemplate,
-    template::PlayerTemplateTarget,
+use crate::collection::{
+    Faction, boost, draw, monster, spell,
+    types::{CardTemplate, PlayerTemplateTarget},
 };
 use once_cell::sync::Lazy;
 
 pub fn get_collection() -> Vec<CardTemplate> {
-    vec![BRAS_DROIT.clone(), CHEVALIER.clone()]
+    vec![BRAS_DROIT.clone(), CHEVALIER.clone(), FANFARE.clone()]
 }
 
-static BRAS_DROIT: Lazy<CardTemplate> =
-    Lazy::new(|| card(1, 2, "Bras droit", "Le bras droit du roi", 5, 5, Faction::HUMAN).build());
+static FANFARE: Lazy<CardTemplate> = Lazy::new(|| {
+    spell(45641211, 2, "Fanfare", "+2/+2 a tout vos monstres", Faction::HUMAN)
+        .effect(vec![boost(
+            crate::collection::types::TemplateTarget::Allies,
+            2,
+            2,
+        )])
+        .build()
+});
+
+static BRAS_DROIT: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1,
+        2,
+        "Bras droit",
+        "Le bras droit du roi",
+        5,
+        5,
+        Faction::HUMAN,
+    )
+    .build()
+});
 
 static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
-    card(
+    monster(
         2,
         3,
         "Chevalier",

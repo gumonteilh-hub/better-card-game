@@ -42,8 +42,7 @@ const applySummon = (
 					hand: state.player.hand.filter(
 						(c) => c.id !== action.value.target.id,
 					),
-					currentMana:
-						newState.player.currentMana - action.value.target.template.cost,
+					currentMana: newState.player.currentMana - action.value.target.cost,
 				},
 			};
 		}
@@ -64,8 +63,7 @@ const applySummon = (
 				enemy: {
 					...newState.enemy,
 					hand: newState.enemy.hand - 1,
-					currentMana:
-						newState.enemy.currentMana - action.value.target.template.cost,
+					currentMana: newState.enemy.currentMana - action.value.target.cost,
 				},
 			};
 		}
@@ -94,8 +92,14 @@ const applyAttack = (
 			...state.player,
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, value]) => {
-					if (value.id === action.value.initiator) {
-						return [key, { ...value, attackCount: value.attackCount + 1 }];
+					if (
+						value.id === action.value.initiator &&
+						value.cardType.type === "monster"
+					) {
+						return [
+							key,
+							{ ...value, attackCount: value.cardType.attackCount + 1 },
+						];
 					} else {
 						return [key, value];
 					}
@@ -140,11 +144,16 @@ const applyReceiveDamage = (
 			...state.player,
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, c]) => {
+					if (c.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
 					if (c.id === action.value.target) {
-						if (c.hp <= action.value.amount) {
+						if (c.cardType.hp <= action.value.amount) {
 							return [key, { ...c, defense: 0 }];
 						}
-						return [key, { ...c, defense: c.hp - action.value.amount }];
+						return [
+							key,
+							{ ...c, defense: c.cardType.hp - action.value.amount },
+						];
 					}
 					return [key, c];
 				}),
@@ -154,11 +163,17 @@ const applyReceiveDamage = (
 			...state.enemy,
 			field: Object.fromEntries(
 				Object.entries(state.enemy.field).map(([key, c]) => {
+					if (c.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
+
 					if (c.id === action.value.target) {
-						if (c.hp <= action.value.amount) {
+						if (c.cardType.hp <= action.value.amount) {
 							return [key, { ...c, defense: 0 }];
 						}
-						return [key, { ...c, defense: c.hp - action.value.amount }];
+						return [
+							key,
+							{ ...c, defense: c.cardType.hp - action.value.amount },
+						];
 					}
 					return [key, c];
 				}),
@@ -227,12 +242,15 @@ const applyHeal = (
 			...state.player,
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, c]) => {
+					if (c.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
+
 					if (c.id === action.value.target) {
-						const healedDefense = c.hp + action.value.amount;
-						if (c.template.hp > healedDefense) {
-							return [key, { ...c, defense: c.template.hp }];
+						const healedHp = c.cardType.hp + action.value.amount;
+						if (c.cardType.max_hp < healedHp) {
+							return [key, { ...c, hp: c.cardType.max_hp }];
 						}
-						return [key, { ...c, defense: healedDefense }];
+						return [key, { ...c, hp: healedHp }];
 					}
 					return [key, c];
 				}),
@@ -242,12 +260,15 @@ const applyHeal = (
 			...state.enemy,
 			field: Object.fromEntries(
 				Object.entries(state.enemy.field).map(([key, c]) => {
+					if (c.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
+
 					if (c.id === action.value.target) {
-						const healedDefense = c.hp + action.value.amount;
-						if (c.template.hp > healedDefense) {
-							return [key, { ...c, defense: c.template.hp }];
+						const healedHp = c.cardType.hp + action.value.amount;
+						if (c.cardType.max_hp < healedHp) {
+							return [key, { ...c, defense: c.cardType.max_hp }];
 						}
-						return [key, { ...c, defense: healedDefense }];
+						return [key, { ...c, defense: healedHp }];
 					}
 					return [key, c];
 				}),
@@ -319,13 +340,16 @@ function applyBoost(
 			...state.player,
 			field: Object.fromEntries(
 				Object.entries(state.player.field).map(([key, value]) => {
+					if (value.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
 					if (value.id === action.value.target) {
 						return [
 							key,
 							{
 								...value,
-								hp: value.hp + action.value.hp,
-								attack: value.attack + action.value.attack,
+								hp: value.cardType.hp + action.value.hp,
+								max_hp: value.cardType.max_hp + action.value.hp,
+								attack: value.cardType.attack + action.value.attack,
 							},
 						];
 					}
@@ -337,13 +361,16 @@ function applyBoost(
 			...state.enemy,
 			field: Object.fromEntries(
 				Object.entries(state.enemy.field).map(([key, value]) => {
+					if (value.cardType.type !== "monster")
+						throw new Error("Trying to apply ReceiveDamage to a spell");
 					if (value.id === action.value.target) {
 						return [
 							key,
 							{
 								...value,
-								hp: value.hp + action.value.hp,
-								attack: value.attack + action.value.attack,
+								hp: value.cardType.hp + action.value.hp,
+								max_hp: value.cardType.max_hp + action.value.hp,
+								attack: value.cardType.attack + action.value.attack,
 							},
 						];
 					}

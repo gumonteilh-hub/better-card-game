@@ -1,8 +1,7 @@
 use serde::Serialize;
 
 
-pub type EntityId = usize;
-pub type TemplateId = usize;
+pub type InstanceId = usize;
 pub type PlayerId = usize;
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize)]

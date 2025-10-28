@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CardTemplate } from "../components/Card";
 import { DeckSummary } from "../components/DeckSummary";
 import { getCollection } from "../game.service";
-import type { Faction, ICardTemplate } from "../types/template";
+import type { Faction, ICardTemplate, TemplateId } from "../types/template";
 import { useUserInfo } from "../utils/useUserInfo";
 
 export const Route = createFileRoute("/collection")({
@@ -34,7 +34,7 @@ function RouteComponent() {
 		}
 	};
 
-	const removeCardFromDeck = (cardId: string) => {
+	const removeCardFromDeck = (cardId: TemplateId) => {
 		const index = temporaryDeck.findIndex((c) => c.id === cardId);
 		if (index !== -1) {
 			const newDeck = [...temporaryDeck];

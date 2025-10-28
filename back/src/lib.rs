@@ -3,15 +3,13 @@
 
 pub use crate::collection::Faction;
 pub use crate::game::Game;
-pub use crate::game::card::CardTemplate;
+use crate::{collection::types::{CardTemplate, TemplateId}, game::action::Action};
 pub use crate::game::view::PublicGameState;
-use crate::game::{action::Action, types::TemplateId};
 
-mod collection;
+pub mod collection;
 pub mod error;
 mod game;
 mod ia;
-mod template;
 
 use error::Result;
 use serde::{Deserialize, Serialize};
@@ -79,7 +77,11 @@ pub fn attack(game_state: &mut Game, initiator: usize, target: usize) -> Result<
     Ok(GameViewResponse { actions, game_view })
 }
 
-pub fn move_card(game_state: &mut Game, card_id: usize, position: usize) -> Result<GameViewResponse> {
+pub fn move_card(
+    game_state: &mut Game,
+    card_id: usize,
+    position: usize,
+) -> Result<GameViewResponse> {
     game_state.move_card(card_id, position)?;
     let actions = game_state.compute_commands()?;
     let game_view = PublicGameState::new(game_state)?;

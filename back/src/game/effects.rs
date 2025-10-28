@@ -1,4 +1,4 @@
-use crate::game::types::{EntityId, PlayerId};
+use crate::game::types::{InstanceId, PlayerId};
 
 use super::events::EventType;
 use serde::{Deserialize, Serialize};
@@ -10,7 +10,7 @@ pub enum Target {
     BothPlayers,
     ItSelf,
     Allies,
-    Id(EntityId),
+    Id(InstanceId),
     //OneAlly,
     //OneEnnemy,
     Ennemies,
@@ -30,17 +30,17 @@ pub enum PlayerTarget {
 #[serde(tag = "type", content = "value")]
 pub enum Effect {
     IncreaseMaxMana {
-        initiator: EntityId,
+        initiator: InstanceId,
         player: PlayerTarget,
         amount: usize,
     },
     RefreshMana {
-        initiator: EntityId,
+        initiator: InstanceId,
         player: PlayerTarget,
         amount: usize,
     },
     MakeDraw {
-        initiator: EntityId,
+        initiator: InstanceId,
         player: PlayerTarget,
         amount: usize,
     },
@@ -49,29 +49,29 @@ pub enum Effect {
         amount: usize,
     },
     Heal {
-        initiator: EntityId,
+        initiator: InstanceId,
         target: Target,
         amount: usize,
     },
     Destroy {
-        initiator: EntityId,
+        initiator: InstanceId,
         target: Target,
     },
     DealDamage {
-        initiator: EntityId,
+        initiator: InstanceId,
         target: Target,
         amount: usize,
     },
     SummonFromHand {
-        entity_id: EntityId,
+        entity_id: InstanceId,
         position: usize,
     },
     Attack {
-        initiator: EntityId,
+        initiator: InstanceId,
         target: Target,
     },
     Boost {
-        initiator: EntityId,
+        initiator: InstanceId,
         attack: usize,
         hp: usize,
         target: Target,

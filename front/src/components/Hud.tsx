@@ -6,7 +6,7 @@ import human from "../assets/hero-human.png";
 import move from "../assets/move_button.png";
 import shield from "../assets/shield.svg";
 import sword from "../assets/sword.svg";
-import type { ICard, IHeroInfo } from "../types/game";
+import type { ICardInstance, IHeroInfo } from "../types/game";
 import { useGameContext } from "../utils/useGameContext";
 import { CardMiniature } from "./Card";
 
@@ -104,7 +104,7 @@ export const TargetWrapper = ({
 
 interface ITrapCardSlotEnemyProps {
 	side: "enemy" | "player";
-	card?: boolean | ICard;
+	card?: boolean | ICardInstance;
 }
 
 export const TrapCardSlot = ({ side, card }: ITrapCardSlotEnemyProps) => {
@@ -114,7 +114,7 @@ export const TrapCardSlot = ({ side, card }: ITrapCardSlotEnemyProps) => {
 	if (side === "player") {
 		return (
 			<div className="trap-card-placeholder">
-				<CardMiniature side={side} card={card as ICard} />
+				<CardMiniature side={side} card={card as ICardInstance} />
 			</div>
 		);
 	}

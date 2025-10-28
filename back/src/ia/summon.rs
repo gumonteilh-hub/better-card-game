@@ -4,7 +4,7 @@ use crate::{
     error::{Result},
     game::{
         action::Action,
-        types::{EntityId, Location, PlayerId},
+        types::{InstanceId, Location, PlayerId},
         Game,
     },
 };
@@ -17,8 +17,8 @@ pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Ve
             game_state
                 .get_hand(player_id)
                 .iter()
-                .map(|(id, entity)| Ok((entity.template.cost, **id)))
-                .collect::<Result<Vec<(usize, EntityId)>>>()?,
+                .map(|(id, entity)| Ok((entity.cost, **id)))
+                .collect::<Result<Vec<(usize, InstanceId)>>>()?,
             current_mana,
             7 - field_size,
         );
@@ -45,10 +45,10 @@ pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Ve
 }
 
 fn maximize_mana_spend(
-    options: Vec<(usize, EntityId)>,
+    options: Vec<(usize, InstanceId)>,
     mana_max: usize,
     place_available: usize,
-) -> Vec<EntityId> {
+) -> Vec<InstanceId> {
     let n = options.len();
 
     if n == 0 || mana_max == 0 || place_available == 0 {

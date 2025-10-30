@@ -65,7 +65,7 @@ impl CardInstance {
                     attack: monster_template.attack,
                     hp: monster_template.hp,
                     max_hp: monster_template.hp,
-                    asleep: false,
+                    asleep: true,
                     attack_count: 0,
                     keywords: monster_template.keywords.clone(),
                     on_play: monster_template

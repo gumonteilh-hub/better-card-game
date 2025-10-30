@@ -180,13 +180,16 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 target: entity.clone(),
                 owner: entity.owner,
             });
-            match &entity.card_type {
+            match &mut entity.card_type {
                 super::card::CardTypeInstance::Monster(monster_instance) => {
                     if !monster_instance.on_play.is_empty() {
                         actions.push(Action::TriggerOnPlay(*entity_id));
                         context
                             .effect_queue
                             .extend(monster_instance.on_play.clone());
+                    }
+                    if monster_instance.keywords.contains(&super::card::Keyword::Charge) {
+                        monster_instance.asleep = false;
                     }
                 }
                 super::card::CardTypeInstance::Spell(spell_instance) => {

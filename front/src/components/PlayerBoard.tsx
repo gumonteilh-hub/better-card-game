@@ -58,20 +58,21 @@ const PlayerBoard = ({
 				<div className="hand">
 					{side === "player"
 						? hand.map((c, index) => (
-								<Draggable
-									key={c.id}
-									id={`card-${c.id}`}
-									cardId={c.id}
-									enabled={playableCards?.includes(c.id) ?? false}
-									style={{ zIndex: index }}
-								>
-									<Card card={c} />
-								</Draggable>
-							))
+							<Draggable
+								cardType={c.cardType.type}
+								key={c.id}
+								id={`card-${c.id}`}
+								cardId={c.id}
+								enabled={playableCards?.includes(c.id) ?? false}
+								style={{ zIndex: index }}
+							>
+								<Card card={c} />
+							</Draggable>
+						))
 						: hand > 0 &&
-							[...Array(hand).keys()].map((index) => (
-								<CardBack key={index}></CardBack>
-							))}
+						[...Array(hand).keys()].map((index) => (
+							<CardBack key={index}></CardBack>
+						))}
 				</div>
 			</div>
 
@@ -92,7 +93,12 @@ interface IFieldProps {
 }
 const Field = ({ field, side }: IFieldProps) => {
 	return (
-		<div className="field">
+		<Droppable
+			accepts={["spell"]}
+			id={`field-${side}`}
+			customClassName="field"
+			position={0}
+		>
 			<div className="column">
 				<CardWrapper side={side} type="attack" card={field[0]} position={0} />
 				<CardWrapper side={side} type="defense" card={field[1]} position={1} />
@@ -111,7 +117,7 @@ const Field = ({ field, side }: IFieldProps) => {
 				<CardWrapper side={side} type="attack" card={field[6]} position={6} />
 				<CardWrapper side={side} type="defense" card={field[7]} position={7} />
 			</div>
-		</div>
+		</Droppable>
 	);
 };
 interface ICardWrapperProps {
@@ -126,7 +132,11 @@ const CardWrapper = ({ card, type, side, position }: ICardWrapperProps) => {
 	} else {
 		if (side === "player") {
 			return (
-				<Droppable id={`field-${position}`} position={position}>
+				<Droppable
+					accepts={["monster", "spell"]}
+					id={`field-${position}`}
+					position={position}
+				>
 					<FieldSlot side={side} position={position} type={type} />
 				</Droppable>
 			);

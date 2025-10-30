@@ -38,7 +38,11 @@ async fn main() {
         .route("/{game_id}", get(game_state))
         .route("/{game_id}/attack/{initiator_id}/{target_id}", post(attack))
         .route("/{game_id}/move/{card_id}/{target_pos}", post(move_card))
-        .route("/{game_id}/play_card/{card_id}/{position}", post(play_card))
+        .route(
+            "/{game_id}/play_monster/{card_id}/{position}",
+            post(play_monster),
+        )
+        .route("/{game_id}/play_spell/{card_id}", post(play_spell))
         .route("/{game_id}/end_turn", post(end_turn));
 
     let app = Router::new()
@@ -84,19 +88,39 @@ async fn start_game(
 }
 
 #[debug_handler]
-async fn play_card(
+async fn play_spell(
+    State(state): State<Arc<AppState>>,
+    Path((game_id, card_id)): Path<(Uuid, usize)>,
+) -> ApiResult<Json<back::GameViewResponse>> {
+    tracing::info!(
+        "Received play_spell request for game: {}, with card_id: {}",
+        game_id,
+        card_id,
+    );
+    match state.game_states.lock().await.get_mut(&game_id) {
+        Some(game) => {
+            let game_view = back::play_spell(game, card_id)?;
+            tracing::info!("Play card performed successfully");
+            Ok(Json(game_view))
+        }
+        None => Err(back::error::Error::GameNotStarted),
+    }
+}
+
+#[debug_handler]
+async fn play_monster(
     State(state): State<Arc<AppState>>,
     Path((game_id, card_id, position)): Path<(Uuid, usize, usize)>,
 ) -> ApiResult<Json<back::GameViewResponse>> {
     tracing::info!(
-        "Received play_card request for game: {}, with card_id: {}, and position: {}",
+        "Received play_monster request for game: {}, with card_id: {}, and position: {}",
         game_id,
         card_id,
         position
     );
     match state.game_states.lock().await.get_mut(&game_id) {
         Some(game) => {
-            let game_view = back::play_card(game, card_id, position)?;
+            let game_view = back::play_monster(game, card_id, position)?;
             tracing::info!("Play card performed successfully");
             Ok(Json(game_view))
         }

@@ -1,7 +1,16 @@
-import { DndContext } from "@dnd-kit/core";
+import {
+	type ClientRect,
+	type Collision,
+	DndContext,
+	type DroppableContainer,
+	pointerWithin,
+	rectIntersection,
+} from "@dnd-kit/core";
+import type { Active, RectMap } from "@dnd-kit/core/dist/store";
+import type { Coordinates } from "@dnd-kit/core/dist/types";
 import { createFileRoute } from "@tanstack/react-router";
 import PlayerBoard from "../../components/PlayerBoard";
-import { endTurn, playCard } from "../../game.service";
+import { endTurn, playMonster, playSpell } from "../../game.service";
 import { GameContextProvider } from "../../utils/GameContextProvider";
 import { useGameContext } from "../../utils/useGameContext";
 
@@ -25,14 +34,25 @@ const Game = () => {
 	const handleDragEnd = (event: any) => {
 		if (isAnimating || !gameState) return;
 		const { active, over } = event;
-		if (over && active) {
-			playCard(
-				gameState.gameId,
-				active.data.current.id,
-				over.data.current.position,
-			).then((res) => {
-				updateGameState(res);
-			});
+		if (
+			over &&
+			active &&
+			over.data.current.accepts.includes(active.data.current.type)
+		) {
+			if (active.data.current.type === "monster") {
+				playMonster(
+					gameState.gameId,
+					active.data.current.id,
+					over.data.current.position,
+				).then((res) => {
+					updateGameState(res);
+				});
+			}
+			if (active.data.current.type === "spell") {
+				playSpell(gameState.gameId, active.data.current.id).then((res) => {
+					updateGameState(res);
+				});
+			}
 		}
 	};
 
@@ -44,9 +64,34 @@ const Game = () => {
 		});
 	}
 
+	function collisionHandler(args: {
+		active: Active;
+		collisionRect: ClientRect;
+		droppableRects: RectMap;
+		droppableContainers: DroppableContainer[];
+		pointerCoordinates: Coordinates | null;
+	}): Collision[] {
+		const isSpell = args.active.data.current?.type === "spell";
+
+		if (isSpell) {
+			const intersectingDroppables = pointerWithin(args);
+			const gameBoard = intersectingDroppables.find(
+				(droppable) => droppable.id === "field-player",
+			);
+
+			return gameBoard ? [gameBoard] : [];
+		}
+
+		return rectIntersection(args);
+	}
+
 	return (
 		<div className="main">
-			<DndContext autoScroll={false} onDragEnd={handleDragEnd}>
+			<DndContext
+				autoScroll={false}
+				onDragEnd={handleDragEnd}
+				collisionDetection={collisionHandler}
+			>
 				<PlayerBoard
 					side="enemy"
 					secredCard={gameState.enemy.secretCard}

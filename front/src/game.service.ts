@@ -27,13 +27,25 @@ export const startGame = async (deck: IDeck): Promise<string> => {
 	});
 };
 
-export const playCard = async (
+export const playMonster = async (
 	gameId: string,
 	cardId: number,
 	position: number,
 ): Promise<IGameUpdate> => {
 	return apiFetch<IGameUpdate>(
-		`/api/game/${gameId}/play_card/${cardId}/${position}`,
+		`/api/game/${gameId}/play_monster/${cardId}/${position}`,
+		{
+			method: "POST",
+		},
+	);
+};
+
+export const playSpell = async (
+	gameId: string,
+	cardId: number,
+): Promise<IGameUpdate> => {
+	return apiFetch<IGameUpdate>(
+		`/api/game/${gameId}/play_spell/${cardId}`,
 		{
 			method: "POST",
 		},

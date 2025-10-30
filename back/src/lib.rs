@@ -47,18 +47,31 @@ pub fn start_game(deck: UserDeck) -> Result<Game> {
     Ok(game_state)
 }
 
-pub fn play_card(
+pub fn play_monster(
     game_state: &mut Game,
     card_id: usize,
     position: usize,
 ) -> Result<GameViewResponse> {
-    game_state.play_card(card_id, position)?;
+    game_state.play_monster(card_id, position)?;
     let actions = game_state.compute_commands()?;
     let game_view = PublicGameState::new(game_state)?;
 
     let response = GameViewResponse { actions, game_view };
     Ok(response)
 }
+
+pub fn play_spell(
+    game_state: &mut Game,
+    card_id: usize,
+) -> Result<GameViewResponse> {
+    game_state.play_spell(card_id)?;
+    let actions = game_state.compute_commands()?;
+    let game_view = PublicGameState::new(game_state)?;
+
+    let response = GameViewResponse { actions, game_view };
+    Ok(response)
+}
+
 
 pub fn end_turn(game_state: &mut Game) -> Result<GameViewResponse> {
     let mut actions = game_state.next_turn()?;
@@ -88,3 +101,5 @@ pub fn move_card(
 
     Ok(GameViewResponse { actions, game_view })
 }
+
+

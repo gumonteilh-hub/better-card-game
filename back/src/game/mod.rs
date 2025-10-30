@@ -164,7 +164,50 @@ impl Game {
         Ok(())
     }
 
-    pub fn play_card(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
+    pub fn play_spell(&mut self, card_id: usize) -> Result<()> {
+        let owner = self
+            .entities
+            .get(&card_id)
+            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?
+            .owner;
+
+        let card_clone = self.get_entity(card_id)?.clone();
+        let card_cost = card_clone.cost;
+
+        if !matches!(card_clone.location, Location::Hand) {
+            return Err(Error::Game(
+                "This card must be in your hand to play it".to_string(),
+            ));
+        }
+
+        let player = self
+            .players
+            .get_mut(&owner)
+            .ok_or_else(|| Error::Game(format!("Player with id {} not found", owner)))?;
+
+        if player.mana < card_cost {
+            return Err(Error::Game(
+                "You don't have enough mana to play this card".into(),
+            ));
+        }
+        player.mana -= card_cost;
+
+        match &card_clone.card_type {
+            card::CardTypeInstance::Spell(spell_instance) => {
+                self.effect_queue.extend(spell_instance.effect.clone());
+            }
+            card::CardTypeInstance::Monster(monster_instance) => {
+                return Err(Error::Game(
+                    "You can not cast a monster, only a spell".into(),
+                ));
+            }
+        }
+
+        self.get_mut_entity(card_id)?.location = Location::Graveyard;
+        Ok(())
+    }
+
+    pub fn play_monster(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
         let owner = self
             .entities
             .get(&card_id)
@@ -186,6 +229,12 @@ impl Game {
         }
 
         let card = self.get_entity(card_id)?;
+
+        if !matches!(card.location, Location::Hand) {
+            return Err(Error::Game(
+                "This card must be in your hand to play it".to_string(),
+            ));
+        }
 
         let card_cost = card.cost;
 

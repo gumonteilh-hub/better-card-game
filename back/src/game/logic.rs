@@ -29,9 +29,9 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                         })
                         .map(|(id, _)| *id)
                     {
-                        let hand_full = context.get_hand(player_id).len() < 10;
+                        let hand_full = context.get_hand(player_id).len() >= 10;
                         if let Some(card) = context.entities.get_mut(&card_id) {
-                            if hand_full {
+                            if !hand_full {
                                 card.location = Location::Hand;
                                 actions.push(Action::Draw {
                                     player: player_id,
@@ -142,7 +142,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 let entity = context.get_mut_entity(target_id)?;
                 match &mut entity.card_type {
                     super::card::CardTypeInstance::Monster(monster_instance) => {
-                        let max_hp = monster_instance.hp;
+                        let max_hp = monster_instance.max_hp;
                         let old_hp = monster_instance.hp;
                         monster_instance.hp = (monster_instance.hp + *amount).min(max_hp);
                         let effective_heal = monster_instance.hp - old_hp;
@@ -188,7 +188,10 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                             .effect_queue
                             .extend(monster_instance.on_play.clone());
                     }
-                    if monster_instance.keywords.contains(&super::card::Keyword::Charge) {
+                    if monster_instance
+                        .keywords
+                        .contains(&super::card::Keyword::Charge)
+                    {
                         monster_instance.asleep = false;
                     }
                 }

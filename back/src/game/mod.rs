@@ -7,6 +7,9 @@ pub mod player;
 pub mod types;
 pub mod view;
 
+#[cfg(test)]
+mod tests;
+
 use std::collections::{HashMap, VecDeque};
 
 use crate::collection::types::CardTemplate;

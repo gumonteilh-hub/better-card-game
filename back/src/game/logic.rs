@@ -324,6 +324,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     super::card::CardTypeInstance::Monster(monster_instance) => {
                         monster_instance.attack += attack;
                         monster_instance.hp += hp;
+                        monster_instance.max_hp += hp;
 
                         actions.push(Action::Boost {
                             target: target_id,

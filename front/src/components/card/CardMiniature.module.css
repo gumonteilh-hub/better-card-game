@@ -1,4 +1,5 @@
 .cardMiniature {
+	position: relative;
 	height: var(--card-miniature-height);
 	aspect-ratio: 1;
 	background-color: #f4ac45;

@@ -1,0 +1,36 @@
+.overlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 60%;
+	height: 60%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	z-index: 100;
+	filter: drop-shadow(0 0 8px currentColor);
+}
+
+.overlay svg {
+	width: 100%;
+	height: 100%;
+}
+
+.death {
+	color: #8b0000;
+}
+
+.play {
+	color: #ffd700;
+}
+
+.attack {
+	color: #ff4500;
+}
+
+.triggerEffectImage {
+	width: 100px;
+	aspect-ratio: 1 ;
+}

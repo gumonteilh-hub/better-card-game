@@ -19,6 +19,7 @@ export const getAnimationDuration = (actionType: ActionType): number => {
 		case "TriggerOnDeath":
 		case "TriggerOnPlay":
 		case "TriggerOnAttack":
+			return 600;
 		case "IncreaseMaxMana":
 		case "RefreshMana":
 		case "BurnCard":
@@ -38,7 +39,10 @@ export type AnimationState =
 	| "damaged"
 	| "boosted"
 	| "winned"
-	| "drawed";
+	| "drawed"
+	| "triggerOnDeath"
+	| "triggerOnPlay"
+	| "triggerOnAttack";
 
 export const computeAnimationState = (
 	actions: IAction[],
@@ -90,10 +94,19 @@ export const computeAnimationState = (
 				animationMap.set(action.value, "winned");
 				break;
 			}
+			case "TriggerOnDeath": {
+				animationMap.set(action.value, "triggerOnDeath");
+				break;
+			}
+			case "TriggerOnPlay": {
+				animationMap.set(action.value, "triggerOnPlay");
+				break;
+			}
+			case "TriggerOnAttack": {
+				animationMap.set(action.value, "triggerOnAttack");
+				break;
+			}
 			case "BurnCard":
-			case "TriggerOnAttack":
-			case "TriggerOnPlay":
-			case "TriggerOnDeath":
 			case "RefreshMana":
 			case "IncreaseMaxMana":
 		}

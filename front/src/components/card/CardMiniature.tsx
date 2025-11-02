@@ -7,6 +7,7 @@ import { useGameContext } from "../../utils/useGameContext";
 import { ActionWrapper } from "../wrapper/ActionWrapper";
 import { Card } from "./Card";
 import styles from "./CardMiniature.module.css";
+import { TriggerEffect } from "./TriggerEffect";
 
 interface ICardMiniatureProps {
 	card: ICardInstance;
@@ -20,6 +21,19 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 		() => animationMap.get(card.id) ?? "idle",
 		[animationMap, card.id],
 	);
+
+	const triggerType = useMemo(() => {
+		switch (animationState) {
+			case "triggerOnDeath":
+				return "onDeath";
+			case "triggerOnPlay":
+				return "onPlay";
+			case "triggerOnAttack":
+				return "onAttack";
+			default:
+				return null;
+		}
+	}, [animationState]);
 
 	if (card.cardType.type !== "monster") {
 		throw new Error("only monster can be in miniature");
@@ -37,6 +51,7 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 						layout
 						layoutId={`card-${card.id}`}
 					>
+						<TriggerEffect type={triggerType} />
 						<div className={styles.cardBody}>
 							<div className={styles.cardImage}>
 								<img src={placeholder} alt="card" />

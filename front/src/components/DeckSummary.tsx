@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Faction, ICardTemplate, TemplateId } from "../types/template";
+import { ManaHud } from "./Hud";
 
 interface DeckSummaryProps {
 	cards: ICardTemplate[];
@@ -56,7 +57,9 @@ export const DeckSummary = ({
 						onClick={() => onCardClick?.(card.id)}
 					>
 						<div className="deck-summary-item-info">
-							<div className="deck-summary-item-cost">{card.cost}</div>
+							<div className="deck-summary-item-cost">
+								<ManaHud content={card.cost.toString()} />
+							</div>
 							<div className="deck-summary-item-name">{card.name}</div>
 						</div>
 						<div className="deck-summary-item-count">x{count}</div>

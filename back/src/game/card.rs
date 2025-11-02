@@ -81,7 +81,7 @@ impl CardInstance {
                         .map(|e| convert_to_effect(e, entity_id))
                         .collect(),
                     on_death: monster_template
-                        .on_play
+                        .on_death
                         .clone()
                         .iter()
                         .map(|e| convert_to_effect(e, entity_id))

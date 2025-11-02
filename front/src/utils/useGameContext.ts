@@ -3,7 +3,7 @@ import type { IGameState, IGameUpdate } from "../types/game";
 import type { IInputMode } from "./GameContextProvider";
 import type { AnimationState } from "./useGameEngine";
 
-interface IGameContext {
+export interface IGameContext {
 	gameState: IGameState;
 	selectedCard?: number;
 	isAnimating: boolean;

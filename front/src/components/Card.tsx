@@ -6,7 +6,7 @@ import type { ICardTemplate } from "../types/template";
 import { cardVariants } from "../utils/cardVariants";
 import { attackReady } from "../utils/gameRules";
 import { useGameContext } from "../utils/useGameContext";
-import { TargetWrapper } from "./Hud";
+import { ManaHud, TargetWrapper } from "./Hud";
 
 interface ICardProps {
 	card: ICardInstance;
@@ -16,7 +16,9 @@ export const Card = ({ card }: ICardProps) => {
 	return (
 		<div className="card">
 			<div className="card-header">
-				<div className="card-cost">{card.cost}</div>
+				<div className="card-cost">
+					<ManaHud content={card.cost.toString()} />
+				</div>
 				<div className="card-name">{card.name}</div>
 			</div>
 			<div className="card-body">
@@ -57,7 +59,9 @@ export const CardTemplate = ({ card }: ICardTemplateProps) => {
 	return (
 		<div className="card card-template">
 			<div className="card-header">
-				<div className="card-cost">{card.cost}</div>
+				<div className="card-cost">
+					<ManaHud content={card.cost.toString()} />
+				</div>
 				<div className="card-name">{card.name}</div>
 			</div>
 			<div className="card-body">

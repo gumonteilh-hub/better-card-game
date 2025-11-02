@@ -136,6 +136,7 @@ const CardWrapper = ({ card, type, side, position }: ICardWrapperProps) => {
 					accepts={["monster", "spell"]}
 					id={`field-${position}`}
 					position={position}
+					customClassName="field-slot-dropzone"
 				>
 					<FieldSlot side={side} position={position} type={type} />
 				</Droppable>

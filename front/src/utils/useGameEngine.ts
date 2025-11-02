@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { getGameInfo } from "../game.service";
 import type { ActionType, IAction } from "../types/action";
@@ -15,6 +16,13 @@ export const useGameEngine = (gameId: string) => {
 	const [animationMap, setAnimationMap] = useState<Map<number, AnimationState>>(
 		new Map(),
 	);
+	const navigate = useNavigate({ from: "game/$gameId/" });
+
+	useEffect(() => {
+		if (!(gameState?.winnerId === undefined || gameState?.winnerId === null)) {
+			navigate({ to: "/" });
+		}
+	}, [gameState?.winnerId, navigate]);
 
 	useEffect(() => {
 		getGameInfo(gameId).then((res) => {
@@ -56,7 +64,7 @@ export const useGameEngine = (gameId: string) => {
 				setActionQueue(
 					actionQueue.filter((_, i) => !processedActions.includes(i)),
 				);
-				setAnimationMap(computeAnimationState(group));
+				setAnimationMap(computeAnimationState(group, intermediateState));
 
 				const animationDuration = getAnimationDuration(currentType);
 
@@ -79,14 +87,20 @@ export const useGameEngine = (gameId: string) => {
 export type AnimationState =
 	| "summoned"
 	| "attacking"
+	| "enemyAttacking"
+	| "enemyAttacked"
 	| "attacked"
 	| "healed"
 	| "dying"
 	| "damaged"
 	| "boosted"
+	| "winned"
 	| "drawed";
 
-const computeAnimationState = (actions: IAction[]) => {
+const computeAnimationState = (
+	actions: IAction[],
+	intermediateState: IGameState,
+) => {
 	const animationMap = new Map<number, AnimationState>();
 
 	for (const action of actions) {
@@ -112,13 +126,33 @@ const computeAnimationState = (actions: IAction[]) => {
 				break;
 			}
 			case "Attack": {
-				animationMap.set(action.value.initiator, "attacking");
-				animationMap.set(action.value.target, "attacked");
+				if (
+					Object.values(intermediateState.player.field).some(
+						(c) => c.id === action.value.initiator,
+					)
+				) {
+					animationMap.set(action.value.initiator, "attacking");
+					animationMap.set(action.value.target, "enemyAttacked");
+				} else {
+					animationMap.set(action.value.initiator, "enemyAttacking");
+					animationMap.set(action.value.target, "attacked");
+				}
 				break;
 			}
 			case "Boost": {
 				animationMap.set(action.value.target, "boosted");
+				break;
 			}
+			case "Win": {
+				animationMap.set(action.value, "winned");
+				break;
+			}
+			case "BurnCard":
+			case "TriggerOnAttack":
+			case "TriggerOnPlay":
+			case "TriggerOnDeath":
+			case "RefreshMana":
+			case "IncreaseMaxMana":
 		}
 	}
 

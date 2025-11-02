@@ -1,7 +1,7 @@
 use crate::{
     UserDeck,
     collection::{
-        Faction, boost, deal_damage, draw, heal, monster,
+        Faction, boost, deal_damage, draw, heal, monster, spell,
         types::{CardTemplate, PlayerTemplateTarget, TemplateTarget},
     },
     game::card::Keyword,
@@ -31,6 +31,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
         VAMPIRE.clone(),
         PALADIN.clone(),
         BOOSTER_TEST.clone(),
+        HEALER_TEST.clone(),
     ]
 }
 
@@ -86,6 +87,18 @@ static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
         Faction::COMMON,
     )
     .on_play(vec![boost(TemplateTarget::Allies, 1, 1)])
+    .build()
+});
+
+static HEALER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
+    spell(
+        213456677,
+        1,
+        "Healer Test",
+        "Heal all your cards 5 hp",
+        Faction::COMMON,
+    )
+    .effect(vec![heal(TemplateTarget::Allies, 5)])
     .build()
 });
 

@@ -78,7 +78,6 @@ const applySummon = (
 			},
 		};
 	}
-	console.log(newState);
 	return newState;
 };
 

@@ -9,6 +9,9 @@ import sword from "../assets/sword.svg";
 import type { ICardInstance, IHeroInfo } from "../types/game";
 import { useGameContext } from "../utils/useGameContext";
 import { CardMiniature } from "./Card";
+import { motion } from "framer-motion";
+import { heroVariants } from "../utils/heroVariants";
+import mana from "../assets/mana.svg";
 
 export const CardBack = () => {
 	return (
@@ -41,7 +44,12 @@ interface IHeroPortraitProps {
 	side: "enemy" | "player";
 }
 export const HeroPortrait = ({ hero, side }: IHeroPortraitProps) => {
-	const { canAttackPlayer } = useGameContext();
+	const { canAttackPlayer, animationMap } = useGameContext();
+
+	const animationState = useMemo(
+		() => animationMap.get(hero.id) ?? "idle",
+		[animationMap, hero.id],
+	);
 
 	const imgSrc = useMemo(() => {
 		switch (hero.faction) {
@@ -57,14 +65,23 @@ export const HeroPortrait = ({ hero, side }: IHeroPortraitProps) => {
 	}, [hero.faction]);
 
 	return (
-		<div className="hero-portrait">
+		<div className={`hero-portrait`}>
 			<div className="hero-image-slot untransformed">
-				<TargetWrapper
-					active={side === "enemy" && canAttackPlayer}
-					id={hero.id}
+				<motion.div
+					className="hero-animation-wrapper"
+					variants={heroVariants}
+					animate={animationState}
+					style={{ willChange: "transform, opacity, filter" }}
+					layout
+					layoutId={`hero-${hero.id}`}
 				>
-					<img src={imgSrc} alt="the hero of the player" />
-				</TargetWrapper>
+					<TargetWrapper
+						active={side === "enemy" && canAttackPlayer}
+						id={hero.id}
+					>
+						<img src={imgSrc} alt="the hero of the player" />
+					</TargetWrapper>
+				</motion.div>
 				<div className="player-hp">
 					<HeartIcon className="heart-icon" />
 					<span className="hp-value ">{hero.hp}</span>
@@ -126,14 +143,14 @@ export const TrapCardSlot = ({ side, card }: ITrapCardSlotEnemyProps) => {
 };
 
 interface IManaHudProps {
-	current: number;
-	max: number;
+	content: string;
 }
 
-export const ManaHud = ({ current, max }: IManaHudProps) => {
+export const ManaHud = ({ content }: IManaHudProps) => {
 	return (
 		<div className="mana-crystal untransformed">
-			{current} /{max}
+			<img src={mana} alt="mana" />
+			<span>{content}</span>
 		</div>
 	);
 };
@@ -208,7 +225,7 @@ export const Hud = ({ currentMana, maxMana, side }: IHudProps) => {
 	return (
 		<div className="hud">
 			<div className="hud-left-side">
-				<ManaHud current={currentMana} max={maxMana} />
+				<ManaHud content={`${currentMana} /${maxMana}`} />
 			</div>
 			<div className="hud-right-side">
 				<AttackModeButton side={side} />

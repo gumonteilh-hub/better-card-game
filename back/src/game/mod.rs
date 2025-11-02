@@ -309,7 +309,8 @@ impl Game {
         actions.append(&mut reset_turn_actions);
 
         if self.current_player == self.player_id_b {
-            actions = ia::ai_play_turn(self, self.player_id_b)?;
+            let mut ia_actions = ia::ai_play_turn(self, self.player_id_b)?;
+            actions.append(&mut ia_actions);
         }
         Ok(actions)
     }

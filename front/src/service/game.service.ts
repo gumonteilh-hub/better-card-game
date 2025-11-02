@@ -1,6 +1,6 @@
-import type { IGameState, IGameUpdate } from "./types/game";
-import type { Faction, ICardTemplate, IDeck } from "./types/template";
-import { apiFetch } from "./utils/api";
+import type { IGameState, IGameUpdate } from "../types/game";
+import type { Faction, ICardTemplate, IDeck } from "../types/template";
+import { apiFetch } from "./api";
 
 export const getCollection = async (
 	faction: Faction,
@@ -44,12 +44,9 @@ export const playSpell = async (
 	gameId: string,
 	cardId: number,
 ): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(
-		`/api/game/${gameId}/play_spell/${cardId}`,
-		{
-			method: "POST",
-		},
-	);
+	return apiFetch<IGameUpdate>(`/api/game/${gameId}/play_spell/${cardId}`, {
+		method: "POST",
+	});
 };
 
 export const endTurn = async (gameId: string): Promise<IGameUpdate> => {

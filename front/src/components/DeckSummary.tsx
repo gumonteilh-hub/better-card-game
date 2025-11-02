@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { Faction, ICardTemplate, TemplateId } from "../types/template";
-import { ManaHud } from "./Hud";
+import styles from "./DeckSummary.module.css";
+import { ManaCrystal } from "./hud/ManaCrystal";
 
 interface DeckSummaryProps {
 	cards: ICardTemplate[];
@@ -36,33 +37,33 @@ export const DeckSummary = ({
 	}, [cards]);
 
 	return (
-		<div className="deck-summary">
+		<div className={styles.deckSummary}>
 			{showTitle && (
-				<div className="deck-summary-header">
+				<div className={styles.header}>
 					<h2>Mon Deck</h2>
 					<h3>{faction}</h3>
 					<div
-						className={`deck-summary-count ${cards.length === 30 ? "complete" : "incomplete"}`}
+						className={`${styles.count} ${cards.length === 30 ? styles.complete : styles.incomplete}`}
 					>
 						{cards.length} / 30
 					</div>
 				</div>
 			)}
-			<div className="deck-summary-list">
+			<div className={styles.list}>
 				{deckSummary.map(({ card, count }) => (
 					<button
 						type="button"
 						key={card.id}
-						className={`deck-summary-item ${onCardClick ? "clickable" : ""}`}
+						className={`${styles.item} ${onCardClick ? styles.clickable : ""}`}
 						onClick={() => onCardClick?.(card.id)}
 					>
-						<div className="deck-summary-item-info">
-							<div className="deck-summary-item-cost">
-								<ManaHud content={card.cost.toString()} />
+						<div className={styles.itemInfo}>
+							<div className={styles.itemCost}>
+								<ManaCrystal content={card.cost.toString()} />
 							</div>
-							<div className="deck-summary-item-name">{card.name}</div>
+							<div className={styles.itemName}>{card.name}</div>
 						</div>
-						<div className="deck-summary-item-count">x{count}</div>
+						<div className={styles.itemCount}>x{count}</div>
 					</button>
 				))}
 			</div>

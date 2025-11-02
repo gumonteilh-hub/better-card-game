@@ -1,0 +1,45 @@
+.cardBack {
+	height: var(--card-heigh);
+	aspect-ratio: var(--card-aspect-ratio);
+	background-color: #023e8a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: solid 2px;
+}
+
+.spiral {
+	--b: 10px;
+	--s: 100px;
+	--c: #90e0ef;
+
+	width: round(var(--s), 4 * var(--b));
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background:
+		repeating-radial-gradient(
+			calc(2 * var(--b)) at top,
+			#0000 -1px,
+			var(--c) 0 calc(50% - 1px),
+			#0000 50% calc(100% - 1px)
+		)
+		calc(50% + var(--b)) 100%,
+		repeating-radial-gradient(
+			calc(2 * var(--b)) at bottom,
+			var(--c) -1px,
+			#0000 0 calc(50% - 1px),
+			var(--c) 50% calc(100% - 1px)
+		)
+		50% 0;
+	background-size: 150% 50%;
+	background-repeat: no-repeat;
+	mask:
+		radial-gradient(
+			calc(1.5 * var(--b)) at calc(100% - var(--b) / 2) 0,
+			#0000 calc(100% / 3),
+			#000 calc(100% / 3 + 1px) 110%,
+			#0000 0
+		)
+		calc(50% + var(--b) / 2) 100% / calc(3 * var(--b)) 50% exclude no-repeat,
+		conic-gradient(#000 0 0);
+}

@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CardTemplate } from "../components/Card";
+import { CardTemplate } from "../components/card/CardTemplate";
 import { DeckSummary } from "../components/DeckSummary";
-import { getCollection } from "../game.service";
+import { getCollection } from "../service/game.service";
 import type { Faction, ICardTemplate, TemplateId } from "../types/template";
 import { useUserInfo } from "../utils/useUserInfo";
 

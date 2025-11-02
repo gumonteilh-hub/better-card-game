@@ -1,7 +1,7 @@
 import { type JSX, useCallback, useMemo, useState } from "react";
-import { attack, move } from "../game.service";
-import { GameContext } from "./useGameContext";
-import { useGameEngine } from "./useGameEngine";
+import { useGameEngine } from "../engine/gameEngine";
+import { attack, move } from "../service/game.service";
+import { GameContext } from "../types/gameContext.type";
 
 export const attackPositions = [0, 2, 3, 5, 6];
 export const defensePositions = [1, 2, 4, 5, 7];

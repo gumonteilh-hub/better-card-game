@@ -1,31 +1,4 @@
 import type { Variants } from "framer-motion";
-import type { ActionType } from "../types/action";
-
-export const getAnimationDuration = (actionType: ActionType): number => {
-	switch (actionType) {
-		case "Destroy":
-			return 700;
-		case "Heal":
-		case "ReceiveDamage":
-			return 400;
-		case "Summon":
-			return 500;
-		case "Attack":
-			return 500;
-		case "Boost":
-			return 300;
-		case "Win":
-			return 1200;
-		case "TriggerOnDeath":
-		case "TriggerOnPlay":
-		case "TriggerOnAttack":
-		case "IncreaseMaxMana":
-		case "RefreshMana":
-		case "BurnCard":
-		case "Draw":
-			return 0;
-	}
-};
 
 export const heroVariants: Variants = {
 	idle: {

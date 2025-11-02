@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { startGame } from "../../game.service";
+import { startGame } from "../../service/game.service";
 import { useUserInfo } from "../../utils/useUserInfo";
 
 export const Route = createFileRoute("/game/")({

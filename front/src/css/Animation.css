@@ -1,0 +1,62 @@
+@keyframes bluePulseGlow {
+	0%,
+	100% {
+		opacity: 0.8;
+		box-shadow:
+			0 0 10px 2px rgba(0, 0, 255, 0.6),
+			0 0 20px 4px rgba(0, 0, 255, 0.4),
+			0 0 30px 6px rgba(0, 0, 255, 0.2),
+			inset 0 0 10px 1px rgba(0, 0, 255, 0.3);
+	}
+
+	50% {
+		opacity: 1;
+		box-shadow:
+			0 0 15px 3px rgba(0, 0, 255, 0.8),
+			0 0 25px 6px rgba(0, 0, 255, 0.6),
+			0 0 40px 8px rgba(0, 0, 255, 0.4),
+			inset 0 0 13px 2px rgba(0, 0, 255, 0.4);
+	}
+}
+
+@keyframes redPulseGlow {
+	0%,
+	100% {
+		opacity: 0.8;
+		box-shadow:
+			0 0 10px 2px rgba(255, 0, 0, 0.6),
+			0 0 20px 4px rgba(255, 0, 0, 0.4),
+			0 0 30px 6px rgba(255, 0, 0, 0.2),
+			inset 0 0 10px 1px rgba(255, 0, 0, 0.3);
+	}
+
+	50% {
+		opacity: 1;
+		box-shadow:
+			0 0 15px 3px rgba(255, 0, 0, 0.8),
+			0 0 25px 6px rgba(255, 0, 0, 0.6),
+			0 0 40px 8px rgba(255, 0, 0, 0.4),
+			inset 0 0 13px 2px rgba(255, 0, 0, 0.4);
+	}
+}
+
+@keyframes pulseGlow {
+	0%,
+	100% {
+		opacity: 0.8;
+		box-shadow:
+			0 0 10px 2px rgba(255, 215, 0, 0.6),
+			0 0 20px 4px rgba(255, 215, 0, 0.4),
+			0 0 30px 6px rgba(255, 215, 0, 0.2),
+			inset 0 0 10px 1px rgba(255, 215, 0, 0.3);
+	}
+
+	50% {
+		opacity: 1;
+		box-shadow:
+			0 0 15px 3px rgba(255, 215, 0, 0.8),
+			0 0 25px 6px rgba(255, 215, 0, 0.6),
+			0 0 40px 8px rgba(255, 215, 0, 0.4),
+			inset 0 0 13px 2px rgba(255, 215, 0, 0.4);
+	}
+}

@@ -1,0 +1,110 @@
+@import "../../css/Animation.css";
+
+.card {
+	height: var(--card-heigh);
+	aspect-ratio: var(--card-aspect-ratio);
+	background-color: #f4ac45;
+	border-radius: 5%;
+}
+
+.cardHeader {
+	height: 10%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.cardCost {
+	width: 25%;
+	z-index: 2;
+	aspect-ratio: 1;
+	transform: translate(-25%, 15%);
+	color: white;
+	display: flex;
+}
+
+.cardName {
+	font-size: 1.5rem;
+}
+
+.cardBody {
+	height: 80%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3%;
+}
+
+.cardImage {
+	--s: 7px;
+	--w: 90%;
+
+	width: round(var(--w), 4 * var(--s));
+	height: 55%;
+	object-fit: cover;
+	box-sizing: border-box;
+	background: #0b486b;
+	--_m: #0000 0 calc(2 * atan(0.5)), #000 0 50%;
+	mask:
+		repeating-conic-gradient(from atan(2) at 50% var(--s), var(--_m))
+		calc(2 * var(--s)) calc(-1 * var(--s)) / calc(4 * var(--s)) 100% intersect,
+		repeating-conic-gradient(from atan(-0.5) at var(--s), var(--_m))
+		calc(-1 * var(--s)) calc(2 * var(--s)) / 100% calc(4 * var(--s));
+}
+
+.cardImage img {
+	width: 100%;
+}
+
+.cardDescription {
+	height: 42%;
+	width: 85%;
+}
+
+.cardFooter {
+	height: 10%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	position: relative;
+}
+
+.cardAttack {
+	position: absolute;
+	left: 5%;
+	bottom: -20%;
+	width: 40px;
+	height: 40px;
+	background-color: var(--attack-color);
+	border: 2px solid rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.cardAttack span {
+	color: white;
+	font-weight: bold;
+	font-size: 1.2rem;
+}
+
+.cardHp {
+	position: absolute;
+	right: 5%;
+	bottom: -20%;
+	background-color: var(--defense-color);
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 2px solid rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.cardHp span {
+	color: white;
+	font-weight: bold;
+	font-size: 1.2rem;
+}

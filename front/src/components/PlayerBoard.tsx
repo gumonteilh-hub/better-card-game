@@ -1,15 +1,13 @@
 import type { ICardInstance, IHeroInfo } from "../types/game";
 import { useGameContext } from "../utils/useGameContext";
-import { Card, CardMiniature } from "./Card";
-import { Draggable, Droppable } from "./DragAndDrop";
-import {
-	CardBack,
-	Deck,
-	FieldSlot,
-	HeroPortrait,
-	Hud,
-	TrapCardSlot,
-} from "./Hud";
+import { Card } from "./card/Card";
+import { CardBack } from "./card/CardBack";
+import { Draggable } from "./DragAndDrop";
+import { Field } from "./Field";
+import { Deck } from "./hud/Deck";
+import { HeroPortrait } from "./hud/HeroPortrait";
+import { PlayerHud } from "./hud/PlayerHud";
+import { TrapCardSlot } from "./hud/TrapCardSlot";
 
 type ICommonProps = {
 	currentMana: number;
@@ -17,19 +15,16 @@ type ICommonProps = {
 	hero: IHeroInfo;
 	field: Record<number, ICardInstance>;
 };
-
 type IPlayerBoardAllyProps = ICommonProps & {
 	side: "player";
 	hand: ICardInstance[];
 	secredCard?: ICardInstance;
 };
-
 type IPlayerBoardEnemyProps = ICommonProps & {
 	side: "enemy";
 	hand: number;
 	secredCard: boolean;
 };
-
 type IPlayerBoardProps = IPlayerBoardAllyProps | IPlayerBoardEnemyProps;
 
 const PlayerBoard = ({
@@ -47,7 +42,7 @@ const PlayerBoard = ({
 		<div className={`board ${side}`}>
 			<div className="left-panel">
 				<div className="hud-slot">
-					<Hud side={side} currentMana={currentMana} maxMana={maxMana} />
+					<PlayerHud side={side} currentMana={currentMana} maxMana={maxMana} />
 				</div>
 				<div className="hero-slot">
 					<HeroPortrait hero={hero} side={side} />
@@ -58,21 +53,21 @@ const PlayerBoard = ({
 				<div className="hand">
 					{side === "player"
 						? hand.map((c, index) => (
-							<Draggable
-								cardType={c.cardType.type}
-								key={c.id}
-								id={`card-${c.id}`}
-								cardId={c.id}
-								enabled={playableCards?.includes(c.id) ?? false}
-								style={{ zIndex: index }}
-							>
-								<Card card={c} />
-							</Draggable>
-						))
+								<Draggable
+									cardType={c.cardType.type}
+									key={c.id}
+									id={`card-${c.id}`}
+									cardId={c.id}
+									enabled={playableCards?.includes(c.id) ?? false}
+									style={{ zIndex: index }}
+								>
+									<Card card={c} />
+								</Draggable>
+							))
 						: hand > 0 &&
-						[...Array(hand).keys()].map((index) => (
-							<CardBack key={index}></CardBack>
-						))}
+							[...Array(hand).keys()].map((index) => (
+								<CardBack key={index}></CardBack>
+							))}
 				</div>
 			</div>
 
@@ -86,65 +81,6 @@ const PlayerBoard = ({
 			</div>
 		</div>
 	);
-};
-interface IFieldProps {
-	field: Record<number, ICardInstance>;
-	side: "enemy" | "player";
-}
-const Field = ({ field, side }: IFieldProps) => {
-	return (
-		<Droppable
-			accepts={["spell"]}
-			id={`field-${side}`}
-			customClassName="field"
-			position={0}
-		>
-			<div className="column">
-				<CardWrapper side={side} type="attack" card={field[0]} position={0} />
-				<CardWrapper side={side} type="defense" card={field[1]} position={1} />
-			</div>
-			<div className="column">
-				<CardWrapper side={side} type="both" card={field[2]} position={2} />
-			</div>
-			<div className="column">
-				<CardWrapper side={side} type="attack" card={field[3]} position={3} />
-				<CardWrapper side={side} type="defense" card={field[4]} position={4} />
-			</div>
-			<div className="column">
-				<CardWrapper side={side} type="both" card={field[5]} position={5} />
-			</div>
-			<div className="column">
-				<CardWrapper side={side} type="attack" card={field[6]} position={6} />
-				<CardWrapper side={side} type="defense" card={field[7]} position={7} />
-			</div>
-		</Droppable>
-	);
-};
-interface ICardWrapperProps {
-	card?: ICardInstance;
-	type: "attack" | "defense" | "both";
-	side: "enemy" | "player";
-	position: number;
-}
-const CardWrapper = ({ card, type, side, position }: ICardWrapperProps) => {
-	if (card) {
-		return <CardMiniature side={side} type={type} card={card} />;
-	} else {
-		if (side === "player") {
-			return (
-				<Droppable
-					accepts={["monster", "spell"]}
-					id={`field-${position}`}
-					position={position}
-					customClassName="field-slot-dropzone"
-				>
-					<FieldSlot side={side} position={position} type={type} />
-				</Droppable>
-			);
-		} else {
-			return <FieldSlot side={side} position={position} type={type} />;
-		}
-	}
 };
 
 export default PlayerBoard;

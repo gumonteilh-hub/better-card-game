@@ -1,5 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { JSX } from "react";
+import styles from "./DragAndDrop.module.css";
 
 export type CardType = "monster" | "spell";
 
@@ -25,13 +26,16 @@ export function Droppable({
 	});
 	const state =
 		isOver &&
-			active?.data.current &&
-			accepts.includes(active?.data.current.type)
-			? "hover"
+		active?.data.current &&
+		accepts.includes(active?.data.current.type)
+			? styles.hover
 			: "";
 
 	return (
-		<div ref={setNodeRef} className={`dropzone ${state} ${customClassName}`}>
+		<div
+			ref={setNodeRef}
+			className={`${styles.dropzone} ${state} ${customClassName}`}
+		>
 			{children}
 		</div>
 	);
@@ -62,16 +66,16 @@ export function Draggable({
 	});
 	const style = transform
 		? {
-			transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-			...externalStyle,
-		}
+				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+				...externalStyle,
+			}
 		: externalStyle;
 
 	return (
 		<div
 			ref={setNodeRef}
 			style={style}
-			className={enabled ? "is-playable-highlight" : ""}
+			className={enabled ? styles.playable : ""}
 			{...listeners}
 			{...attributes}
 		>

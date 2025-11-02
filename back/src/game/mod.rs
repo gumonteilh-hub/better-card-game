@@ -146,7 +146,10 @@ impl Game {
             return Err(Error::Game("Target position is not valid".into()));
         }
 
-        if self.get_field(card.owner).contains_key(&position) {
+        if self
+            .get_field_with_position(card.owner)
+            .contains_key(&position)
+        {
             return Err(Error::Game("You can't move to a position not empty".into()));
         }
 

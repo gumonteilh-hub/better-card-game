@@ -16,3 +16,4 @@ Features:
 
 Bugs:
  - card miniature overview pop when trying to move to the left
+ - Windfurry broken in front

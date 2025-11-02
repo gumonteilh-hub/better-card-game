@@ -10,8 +10,8 @@ import type { Active, RectMap } from "@dnd-kit/core/dist/store";
 import type { Coordinates } from "@dnd-kit/core/dist/types";
 import { createFileRoute } from "@tanstack/react-router";
 import PlayerBoard from "../../components/PlayerBoard";
-import { endTurn, playMonster, playSpell } from "../../game.service";
-import { GameContextProvider } from "../../utils/GameContextProvider";
+import { GameContextProvider } from "../../engine/GameContextProvider";
+import { endTurn, playMonster, playSpell } from "../../service/game.service";
 import { useGameContext } from "../../utils/useGameContext";
 
 export const Route = createFileRoute("/game/$gameId")({

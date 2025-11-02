@@ -1,0 +1,24 @@
+.container {
+	height: var(--card-miniature-height);
+	aspect-ratio: 1;
+	position: relative;
+
+	box-sizing: border-box;
+	border: dashed 5px;
+
+	.sword {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scaleX(-1);
+		width: 80%;
+	}
+
+	.shield {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scaleX(-1);
+		width: 80%;
+	}
+}

@@ -1,0 +1,87 @@
+.cardMiniature {
+	height: var(--card-miniature-height);
+	aspect-ratio: 1;
+	background-color: #f4ac45;
+}
+
+.cardMiniature.attack {
+	border-radius: 0;
+	border: 5px dashed var(--attack-color);
+	box-shadow: inset 0 0 8px rgba(139, 0, 0, 0.4);
+}
+
+.cardMiniature.defense {
+	border: 5px inset grey;
+	border-radius: 0;
+	box-shadow: outset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.cardMiniature.both {
+	border-top: 5px dashed var(--attack-color);
+	border-left: 5px dashed var(--attack-color);
+	border-bottom: 5px inset grey;
+	border-right: 5px inset grey;
+	box-shadow: inset 0 0 8px rgba(139, 0, 0, 0.4);
+}
+
+.cardBody {
+	composes: cardBody from "./Card.module.css";
+	height: 90%;
+	justify-content: center;
+}
+
+.cardImage {
+	composes: cardImage from "./Card.module.css";
+	height: 95%;
+}
+
+.cardFooter {
+	composes: cardFooter from "./Card.module.css";
+	height: 10%;
+}
+
+.cardAttack {
+	composes: cardAttack from "./Card.module.css";
+	left: 5%;
+	bottom: -10%;
+	width: 24px;
+	height: 24px;
+}
+
+.cardAttack span {
+	font-size: 0.9rem;
+}
+
+.cardHp {
+	composes: cardHp from "./Card.module.css";
+	right: 5%;
+	bottom: -10%;
+	width: 24px;
+	height: 24px;
+}
+
+.cardHp span {
+	font-size: 0.9rem;
+}
+
+.cardMiniatureContainer {
+	position: relative;
+	display: inline-block;
+}
+
+.cardOverview {
+	position: absolute;
+	right: 100%;
+	margin-right: 10px;
+	top: calc(var(--card-miniature-height) / 2 - var(--card-heigh) / 2);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0s;
+	z-index: 1000;
+}
+
+.cardMiniatureContainer:hover .cardOverview {
+	opacity: 1;
+	pointer-events: auto;
+	transition: opacity 0.1s ease-in 1s;
+}

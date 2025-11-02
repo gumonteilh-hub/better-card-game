@@ -1,0 +1,17 @@
+.deck {
+	position: relative;
+}
+
+.deck > div:nth-child(1) {
+	position: absolute;
+	transform: rotate(-5deg);
+}
+
+.deck > div:nth-child(2) {
+	position: absolute;
+}
+
+.deck > div:nth-child(3) {
+	position: absolute;
+	transform: rotate(5deg);
+}

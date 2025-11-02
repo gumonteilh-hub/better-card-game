@@ -1,6 +1,5 @@
 import "./css/App.css";
 import "./css/Hud.css";
-import "./css/Card.css";
 import "./css/Board.css";
 import "./css/Home.css";
 import "./css/Collection.css";

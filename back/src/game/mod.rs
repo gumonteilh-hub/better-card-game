@@ -69,13 +69,13 @@ impl Game {
         let player_id_a = entity_id;
         players.insert(
             player_id_a,
-            PlayerInstance::new(player_id_a, 1, deck_a.faction),
+            PlayerInstance::new(player_id_a, 1, deck_a.archetype),
         );
         entity_id += 1;
         let player_id_b = entity_id;
         players.insert(
             player_id_b,
-            PlayerInstance::new(player_id_b, 0, deck_b.faction),
+            PlayerInstance::new(player_id_b, 0, deck_b.archetype),
         );
         entity_id += 1;
 

@@ -1,5 +1,5 @@
 import type { IAction, PlayerId } from "./action";
-import type { Faction, Keywords, TemplateId } from "./template";
+import type { Race, Keywords, TemplateId, Archetype, Class } from "./template";
 
 export interface IGameUpdate {
 	actions: IAction[];
@@ -41,7 +41,7 @@ export interface IHeroInfo {
 	id: number;
 	name: string;
 	hp: number;
-	faction: Faction;
+	archetype: Archetype;
 }
 
 type InstanceId = number;
@@ -51,7 +51,8 @@ export type ICardInstance = {
 	template_id: TemplateId;
 	name: string;
 	description: string;
-	faction: Faction;
+	race: Race;
+	class: Class;
 	cost: number;
 	owner: PlayerId;
 	location: Location;

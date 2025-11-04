@@ -1,7 +1,7 @@
 use crate::{
     UserDeck,
     collection::{
-        Faction, boost, deal_damage, draw, heal, monster, spell,
+        Archetype, Class, Race, boost, deal_damage, draw, heal, monster, spell,
         types::{CardTemplate, PlayerTemplateTarget, TemplateTarget},
     },
     game::card::Keyword,
@@ -37,7 +37,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
 
 pub fn get_ia_deck() -> UserDeck {
     UserDeck {
-        faction: Faction::DEMON,
+        archetype: Archetype::Race(Race::DEMON),
         cards: vec![
             RECRUE.clone().id,
             GUERRIER.clone().id,
@@ -73,8 +73,19 @@ pub fn get_ia_deck() -> UserDeck {
     }
 }
 
-static RECRUE: Lazy<CardTemplate> =
-    Lazy::new(|| monster(100, 1, "Recrue", "Une simple recrue", 1, 1, Faction::COMMON).build());
+static RECRUE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        100,
+        1,
+        "Recrue",
+        "Une simple recrue",
+        1,
+        1,
+        Race::COMMON,
+        Class::COMMON,
+    )
+    .build()
+});
 
 static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
@@ -84,7 +95,8 @@ static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
         "On play : boost the cards on the field +1/+1",
         1,
         1,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_play(vec![boost(TemplateTarget::Allies, 1, 1)])
     .build()
@@ -96,7 +108,8 @@ static HEALER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
         1,
         "Healer Test",
         "Heal all your cards 5 hp",
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .effect(vec![heal(TemplateTarget::Allies, 5)])
     .build()
@@ -110,7 +123,8 @@ static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
         "Un guerrier courageux",
         2,
         2,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .build()
 });
@@ -123,7 +137,8 @@ static ECLAIREUR: Lazy<CardTemplate> = Lazy::new(|| {
         "Un éclaireur agile",
         1,
         1,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![Keyword::Charge])
     .build()
@@ -137,7 +152,8 @@ static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
         "Un noble chevalier",
         2,
         4,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![])
     .build()
@@ -151,7 +167,8 @@ static CAVALIER: Lazy<CardTemplate> = Lazy::new(|| {
         "Un cavalier rapide",
         3,
         2,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![Keyword::Charge])
     .build()
@@ -165,7 +182,8 @@ static CHAMPION: Lazy<CardTemplate> = Lazy::new(|| {
         "Un champion puissant",
         4,
         4,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .build()
 });
@@ -178,7 +196,8 @@ static BERSERKER: Lazy<CardTemplate> = Lazy::new(|| {
         "Un berserker féroce",
         3,
         3,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![Keyword::Windfury])
     .build()
@@ -192,14 +211,26 @@ static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
         "Un gardien robuste",
         3,
         7,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![])
     .build()
 });
 
-static GEANT: Lazy<CardTemplate> =
-    Lazy::new(|| monster(108, 6, "Géant", "Un géant imposant", 6, 6, Faction::COMMON).build());
+static GEANT: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        108,
+        6,
+        "Géant",
+        "Un géant imposant",
+        6,
+        6,
+        Race::COMMON,
+        Class::COMMON,
+    )
+    .build()
+});
 
 static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
@@ -209,7 +240,8 @@ static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
         "Un dragon majestueux",
         7,
         7,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![Keyword::Charge])
     .build()
@@ -223,7 +255,8 @@ static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: piochez une carte",
         1,
         2,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_play(vec![draw(PlayerTemplateTarget::Player, 1)])
     .build()
@@ -237,7 +270,8 @@ static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: rend 3 PV à vos alliés",
         2,
         3,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_play(vec![heal(TemplateTarget::Allies, 3)])
     .build()
@@ -251,7 +285,8 @@ static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: inflige 2 dégâts à tous les ennemis",
         3,
         2,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_play(vec![deal_damage(TemplateTarget::Ennemies, 2)])
     .build()
@@ -265,7 +300,8 @@ static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: les deux joueurs piochent 2 cartes",
         4,
         4,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_play(vec![draw(PlayerTemplateTarget::BothPlayers, 2)])
     .build()
@@ -279,7 +315,8 @@ static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: rend 5 PV au héros allié",
         3,
         4,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![])
     .on_play(vec![heal(TemplateTarget::Player, 5)])
@@ -294,7 +331,8 @@ static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
         "Mort: inflige 3 dégâts à tous les personnages",
         1,
         1,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_death(vec![deal_damage(TemplateTarget::All, 3)])
     .build()
@@ -308,7 +346,8 @@ static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
         "Mort: inflige 4 dégâts au héros ennemi",
         4,
         4,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_death(vec![deal_damage(TemplateTarget::EnnemyPlayer, 4)])
     .build()
@@ -322,7 +361,8 @@ static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
         "Attaque: inflige 1 dégât au héros ennemi",
         2,
         3,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_attack(vec![deal_damage(TemplateTarget::EnnemyPlayer, 1)])
     .build()
@@ -336,7 +376,8 @@ static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
         "Attaque: rend 2 PV au héros allié",
         3,
         3,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .on_attack(vec![heal(TemplateTarget::Player, 2)])
     .build()
@@ -350,7 +391,8 @@ static PALADIN: Lazy<CardTemplate> = Lazy::new(|| {
         "Apparition: rend 4 PV à tous les alliés. Provocation",
         4,
         6,
-        Faction::COMMON,
+        Race::COMMON,
+        Class::COMMON,
     )
     .keywords(vec![])
     .on_play(vec![heal(TemplateTarget::Allies, 4)])

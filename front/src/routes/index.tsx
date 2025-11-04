@@ -55,7 +55,7 @@ function RouteComponent() {
 			{userInfos?.deck && (
 				<div className="deck-recap">
 					<DeckSummary
-						faction={userInfos.deck.faction}
+						archetype={userInfos.deck.archetype}
 						cards={userInfos.deck.cards}
 					></DeckSummary>
 				</div>

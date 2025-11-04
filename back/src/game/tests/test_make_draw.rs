@@ -9,10 +9,11 @@
 #[cfg(test)]
 mod tests {
     use super::super::test_utils::{add_card_to_deck, create_test_game, create_test_spell};
+    use crate::collection::Class;
     use crate::game::effects::{Effect, PlayerTarget};
     use crate::game::types::Location;
     use crate::{
-        Faction,
+        Race,
         game::card::{CardInstance, CardTypeInstance, MonsterInstance},
     };
 
@@ -112,7 +113,8 @@ mod tests {
                 name: "Test Card in Hand".to_string(),
                 description: "Test".to_string(),
                 template_id: 9996,
-                faction: Faction::COMMON,
+                race: Race::COMMON,
+                class: Class::COMMON,
                 cost: 0,
                 owner: player_a,
                 location: Location::Hand,

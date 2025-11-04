@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CardTemplate } from "../components/card/CardTemplate";
 import { DeckSummary } from "../components/DeckSummary";
 import { getCollection } from "../service/game.service";
-import type { Faction, ICardTemplate, TemplateId } from "../types/template";
+import type { ICardTemplate, TemplateId, Archetype } from "../types/template";
 import { useUserInfo } from "../utils/useUserInfo";
 
 export const Route = createFileRoute("/collection")({
@@ -17,14 +17,16 @@ function RouteComponent() {
 	const [temporaryDeck, setTemporaryDeck] = useState<ICardTemplate[]>(
 		userInfos?.deck?.cards ?? [],
 	);
-	const [selectedFaction, setSelectedFaction] = useState<Faction>(
-		userInfos?.deck?.faction ?? "HUMAN",
+	const [selectedArchetype, setSelectedArchetype] = useState<Archetype>(
+		userInfos?.deck?.archetype ?? { type: "race", value: "HUMAN" },
 	);
 	const [collection, setCollection] = useState<ICardTemplate[]>([]);
 
 	useEffect(() => {
 		setTemporaryDeck(userInfos?.deck?.cards ?? []);
-		setSelectedFaction(userInfos?.deck?.faction ?? "HUMAN");
+		setSelectedArchetype(
+			userInfos?.deck?.archetype ?? { type: "race", value: "HUMAN" },
+		);
 	}, [userInfos]);
 
 	const addCardToDeck = (card: ICardTemplate) => {
@@ -32,6 +34,33 @@ function RouteComponent() {
 		if (count < 2) {
 			setTemporaryDeck([...temporaryDeck, card]);
 		}
+	};
+
+	const handleSelectArchetype = (value: string) => {
+		switch (value) {
+			case "HUMAN":
+				setSelectedArchetype({ type: "race", value: "HUMAN" });
+				break;
+			case "DRAGON":
+				setSelectedArchetype({ type: "race", value: "DRAGON" });
+				break;
+			case "DEMON":
+				setSelectedArchetype({ type: "race", value: "DEMON" });
+				break;
+			case "WARRIOR":
+				setSelectedArchetype({ type: "class", value: "WARRIOR" });
+				break;
+			case "MAGE":
+				setSelectedArchetype({ type: "class", value: "MAGE" });
+				break;
+			case "ROGUE":
+				setSelectedArchetype({ type: "class", value: "ROGUE" });
+				break;
+			default:
+				throw new Error("Unknown archetype");
+		}
+
+		setTemporaryDeck([]);
 	};
 
 	const removeCardFromDeck = (cardId: TemplateId) => {
@@ -44,7 +73,7 @@ function RouteComponent() {
 	};
 
 	useEffect(() => {
-		getCollection(selectedFaction).then((cards) => {
+		getCollection(selectedArchetype).then((cards) => {
 			setCollection(
 				cards.sort((a, b) => {
 					if (a.cost === b.cost) {
@@ -54,13 +83,13 @@ function RouteComponent() {
 				}),
 			);
 		});
-	}, [selectedFaction]);
+	}, [selectedArchetype]);
 
 	function handleSave(): void {
 		saveUserInfo({
 			...userInfos,
 			deck: {
-				faction: selectedFaction,
+				archetype: selectedArchetype,
 				cards: temporaryDeck,
 			},
 		});
@@ -85,13 +114,18 @@ function RouteComponent() {
 							Sauvegarder
 						</button>
 						<select
-							onChange={(e) =>
-								setSelectedFaction(e.currentTarget.value as Faction)
-							}
+							onChange={(e) => handleSelectArchetype(e.currentTarget.value)}
 						>
-							<option value={"HUMAN"}>Human</option>
-							<option value={"DRAGON"}>Dragon</option>
-							<option value={"DEMON"}>Demon</option>
+							<optgroup label="Race">
+								<option value={"HUMAN"}>Human</option>
+								<option value={"DRAGON"}>Dragon</option>
+								<option value={"DEMON"}>Demon</option>
+							</optgroup>
+							<optgroup label="Class">
+								<option value={"WARRIOR"}>Warrior</option>
+								<option value={"MAGE"}>Mage</option>
+								<option value={"ROGUE"}>Rogue</option>
+							</optgroup>
 						</select>
 					</div>
 				</div>
@@ -115,7 +149,7 @@ function RouteComponent() {
 			<div className="deck-sidebar">
 				<DeckSummary
 					cards={temporaryDeck}
-					faction={selectedFaction}
+					archetype={selectedArchetype}
 					onCardClick={removeCardFromDeck}
 				/>
 			</div>

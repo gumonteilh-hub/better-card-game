@@ -1,5 +1,5 @@
 use crate::collection::{
-    Faction, heal, monster,
+    Race, heal, monster,
     types::{CardTemplate, TemplateTarget},
 };
 use once_cell::sync::Lazy;
@@ -16,7 +16,8 @@ static FEERIQUE: Lazy<CardTemplate> = Lazy::new(|| {
         "Attaque: soigne tout les alliés de 5 hp",
         7,
         7,
-        Faction::DRAGON,
+        Race::DRAGON,
+        super::Class::COMMON,
     )
     .on_attack(vec![heal(TemplateTarget::Allies, 5)])
     .build()

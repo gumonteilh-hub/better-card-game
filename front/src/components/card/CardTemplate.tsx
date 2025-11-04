@@ -1,5 +1,5 @@
 import type { ICardTemplate } from "../../types/template";
-import placeholder from "../assets/test.png";
+import placeholder from "../../assets/test.png";
 import { ManaCrystal } from "../hud/ManaCrystal";
 import styles from "./Card.module.css";
 
@@ -35,7 +35,10 @@ export const CardTemplate = ({ card }: ICardTemplateProps) => {
 						<span>{card.cardType.attack}</span>
 					</div>
 				)}
-				<div className="tribut">{card.faction}</div>
+				<div className="tribut">
+					{card.race !== "COMMON" && card.race} <br />
+					{card.class !== "COMMON" && card.class}
+				</div>
 				{card.cardType.type === "monster" && (
 					<div className={styles.cardHp}>
 						<span>{card.cardType.hp}</span>

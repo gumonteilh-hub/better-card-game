@@ -23,17 +23,20 @@ export const HeroPortrait = ({ hero, side }: IHeroPortraitProps) => {
 	);
 
 	const imgSrc = useMemo(() => {
-		switch (hero.faction) {
+		switch (hero.archetype.value) {
 			case "HUMAN":
+			case "WARRIOR":
 				return human;
 			case "DRAGON":
+			case "MAGE":
 				return dragon;
 			case "DEMON":
+			case "ROGUE":
 				return demon;
 			case "COMMON":
 				throw new Error("Player can't be from common faction");
 		}
-	}, [hero.faction]);
+	}, [hero.archetype]);
 
 	return (
 		<div className={styles.container}>

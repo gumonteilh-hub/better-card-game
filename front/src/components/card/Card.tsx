@@ -35,7 +35,10 @@ export const Card = ({ card }: ICardProps) => {
 						<span>{card.cardType.attack}</span>
 					</div>
 				)}
-				<div className="tribut">{card.faction}</div>
+				<div className="tribut">
+					{card.race !== "COMMON" && card.race} <br />
+					{card.class !== "COMMON" && card.class}
+				</div>
 				{card.cardType.type === "monster" && (
 					<div className={styles.cardHp}>
 						<span>{card.cardType.hp}</span>

@@ -1,10 +1,16 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-pub use crate::collection::Faction;
+pub use crate::collection::Race;
 pub use crate::game::Game;
-use crate::{collection::types::{CardTemplate, TemplateId}, game::action::Action};
 pub use crate::game::view::PublicGameState;
+use crate::{
+    collection::{
+        Archetype,
+        types::{CardTemplate, TemplateId},
+    },
+    game::action::Action,
+};
 
 pub mod collection;
 pub mod error;
@@ -24,22 +30,22 @@ pub struct GameViewResponse {
 #[derive(Debug, Deserialize)]
 pub struct UserDeck {
     pub cards: Vec<TemplateId>,
-    pub faction: Faction,
+    pub archetype: Archetype,
 }
 
-pub fn get_collection(faction: Faction) -> Vec<CardTemplate> {
-    collection::get_collection(faction)
+pub fn get_collection(archetype: Archetype) -> Vec<CardTemplate> {
+    collection::get_collection(archetype)
 }
 
 pub fn start_game(deck: UserDeck) -> Result<Game> {
     let ia_deck = collection::get_ia_deck();
-    let ia_faction = ia_deck.faction;
-    let player_faction = deck.faction;
+    let ia_archetype = ia_deck.archetype;
+    let player_archetype = deck.archetype;
     let mut game_state = Game::new(
         deck,
         ia_deck,
-        get_collection(player_faction),
-        get_collection(ia_faction),
+        get_collection(player_archetype),
+        get_collection(ia_archetype),
     )?;
 
     game_state.compute_commands()?;
@@ -60,10 +66,7 @@ pub fn play_monster(
     Ok(response)
 }
 
-pub fn play_spell(
-    game_state: &mut Game,
-    card_id: usize,
-) -> Result<GameViewResponse> {
+pub fn play_spell(game_state: &mut Game, card_id: usize) -> Result<GameViewResponse> {
     game_state.play_spell(card_id)?;
     let actions = game_state.compute_commands()?;
     let game_view = PublicGameState::new(game_state)?;
@@ -71,7 +74,6 @@ pub fn play_spell(
     let response = GameViewResponse { actions, game_view };
     Ok(response)
 }
-
 
 pub fn end_turn(game_state: &mut Game) -> Result<GameViewResponse> {
     let mut actions = game_state.next_turn()?;
@@ -101,5 +103,3 @@ pub fn move_card(
 
     Ok(GameViewResponse { actions, game_view })
 }
-
-

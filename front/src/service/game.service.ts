@@ -1,12 +1,13 @@
 import type { IGameState, IGameUpdate } from "../types/game";
-import type { Faction, ICardTemplate, IDeck } from "../types/template";
+import type { ICardTemplate, IDeck, Archetype } from "../types/template";
 import { apiFetch } from "./api";
 
 export const getCollection = async (
-	faction: Faction,
+	archetype: Archetype,
 ): Promise<ICardTemplate[]> => {
-	return apiFetch<ICardTemplate[]>(`/api/collection/${faction}`, {
-		method: "GET",
+	return apiFetch<ICardTemplate[]>(`/api/collection`, {
+		method: "POST",
+		body: JSON.stringify(archetype),
 	});
 };
 
@@ -18,7 +19,7 @@ export const getGameInfo = (gameId: string) => {
 
 export const startGame = async (deck: IDeck): Promise<string> => {
 	const body = {
-		faction: deck.faction,
+		archetype: deck.archetype,
 		cards: deck.cards.map((c) => c.id),
 	};
 	return apiFetch<string>("/api/start", {

@@ -1,12 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    Faction,
-    game::{
+    collection::Class, game::{
         card::Keyword,
         effects::{Effect, PlayerTarget, Target},
         types::InstanceId,
-    },
+    }, Race
 };
 
 pub type TemplateId = usize;
@@ -23,7 +22,8 @@ pub struct CardTemplate {
     pub cost: usize,
     pub name: String,
     pub description: String,
-    pub faction: Faction,
+    pub race: Race,
+    pub class: Class,
     pub card_type: CardTypeTemplate,
 }
 

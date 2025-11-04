@@ -1,4 +1,4 @@
-use crate::collection::Faction;
+use crate::collection::Archetype;
 use serde::Serialize;
 
 use super::types::PlayerId;
@@ -11,16 +11,16 @@ pub struct PlayerInstance {
     pub base_mana: usize,
     pub move_count: usize,
     pub max_move: usize,
-    pub faction: Faction,
+    pub archetype: Archetype,
 }
 impl PlayerInstance {
-    pub fn new(id: usize, base_mana: usize, faction: Faction) -> Self {
+    pub fn new(id: usize, base_mana: usize, archetype: Archetype) -> Self {
         Self {
             player_id: id,
             hp: 30,
             mana: base_mana,
             base_mana,
-            faction,
+            archetype,
             max_move: 3,
             move_count: 3,
         }

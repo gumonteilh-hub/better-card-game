@@ -1,4 +1,15 @@
-export type Faction = "HUMAN" | "DRAGON" | "DEMON" | "COMMON";
+export type Archetype =
+	| {
+		type: "race";
+		value: Race;
+	}
+	| {
+		type: "class";
+		value: Class;
+	};
+
+export type Race = "HUMAN" | "DRAGON" | "DEMON" | "COMMON";
+export type Class = "WARRIOR" | "MAGE" | "ROGUE" | "COMMON";
 
 export type Keywords = "CHARGE" | "WINDFURRY" | "INVISBLE";
 
@@ -8,7 +19,7 @@ export type TemplateId = number;
 type TemplateEffect = any;
 
 export interface IDeck {
-	faction: Faction;
+	archetype: Archetype;
 	cards: ICardTemplate[];
 }
 
@@ -17,7 +28,8 @@ export interface ICardTemplate {
 	name: string;
 	description: string;
 	cost: number;
-	faction: Faction;
+	race: Race;
+	class: Class;
 	cardType: ICardTypeTemplate;
 }
 

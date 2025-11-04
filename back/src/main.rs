@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use axum_macros::debug_handler;
-use back::{self, error::Error};
+use back::{self, collection::Archetype, error::Error};
 
 use axum::{
     Json, Router,
@@ -46,7 +46,7 @@ async fn main() {
         .route("/{game_id}/end_turn", post(end_turn));
 
     let app = Router::new()
-        .route("/collection/{faction}", get(collection))
+        .route("/collection", post(collection))
         .route("/start", post(start_game))
         .nest("/game", api)
         .with_state(shared_state)
@@ -61,13 +61,13 @@ async fn main() {
 
 #[debug_handler]
 async fn collection(
-    Path(faction): Path<back::Faction>,
+    LoggedJson(payload): LoggedJson<Archetype>,
 ) -> ApiResult<Json<Vec<back::collection::types::CardTemplate>>> {
     tracing::info!(
-        "Received get_collection request with faction: {:?}",
-        faction
+        "Received get_collection request with archetype: {:?}",
+        payload
     );
-    Ok(Json(back::get_collection(faction)))
+    Ok(Json(back::get_collection(payload)))
 }
 
 #[debug_handler]

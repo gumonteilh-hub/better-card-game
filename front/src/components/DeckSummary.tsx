@@ -1,16 +1,16 @@
 import { useMemo } from "react";
-import type { Faction, ICardTemplate, TemplateId } from "../types/template";
+import type { ICardTemplate, TemplateId, Archetype } from "../types/template";
 import styles from "./DeckSummary.module.css";
 import { ManaCrystal } from "./hud/ManaCrystal";
 
 interface DeckSummaryProps {
 	cards: ICardTemplate[];
-	faction: Faction;
+	archetype: Archetype;
 	onCardClick?: (cardId: TemplateId) => void;
 	showTitle?: boolean;
 }
 export const DeckSummary = ({
-	faction,
+	archetype,
 	cards,
 	onCardClick,
 	showTitle = true,
@@ -41,7 +41,7 @@ export const DeckSummary = ({
 			{showTitle && (
 				<div className={styles.header}>
 					<h2>Mon Deck</h2>
-					<h3>{faction}</h3>
+					<h3>{archetype.value}</h3>
 					<div
 						className={`${styles.count} ${cards.length === 30 ? styles.complete : styles.incomplete}`}
 					>

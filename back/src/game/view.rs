@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::Game;
 use super::types::Location;
 use crate::{
-    collection::Faction,
+    collection::Archetype,
     error::{Error, Result},
     game::card::CardInstance,
 };
@@ -17,7 +17,7 @@ pub struct HeroInfo {
     pub id: usize,
     pub name: String,
     pub hp: usize,
-    pub faction: Faction,
+    pub archetype: Archetype,
 }
 
 #[derive(Serialize)]
@@ -130,7 +130,7 @@ impl PublicGameState {
                     id: player_b.player_id,
                     name: "Enemy IA".into(),
                     hp: player_b.hp,
-                    faction: player_b.faction,
+                    archetype: player_b.archetype,
                 },
                 deck_size: enemy_deck_size,
             },
@@ -144,7 +144,7 @@ impl PublicGameState {
                     id: player_a.player_id,
                     name: "Player".into(),
                     hp: player_a.hp,
-                    faction: player_a.faction,
+                    archetype: player_a.archetype,
                 },
                 max_move: player_a.max_move,
                 move_count: player_a.move_count,

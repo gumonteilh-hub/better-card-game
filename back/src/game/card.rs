@@ -1,6 +1,9 @@
 use crate::{
-    Faction,
-    collection::types::{CardTemplate, CardTypeTemplate, TemplateId, convert_to_effect},
+    Race,
+    collection::{
+        Class,
+        types::{CardTemplate, CardTypeTemplate, TemplateId, convert_to_effect},
+    },
     game::effects::Effect,
 };
 
@@ -20,7 +23,8 @@ pub struct CardInstance {
     pub name: String,
     pub description: String,
     pub template_id: TemplateId,
-    pub faction: Faction,
+    pub race: Race,
+    pub class: Class,
     pub cost: usize,
     pub owner: PlayerId,
     pub location: Location,
@@ -105,7 +109,8 @@ impl CardInstance {
             cost: template.cost,
             name: template.name.clone(),
             description: template.description.clone(),
-            faction: template.faction,
+            race: template.race,
+            class: template.class,
             card_type,
         }
     }

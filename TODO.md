@@ -1,5 +1,4 @@
 Features:
- - implement card Class and rename Faction to Race
  - Develop new keywords/effects :
     - hook "on receive attack"
     - hook "on kill"

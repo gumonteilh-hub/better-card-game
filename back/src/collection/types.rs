@@ -1,11 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    collection::Class, game::{
+    Race,
+    collection::Class,
+    game::{
         card::Keyword,
         effects::{Effect, PlayerTarget, Target},
         types::InstanceId,
-    }, Race
+    },
 };
 
 pub type TemplateId = usize;
@@ -35,7 +37,7 @@ pub enum CardTypeTemplate {
     Spell(SpellTemplate),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MonsterTemplate {
     pub attack: usize,
@@ -68,7 +70,7 @@ pub enum PlayerTemplateTarget {
     BothPlayers,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum TemplateEffect {
     Boost {
@@ -95,6 +97,10 @@ pub enum TemplateEffect {
     Attack {
         target: TemplateTarget,
     },
+    Summon {
+        side: PlayerTemplateTarget,
+        target: CardTemplate,
+    },
 }
 
 fn convert_template_target(target: &TemplateTarget) -> Target {
@@ -110,15 +116,19 @@ fn convert_template_target(target: &TemplateTarget) -> Target {
     }
 }
 
+fn convert_template_player_target(target: &PlayerTemplateTarget) -> PlayerTarget {
+    match target {
+        PlayerTemplateTarget::EnnemyPlayer => PlayerTarget::EnnemyPlayer,
+        PlayerTemplateTarget::Player => PlayerTarget::Player,
+        PlayerTemplateTarget::BothPlayers => PlayerTarget::BothPlayers,
+    }
+}
+
 pub fn convert_to_effect(teff: &TemplateEffect, initiator_id: InstanceId) -> Effect {
     match teff {
         TemplateEffect::MakeDraw { player, amount } => Effect::MakeDraw {
             initiator: initiator_id,
-            player: match player {
-                PlayerTemplateTarget::EnnemyPlayer => PlayerTarget::EnnemyPlayer,
-                PlayerTemplateTarget::Player => PlayerTarget::Player,
-                PlayerTemplateTarget::BothPlayers => PlayerTarget::BothPlayers,
-            },
+            player: convert_template_player_target(player),
             amount: *amount,
         },
         TemplateEffect::Heal { target, amount } => Effect::Heal {
@@ -144,6 +154,11 @@ pub fn convert_to_effect(teff: &TemplateEffect, initiator_id: InstanceId) -> Eff
             target: convert_template_target(target),
             attack: *attack,
             hp: *hp,
+        },
+        TemplateEffect::Summon { side, target } => Effect::Summon {
+            initiator: initiator_id,
+            side: convert_template_player_target(side),
+            target: target.clone(),
         },
     }
 }

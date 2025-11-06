@@ -10,7 +10,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
 
 static INDICIBLE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        3,
+        3001,
         1,
         "Indicible",
         "Mort: inflige 3 degats a tout les adversaires",

@@ -75,7 +75,7 @@ pub fn get_ia_deck() -> UserDeck {
 
 static RECRUE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        100,
+        1,
         1,
         "Recrue",
         "Une simple recrue",
@@ -89,7 +89,7 @@ static RECRUE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        213456789677,
+        2,
         1,
         "Booster Test",
         "On play : boost the cards on the field +1/+1",
@@ -104,7 +104,7 @@ static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
 
 static HEALER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
     spell(
-        213456677,
+        3,
         1,
         "Healer Test",
         "Heal all your cards 5 hp",
@@ -117,7 +117,7 @@ static HEALER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
 
 static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        101,
+        4,
         2,
         "Guerrier",
         "Un guerrier courageux",
@@ -131,7 +131,7 @@ static GUERRIER: Lazy<CardTemplate> = Lazy::new(|| {
 
 static ECLAIREUR: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        102,
+        5,
         1,
         "Éclaireur",
         "Un éclaireur agile",
@@ -146,7 +146,7 @@ static ECLAIREUR: Lazy<CardTemplate> = Lazy::new(|| {
 
 static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        103,
+        6,
         3,
         "Chevalier",
         "Un noble chevalier",
@@ -161,7 +161,7 @@ static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
 
 static CAVALIER: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        104,
+        7,
         3,
         "Cavalier",
         "Un cavalier rapide",
@@ -176,7 +176,7 @@ static CAVALIER: Lazy<CardTemplate> = Lazy::new(|| {
 
 static CHAMPION: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        105,
+        8,
         4,
         "Champion",
         "Un champion puissant",
@@ -190,7 +190,7 @@ static CHAMPION: Lazy<CardTemplate> = Lazy::new(|| {
 
 static BERSERKER: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        106,
+        9,
         4,
         "Berserker",
         "Un berserker féroce",
@@ -205,7 +205,7 @@ static BERSERKER: Lazy<CardTemplate> = Lazy::new(|| {
 
 static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        107,
+        10,
         5,
         "Gardien",
         "Un gardien robuste",
@@ -220,7 +220,7 @@ static GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
 
 static GEANT: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        108,
+        11,
         6,
         "Géant",
         "Un géant imposant",
@@ -234,7 +234,7 @@ static GEANT: Lazy<CardTemplate> = Lazy::new(|| {
 
 static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        109,
+        12,
         7,
         "Dragon",
         "Un dragon majestueux",
@@ -249,7 +249,7 @@ static DRAGON: Lazy<CardTemplate> = Lazy::new(|| {
 
 static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        110,
+        13,
         2,
         "Apprenti Mage",
         "Apparition: piochez une carte",
@@ -264,7 +264,7 @@ static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        111,
+        14,
         3,
         "Clerc",
         "Apparition: rend 3 PV à vos alliés",
@@ -279,7 +279,7 @@ static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
 
 static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        112,
+        15,
         4,
         "Pyromancien",
         "Apparition: inflige 2 dégâts à tous les ennemis",
@@ -294,7 +294,7 @@ static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
 
 static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        113,
+        16,
         5,
         "Arcaniste",
         "Apparition: les deux joueurs piochent 2 cartes",
@@ -309,7 +309,7 @@ static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        114,
+        17,
         4,
         "Ange Gardien",
         "Apparition: rend 5 PV au héros allié",
@@ -325,7 +325,7 @@ static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
 
 static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        115,
+        18,
         1,
         "Kamikaze",
         "Mort: inflige 3 dégâts à tous les personnages",
@@ -340,7 +340,7 @@ static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        116,
+        19,
         5,
         "Nécromancien",
         "Mort: inflige 4 dégâts au héros ennemi",
@@ -355,7 +355,7 @@ static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
 
 static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        117,
+        20,
         3,
         "Sorcière",
         "Attaque: inflige 1 dégât au héros ennemi",
@@ -370,7 +370,7 @@ static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        118,
+        21,
         4,
         "Vampire",
         "Attaque: rend 2 PV au héros allié",
@@ -385,7 +385,7 @@ static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static PALADIN: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        119,
+        22,
         6,
         "Paladin",
         "Apparition: rend 4 PV à tous les alliés. Provocation",

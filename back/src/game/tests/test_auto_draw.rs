@@ -166,15 +166,13 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        for _ in 0..10 {
+        for _ in 0..9 {
             add_card_to_hand(&mut game, player_a);
         }
 
         add_card_to_deck(&mut game, player_a);
         add_card_to_deck(&mut game, player_a);
         add_card_to_deck(&mut game, player_a);
-
-        assert_eq!(game.get_hand(player_a).len(), 10);
 
         let monster = create_test_monster_in_hand(
             &mut game,
@@ -188,14 +186,7 @@ mod tests {
             }],
         );
 
-        let card_to_remove = game
-            .entities
-            .iter()
-            .find(|(_, e)| e.owner == player_a && e.location == Location::Hand)
-            .map(|(id, _)| *id)
-            .unwrap();
-        game.entities.get_mut(&card_to_remove).unwrap().location = Location::Graveyard;
-
+        assert_eq!(game.get_hand(player_a).len(), 10);
         game.players.get_mut(&player_a).unwrap().mana = 5;
         game.play_monster(monster, 0).unwrap();
         game.compute_commands().unwrap();
@@ -207,7 +198,7 @@ mod tests {
             .values()
             .filter(|e| e.owner == player_a && e.location == Location::Graveyard)
             .count();
-        assert_eq!(graveyard_count, 3);
+        assert_eq!(graveyard_count, 2);
 
         let deck_count = game
             .entities

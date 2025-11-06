@@ -8,6 +8,8 @@ use crate::{
     },
 };
 
+mod summon;
+
 pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>> {
     let mut actions: Vec<Action> = Vec::new();
     match effect {
@@ -343,6 +345,14 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     }
                 }
             }
+        }
+        Effect::Summon {
+            initiator,
+            side,
+            target,
+        } => {
+            let summon_actions = summon::compute(context, initiator, side, target)?;
+            actions.extend(summon_actions);
         }
     }
 

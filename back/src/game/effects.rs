@@ -1,4 +1,7 @@
-use crate::game::types::{InstanceId, PlayerId};
+use crate::{
+    collection::types::CardTemplate,
+    game::types::{InstanceId, PlayerId},
+};
 
 use super::events::EventType;
 use serde::{Deserialize, Serialize};
@@ -26,7 +29,7 @@ pub enum PlayerTarget {
     Id(PlayerId),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum Effect {
     IncreaseMaxMana {
@@ -76,10 +79,15 @@ pub enum Effect {
         hp: usize,
         target: Target,
     },
+    Summon {
+        initiator: InstanceId,
+        side: PlayerTarget,
+        target: CardTemplate,
+    },
     Win(PlayerId),
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct TriggeredEffect {
     pub trigger: EventType,
     pub effects: Vec<Effect>,

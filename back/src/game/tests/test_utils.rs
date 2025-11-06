@@ -116,6 +116,15 @@ pub fn update_effect_initiator(effect: Effect, initiator_id: usize) -> Effect {
         },
         Effect::AutoDraw { player, amount } => Effect::AutoDraw { player, amount },
         Effect::Win(player) => Effect::Win(player),
+        Effect::Summon {
+            initiator,
+            side,
+            target,
+        } => Effect::Summon {
+            initiator: initiator_id,
+            side,
+            target,
+        },
     }
 }
 

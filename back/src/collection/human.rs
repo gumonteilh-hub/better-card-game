@@ -1,16 +1,21 @@
 use crate::collection::{
-    Race, boost, draw, monster, spell,
-    types::{CardTemplate, PlayerTemplateTarget},
+    Race, boost, monster, spell,
+    types::{CardTemplate, PlayerTemplateTarget, TemplateEffect},
 };
 use once_cell::sync::Lazy;
 
 pub fn get_collection() -> Vec<CardTemplate> {
-    vec![BRAS_DROIT.clone(), CHEVALIER.clone(), FANFARE.clone()]
+    vec![
+        BRAS_DROIT.clone(),
+        CHEVALIER.clone(),
+        FANFARE.clone(),
+        ECUYER.clone(),
+    ]
 }
 
 static FANFARE: Lazy<CardTemplate> = Lazy::new(|| {
     spell(
-        45641211,
+        1001,
         2,
         "Fanfare",
         "+2/+2 a tout vos monstres",
@@ -27,7 +32,7 @@ static FANFARE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static BRAS_DROIT: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        1,
+        1002,
         2,
         "Bras droit",
         "Le bras droit du roi",
@@ -39,17 +44,34 @@ static BRAS_DROIT: Lazy<CardTemplate> = Lazy::new(|| {
     .build()
 });
 
-static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
+static ECUYER: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        2,
-        3,
-        "Chevalier",
-        "Apparition: vous piochez une carte",
-        3,
-        4,
+        1003,
+        1,
+        "Ecuyer",
+        "Une jeune recrue",
+        1,
+        1,
         Race::HUMAN,
         super::Class::COMMON,
     )
-    .on_play(vec![draw(PlayerTemplateTarget::Player, 1)])
+    .build()
+});
+
+static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1004,
+        3,
+        "Chevalier",
+        "Invoque 1 ecuyer",
+        3,
+        3,
+        Race::HUMAN,
+        super::Class::COMMON,
+    )
+    .on_play(vec![TemplateEffect::Summon {
+        side: PlayerTemplateTarget::Player,
+        target: ECUYER.clone(),
+    }])
     .build()
 });

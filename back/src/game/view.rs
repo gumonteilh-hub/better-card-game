@@ -8,10 +8,10 @@ use super::types::Location;
 use crate::{
     collection::Archetype,
     error::{Error, Result},
-    game::card::CardInstance,
+    game::{card::CardInstance, types::PlayerId},
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct HeroInfo {
     pub id: usize,
@@ -20,7 +20,7 @@ pub struct HeroInfo {
     pub archetype: Archetype,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EnemyInfo {
     pub secret_card: bool,
@@ -32,7 +32,7 @@ pub struct EnemyInfo {
     pub deck_size: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerInfo {
     pub secret_card: Option<CardInstance>,
@@ -46,7 +46,7 @@ pub struct PlayerInfo {
     pub deck_size: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicGameState {
     pub game_id: Uuid,
@@ -58,7 +58,8 @@ pub struct PublicGameState {
 }
 
 impl PublicGameState {
-    pub fn new(game_state: &Game) -> Result<Self> {
+    // todo make use of player_id
+    pub fn new(game_state: &Game, player_id: PlayerId) -> Result<Self> {
         let player_a = game_state
             .players
             .get(&game_state.player_id_a)

@@ -13,8 +13,8 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (userInfos?.deck?.cards.length === 30) {
-			startGame(userInfos.deck).then((id) => {
-				navigate({ to: `/game/${id}` });
+			startGame(userInfos.deck).then(({ userId }) => {
+				navigate({ to: `/game/${userId}` });
 			});
 		}
 	}, [navigate, userInfos?.deck]);

@@ -1,4 +1,4 @@
-import type { ICardInstance, Location } from "./game";
+import type { ICardInstance, IGameState, Location } from "./game";
 
 export type IAction =
 	| BurnAction
@@ -14,6 +14,9 @@ export type IAction =
 	| TriggerOnDeathAction
 	| RefreshManaAction
 	| BoostAction
+	| UpdateGameViewAction
+	| StartTurnAction
+	| EnemyDrawAction
 	| IncreaseMaxManaAction;
 
 export type ActionType =
@@ -30,10 +33,30 @@ export type ActionType =
 	| "TriggerOnAttack"
 	| "IncreaseMaxMana"
 	| "Boost"
+	| "StartTurn"
+	| "EnemyDraw"
+	| "UpdateGameView"
 	| "RefreshMana";
 
 export type EntityId = number;
 export type PlayerId = number;
+
+type EnemyDrawAction = {
+	type: "EnemyDraw";
+};
+
+type UpdateGameViewAction = {
+	type: "UpdateGameView";
+	value: {
+		player: PlayerId;
+		game: IGameState;
+	};
+};
+
+type StartTurnAction = {
+	type: "StartTurn";
+	value: PlayerId;
+};
 
 type BoostAction = {
 	type: "Boost";

@@ -1,11 +1,11 @@
 use std::collections::HashSet;
 
 use crate::{
-    error::{Result},
+    error::Result,
     game::{
+        Game,
         action::Action,
         types::{InstanceId, Location, PlayerId},
-        Game,
     },
 };
 
@@ -36,7 +36,7 @@ pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Ve
         free_positions.sort_by_key(|&pos| (pos as i32 - 3).abs());
 
         for (card_id, &position) in cards_to_play.iter().zip(&free_positions) {
-            game_state.play_monster(*card_id, position)?;
+            game_state.play_monster(player_id, *card_id, position)?;
         }
     }
 

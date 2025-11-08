@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { ICardTemplate, TemplateId, Archetype } from "../types/template";
+import type { Archetype, ICardTemplate, TemplateId } from "../types/template";
 import styles from "./DeckSummary.module.css";
 import { ManaCrystal } from "./hud/ManaCrystal";
 

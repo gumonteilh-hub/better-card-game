@@ -39,6 +39,10 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                                     player: player_id,
                                     card: card.clone(),
                                 });
+                                let oponent = context.get_opponent(&player_id)?;
+                                actions.push(Action::EnemyDraw {
+                                    player: oponent.player_id,
+                                });
                             } else {
                                 card.location = Location::Graveyard;
                                 actions.push(Action::BurnCard {
@@ -267,6 +271,10 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                             actions.push(Action::Draw {
                                 player: *player,
                                 card: card.clone(),
+                            });
+                            let oponent = context.get_opponent(player)?;
+                            actions.push(Action::EnemyDraw {
+                                player: oponent.player_id,
                             });
                         } else {
                             card.location = Location::Graveyard;

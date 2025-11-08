@@ -1,5 +1,5 @@
-import type { ICardTemplate } from "../../types/template";
 import placeholder from "../../assets/test.png";
+import type { ICardTemplate } from "../../types/template";
 import { ManaCrystal } from "../hud/ManaCrystal";
 import styles from "./Card.module.css";
 

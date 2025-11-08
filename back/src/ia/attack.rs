@@ -223,7 +223,7 @@ fn execute_greedy_attack_strategy(
 
         match best_attack {
             Some((attacker_id, target_id, _score)) => {
-                game.attack(attacker_id, target_id)?;
+                game.attack(player_id, attacker_id, target_id)?;
 
                 let mut actions = game.compute_commands()?;
                 all_actions.append(&mut actions);

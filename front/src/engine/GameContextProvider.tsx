@@ -1,6 +1,5 @@
 import { type JSX, useCallback, useMemo, useState } from "react";
 import { useGameEngine } from "../engine/gameEngine";
-import { attack, move } from "../service/game.service";
 import { GameContext } from "../types/gameContext.type";
 
 export const attackPositions = [0, 2, 3, 5, 6];
@@ -20,14 +19,22 @@ const linkedPositions = [
 ];
 
 export const GameContextProvider = ({
-	gameId,
+	userId,
 	children,
 }: {
-	gameId: string;
+	userId: string;
 	children: JSX.Element;
 }) => {
-	const { isAnimating, gameState, updateGameState, animationMap } =
-		useGameEngine(gameId);
+	const {
+		isAnimating,
+		gameState,
+		move,
+		attack,
+		playMonster,
+		playSpell,
+		endTurn,
+		animationMap,
+	} = useGameEngine(userId);
 	const [selectedCard, setSelectedCard] = useState<number>();
 	const [inputMode, setInputMode] = useState<IInputMode>("attack");
 
@@ -83,11 +90,9 @@ export const GameContextProvider = ({
 			if (!gameState || isAnimating || !selectedCard) return;
 
 			setSelectedCard(undefined);
-			move(gameState.gameId, selectedCard, pos).then((res) => {
-				updateGameState(res);
-			});
+			move(selectedCard, pos);
 		},
-		[gameState, isAnimating, selectedCard, updateGameState],
+		[gameState, isAnimating, selectedCard, move],
 	);
 
 	const handleTargetSelect = useCallback(
@@ -95,11 +100,9 @@ export const GameContextProvider = ({
 			if (!gameState || isAnimating || !selectedCard) return;
 
 			setSelectedCard(undefined);
-			attack(gameState.gameId, selectedCard, cardId).then((res) => {
-				updateGameState(res);
-			});
+			attack(selectedCard, cardId);
 		},
-		[gameState, isAnimating, selectedCard, updateGameState],
+		[gameState, isAnimating, selectedCard, attack],
 	);
 
 	const handleSetInputMode = useCallback((inputMode: IInputMode) => {
@@ -117,7 +120,9 @@ export const GameContextProvider = ({
 				gameState,
 				isAnimating,
 				selectedCard,
-				updateGameState,
+				endTurn,
+				playSpell,
+				playMonster,
 				handleTargetSelect,
 				handleMoveSelect,
 				playableCards,

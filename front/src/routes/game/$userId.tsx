@@ -11,24 +11,24 @@ import type { Coordinates } from "@dnd-kit/core/dist/types";
 import { createFileRoute } from "@tanstack/react-router";
 import PlayerBoard from "../../components/PlayerBoard";
 import { GameContextProvider } from "../../engine/GameContextProvider";
-import { endTurn, playMonster, playSpell } from "../../service/game.service";
 import { useGameContext } from "../../utils/useGameContext";
 
-export const Route = createFileRoute("/game/$gameId")({
+export const Route = createFileRoute("/game/$userId")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { gameId } = Route.useParams();
+	const { userId } = Route.useParams();
 	return (
-		<GameContextProvider gameId={gameId}>
+		<GameContextProvider userId={userId}>
 			<Game></Game>
 		</GameContextProvider>
 	);
 }
 
 const Game = () => {
-	const { gameState, isAnimating, updateGameState } = useGameContext();
+	const { gameState, isAnimating, endTurn, playMonster, playSpell } =
+		useGameContext();
 
 	// biome-ignore lint/suspicious/noExplicitAny: <type inherited from dnd-kit>
 	const handleDragEnd = (event: any) => {
@@ -40,18 +40,10 @@ const Game = () => {
 			over.data.current.accepts.includes(active.data.current.type)
 		) {
 			if (active.data.current.type === "monster") {
-				playMonster(
-					gameState.gameId,
-					active.data.current.id,
-					over.data.current.position,
-				).then((res) => {
-					updateGameState(res);
-				});
+				playMonster(active.data.current.id, over.data.current.position);
 			}
 			if (active.data.current.type === "spell") {
-				playSpell(gameState.gameId, active.data.current.id).then((res) => {
-					updateGameState(res);
-				});
+				playSpell(active.data.current.id);
 			}
 		}
 	};
@@ -59,9 +51,7 @@ const Game = () => {
 	function handleEndTurn(): void {
 		if (isAnimating || !gameState) return;
 
-		endTurn(gameState?.gameId).then((res) => {
-			updateGameState(res);
-		});
+		endTurn();
 	}
 
 	function collisionHandler(args: {

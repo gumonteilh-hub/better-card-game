@@ -35,7 +35,7 @@ pub fn ai_play_turn(game_state: &mut Game, player_id: PlayerId) -> Result<Vec<Ac
     let mut attack_actions_2 = attack::ai_attack_sequence(game_state, player_id, behavior)?;
     all_actions.append(&mut attack_actions_2);
 
-    let mut end_turn_actions = game_state.next_turn()?;
+    let mut end_turn_actions = game_state.end_turn(player_id)?;
     all_actions.append(&mut end_turn_actions);
 
     Ok(all_actions)

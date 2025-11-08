@@ -39,17 +39,17 @@ struct GameHandle {
 
 #[derive(Debug)]
 enum GameCommand {
-    PlayerConnected {
+    Connected {
         user_id: Uuid,
         ws_tx: mpsc::Sender<ServerMessage>,
     },
 
-    PlayerAction {
+    Action {
         user_id: Uuid,
         action: PlayerActionCommand,
     },
 
-    PlayerDisconnected {
+    Disconnected {
         user_id: Uuid,
     },
 }
@@ -129,7 +129,7 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, game: GameHandle) {
 
     if game
         .tx
-        .send(GameCommand::PlayerConnected { user_id, ws_tx: tx })
+        .send(GameCommand::Connected { user_id, ws_tx: tx })
         .await
         .is_err()
     {
@@ -158,7 +158,7 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, game: GameHandle) {
                 let deserialized_action: PlayerActionCommand = serde_json::from_str(&text).unwrap();
 
                 if game_tx
-                    .send(GameCommand::PlayerAction {
+                    .send(GameCommand::Action {
                         user_id,
                         action: deserialized_action,
                     })
@@ -176,10 +176,7 @@ async fn handle_socket(socket: WebSocket, user_id: Uuid, game: GameHandle) {
         _ = (&mut recv_task) => send_task.abort(),
     }
 
-    let _ = game
-        .tx
-        .send(GameCommand::PlayerDisconnected { user_id })
-        .await;
+    let _ = game.tx.send(GameCommand::Disconnected { user_id }).await;
     tracing::info!("User {} disconnected", user_id);
 }
 
@@ -205,7 +202,7 @@ async fn game_task(
 
     while let Some(cmd) = rx.recv().await {
         match cmd {
-            GameCommand::PlayerConnected { user_id, ws_tx } => {
+            GameCommand::Connected { user_id, ws_tx } => {
                 tracing::info!("Player {} connected to game {}", user_id, game_id);
                 state.player_channels.insert(user_id, ws_tx);
 
@@ -221,10 +218,10 @@ async fn game_task(
                 )
                 .await;
 
-                broadcast_to_all(&state, ServerMessage::Message(format!("Player joined"))).await;
+                broadcast_to_all(&state, ServerMessage::Message("Player joined".to_string())).await;
             }
 
-            GameCommand::PlayerAction { user_id, action } => {
+            GameCommand::Action { user_id, action } => {
                 tracing::info!("Player {} wants to do: {:?}", user_id, action);
 
                 tracing::info!("{}", state.player_id_turn);
@@ -311,11 +308,11 @@ async fn game_task(
                 }
             }
 
-            GameCommand::PlayerDisconnected { user_id } => {
+            GameCommand::Disconnected { user_id } => {
                 tracing::info!("Player {} disconnected from game {}", user_id, game_id);
                 state.player_channels.remove(&user_id);
 
-                broadcast_to_all(&state, ServerMessage::Message(format!("Player left"))).await;
+                broadcast_to_all(&state, ServerMessage::Message("Player left".to_string())).await;
             }
         }
     }
@@ -333,10 +330,10 @@ async fn broadcast_to_all(state: &GameState, msg: ServerMessage) {
 
 /// Envoie un message à un joueur spécifique
 async fn broadcast_to_player(state: &GameState, user_id: Uuid, msg: ServerMessage) {
-    if let Some(tx) = state.player_channels.get(&user_id) {
-        if tx.try_send(msg).is_err() {
-            tracing::warn!("Failed to send to player {}", user_id);
-        }
+    if let Some(tx) = state.player_channels.get(&user_id)
+        && tx.try_send(msg).is_err()
+    {
+        tracing::warn!("Failed to send to player {}", user_id);
     }
 }
 

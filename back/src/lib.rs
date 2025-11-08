@@ -63,13 +63,11 @@ pub fn play_monster(
     let mut actions = game_state.compute_commands()?;
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
-        player: player,
+        player,
         game: player_game_view,
     });
     let oponent = game_state
-        .players
-        .iter()
-        .map(|(p, _)| p)
+        .players.keys()
         .find(|p| **p != player)
         .unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
@@ -85,13 +83,11 @@ pub fn play_spell(game_state: &mut Game, player: PlayerId, card_id: usize) -> Re
     let mut actions = game_state.compute_commands()?;
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
-        player: player,
+        player,
         game: player_game_view,
     });
     let oponent = game_state
-        .players
-        .iter()
-        .map(|(p, _)| p)
+        .players.keys()
         .find(|p| **p != player)
         .unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
@@ -108,13 +104,11 @@ pub fn end_turn(game_state: &mut Game, player: PlayerId) -> Result<Vec<Action>> 
     actions.extend(other_actions);
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
-        player: player,
+        player,
         game: player_game_view,
     });
     let oponent = game_state
-        .players
-        .iter()
-        .map(|(p, _)| p)
+        .players.keys()
         .find(|p| **p != player)
         .unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
@@ -135,13 +129,11 @@ pub fn attack(
     let mut actions = game_state.compute_commands()?;
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
-        player: player,
+        player,
         game: player_game_view,
     });
     let oponent = game_state
-        .players
-        .iter()
-        .map(|(p, _)| p)
+        .players.keys()
         .find(|p| **p != player)
         .unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
@@ -162,13 +154,11 @@ pub fn move_card(
     let mut actions = game_state.compute_commands()?;
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
-        player: player,
+        player,
         game: player_game_view,
     });
     let oponent = game_state
-        .players
-        .iter()
-        .map(|(p, _)| p)
+        .players.keys()
         .find(|p| **p != player)
         .unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;

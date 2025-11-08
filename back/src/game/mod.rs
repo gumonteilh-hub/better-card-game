@@ -266,13 +266,10 @@ impl Game {
 
     pub fn end_turn(&mut self, ending_player: PlayerId) -> Result<Vec<Action>> {
         let mut actions = Vec::new();
-        let starting_player = self
-            .players
-            .iter()
-            .map(|(p, _)| p)
+        let starting_player = *self
+            .players.keys()
             .find(|p| **p != ending_player)
-            .unwrap()
-            .clone();
+            .unwrap();
 
         actions.push(Action::StartTurn(starting_player));
         self.current_player = starting_player;

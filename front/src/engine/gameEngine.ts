@@ -55,7 +55,6 @@ export const useGameEngine = (userId: string) => {
 	const wsRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		console.log(userId);
 		const ws = new WebSocket(`ws://${window.location.host}/game/${userId}`);
 		wsRef.current = ws;
 
@@ -64,7 +63,6 @@ export const useGameEngine = (userId: string) => {
 
 			switch (action.type) {
 				case "action": {
-					console.log(action.value);
 					setActionQueue((prev) => [...prev, action.value]);
 					break;
 				}
@@ -171,8 +169,6 @@ export const useGameEngine = (userId: string) => {
 				for (const action of group) {
 					intermediateState = applyAction(intermediateState, action);
 				}
-				console.log({ intermediateState });
-				console.log({ currentType });
 
 				const isAnimationBefore = animationBefore.includes(currentType);
 

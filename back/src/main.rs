@@ -52,8 +52,8 @@ async fn main() {
         .route("/collection", post(collection))
         .route("/ia/{user_id}", post(start_game_vs_ia))
         .route("/user/{user_id}", get(find_current_game))
-        .nest("/matchmaking", matchmaking_routes)
-        .nest("/game", game_routes)
+        .nest("/ws/matchmaking", matchmaking_routes)
+        .nest("/ws/game", game_routes)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
 

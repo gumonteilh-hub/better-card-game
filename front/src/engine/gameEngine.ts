@@ -56,7 +56,7 @@ export const useGameEngine = (userId: string, gameId: string) => {
 
 	useEffect(() => {
 		const ws = new WebSocket(
-			`ws://${window.location.host}/game/${gameId}/${userId}`,
+			`ws://${window.location.host}/ws/game/${gameId}/${userId}`,
 		);
 		wsRef.current = ws;
 

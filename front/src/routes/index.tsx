@@ -119,7 +119,7 @@ const Matchmaking = () => {
 		if (!userInfos?.deck || !userInfos.userId || !open) return;
 
 		const ws = new WebSocket(
-			`ws://${window.location.host}/matchmaking/${userInfos.userId}`,
+			`ws://${window.location.host}/ws/matchmaking/${userInfos.userId}`,
 		);
 		wsRef.current = ws;
 

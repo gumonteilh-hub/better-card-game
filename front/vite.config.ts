@@ -22,11 +22,11 @@ export default defineConfig({
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ""),
 			},
-			"/game": {
+			"/ws/game": {
 				target: "ws://localhost:9999",
 				ws: true,
 			},
-			"/matchmaking": {
+			"/ws/matchmaking": {
 				target: "ws://localhost:9999",
 				ws: true,
 			},

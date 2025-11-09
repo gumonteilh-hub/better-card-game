@@ -12,15 +12,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import PlayerBoard from "../../components/PlayerBoard";
 import { GameContextProvider } from "../../engine/GameContextProvider";
 import { useGameContext } from "../../utils/useGameContext";
+import { useUserInfo } from "../../utils/useUserInfo";
 
-export const Route = createFileRoute("/game/$userId")({
+export const Route = createFileRoute("/game/$gameId")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { userId } = Route.useParams();
+	const { userInfos } = useUserInfo();
+	const { gameId } = Route.useParams();
+	if (!userInfos) {
+		return <>Loading</>;
+	}
 	return (
-		<GameContextProvider userId={userId}>
+		<GameContextProvider userId={userInfos.userId} gameId={gameId}>
 			<Game></Game>
 		</GameContextProvider>
 	);

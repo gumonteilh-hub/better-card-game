@@ -25,3 +25,9 @@ export const startGame = async (deck: IDeck): Promise<StartGameInfo> => {
 		body: JSON.stringify(body),
 	});
 };
+
+export const findCurrentGame = async (userId: string): Promise<string> => {
+	return apiFetch<string>(`/api/user/${userId}`, {
+		method: "GET",
+	});
+};

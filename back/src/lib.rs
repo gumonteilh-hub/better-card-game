@@ -27,7 +27,7 @@ pub struct GameViewResponse {
     game_view: PublicGameState,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct UserDeck {
     pub cards: Vec<TemplateId>,
     pub archetype: Archetype,

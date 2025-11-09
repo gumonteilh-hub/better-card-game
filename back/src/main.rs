@@ -1,8 +1,11 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 use axum_macros::debug_handler;
 use back::{
-    self, PublicGameState,
+    self, PublicGameState, UserDeck,
     collection::Archetype,
     error::Error,
     game::{action::Action, types::PlayerId},
@@ -17,7 +20,7 @@ use axum::{
     },
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{any, post},
+    routing::{any, get, post},
 };
 use dashmap::DashMap;
 use futures::{SinkExt, StreamExt};
@@ -30,6 +33,29 @@ use uuid::Uuid;
 struct AppState {
     current_live_games: DashMap<Uuid, Uuid>,
     games: DashMap<Uuid, GameHandle>,
+    matchmaking_queue: Arc<Mutex<Vec<MatchmakingPlayer>>>,
+}
+
+struct MatchmakingPlayer {
+    user_id: Uuid,
+    deck: UserDeck,
+    tx: mpsc::Sender<MatchmakingMessage>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
+enum MatchmakingClientMessage {
+    JoinQueue { deck: UserDeck },
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+enum MatchmakingMessage {
+    Waiting,
+    GameFound {
+        #[serde(rename = "gameId")]
+        game_id: String,
+    },
 }
 
 #[derive(Clone)]
@@ -93,11 +119,189 @@ struct GameState {
     player_channels: HashMap<Uuid, mpsc::Sender<ServerMessage>>,
 }
 
+async fn create_pvp_game(
+    state: &Arc<AppState>,
+    player_a_id: Uuid,
+    deck_a: UserDeck,
+    player_b_id: Uuid,
+    deck_b: UserDeck,
+) -> Uuid {
+    // Récupérer collections
+    let collection_a = back::get_collection(deck_a.archetype);
+    let collection_b = back::get_collection(deck_b.archetype);
+
+    // Créer game (PvP, pas vs_ia)
+    let mut game =
+        back::Game::new(deck_a, deck_b, collection_a, collection_b).expect("Failed to create game");
+
+    game.vs_ia = false; // PvP mode
+    game.compute_commands()
+        .expect("Failed to compute initial commands");
+
+    let game_id = game.game_id;
+
+    // Spawn game task
+    let (tx, rx) = mpsc::channel::<GameCommand>(100);
+    tokio::spawn(game_task(game_id, game, player_a_id, player_b_id, rx));
+
+    state.games.insert(game_id, GameHandle { tx });
+    state.current_live_games.insert(player_a_id, game_id);
+    state.current_live_games.insert(player_b_id, game_id);
+
+    tracing::info!(
+        "PvP game {} created: {} vs {}",
+        game_id,
+        player_a_id,
+        player_b_id
+    );
+
+    game_id
+}
+
+#[debug_handler]
+async fn handle_matchmaking(
+    ws: WebSocketUpgrade,
+    State(state): State<Arc<AppState>>,
+    Path(user_id): Path<Uuid>,
+) -> Response {
+    tracing::info!(
+        "WebSocket connection request from user to start matchmaking {}",
+        user_id
+    );
+
+    ws.on_upgrade(move |socket| handle_matchmaking_socket(socket, state, user_id))
+}
+
+async fn handle_matchmaking_socket(socket: WebSocket, state: Arc<AppState>, user_id: Uuid) {
+    tracing::info!("WebSocket upgraded for user {} in matchmaking", user_id);
+
+    // Vérifier si l'utilisateur a déjà une partie en cours
+    if let Some(existing_game_id) = state.current_live_games.get(&user_id) {
+        let game_id = *existing_game_id.value();
+        tracing::info!("User {} already has an active game: {}", user_id, game_id);
+
+        // Envoyer immédiatement GameFound
+        let message = MatchmakingMessage::GameFound {
+            game_id: game_id.to_string(),
+        };
+        let serialized = serde_json::to_string(&message).unwrap();
+
+        let (mut ws_sender, _ws_receiver) = socket.split();
+        let _ = ws_sender.send(Message::Text(serialized.into())).await;
+        let _ = ws_sender.close().await;
+
+        tracing::info!(
+            "Sent existing game info to user {} and closed connection",
+            user_id
+        );
+        return;
+    }
+
+    let (mut ws_sender, mut ws_receiver) = socket.split();
+
+    let (tx, mut rx) = mpsc::channel::<MatchmakingMessage>(10);
+
+    let mut send_task = tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            let serialized = serde_json::to_string(&msg).unwrap();
+            if ws_sender
+                .send(Message::Text(serialized.into()))
+                .await
+                .is_err()
+            {
+                break;
+            }
+        }
+    });
+
+    let state_clone = state.clone();
+    let tx_clone = tx.clone();
+    let mut recv_task = tokio::spawn(async move {
+        while let Some(Ok(msg)) = ws_receiver.next().await {
+            if let Message::Text(text) = msg {
+                tracing::info!("Matchmaking message from {}: {}", user_id, text);
+
+                let client_msg: MatchmakingClientMessage = match serde_json::from_str(&text) {
+                    Ok(m) => m,
+                    Err(e) => {
+                        tracing::error!("Invalid matchmaking message: {}", e);
+                        continue;
+                    }
+                };
+
+                let MatchmakingClientMessage::JoinQueue { deck } = client_msg;
+
+                let opponent = {
+                    let mut queue = state_clone.matchmaking_queue.lock().unwrap();
+                    if queue.is_empty() {
+                        queue.push(MatchmakingPlayer {
+                            user_id,
+                            deck: deck.clone(),
+                            tx: tx_clone.clone(),
+                        });
+                        None
+                    } else {
+                        Some(queue.remove(0))
+                    }
+                };
+
+                if let Some(opponent) = opponent {
+                    tracing::info!("Match found! {} vs {}", user_id, opponent.user_id);
+
+                    let game_id = create_pvp_game(
+                        &state_clone,
+                        user_id,
+                        deck,
+                        opponent.user_id,
+                        opponent.deck,
+                    )
+                    .await;
+
+                    let _ = opponent
+                        .tx
+                        .send(MatchmakingMessage::GameFound {
+                            game_id: game_id.to_string(),
+                        })
+                        .await;
+
+                    let _ = tx_clone
+                        .send(MatchmakingMessage::GameFound {
+                            game_id: game_id.to_string(),
+                        })
+                        .await;
+
+                    break; // Fermer connexion matchmaking
+                } else {
+                    // En attente
+                    let _ = tx_clone.send(MatchmakingMessage::Waiting).await;
+                }
+            }
+        }
+
+        // Connexion fermée → retirer de la queue si toujours présent
+        state_clone
+            .matchmaking_queue
+            .lock()
+            .unwrap()
+            .retain(|p| p.user_id != user_id);
+
+        tracing::info!("User {} left matchmaking", user_id);
+    });
+
+    // Attendre fin des tasks
+    tokio::select! {
+        _ = (&mut send_task) => recv_task.abort(),
+        _ = (&mut recv_task) => send_task.abort(),
+    }
+
+    tracing::info!("Matchmaking socket closed for user {}", user_id);
+}
+
 #[debug_handler]
 async fn handle(
     ws: WebSocketUpgrade,
     State(state): State<Arc<AppState>>,
-    Path(user_id): Path<Uuid>,
+    Path((game_id, user_id)): Path<(Uuid, Uuid)>,
 ) -> Response {
     tracing::info!("WebSocket connection request from user {}", user_id);
 
@@ -292,8 +496,11 @@ async fn game_task(
                         | Action::TriggerOnPlay { .. }
                         | Action::TriggerOnDeath { .. }
                         | Action::TriggerOnAttack { .. }
-                        | Action::Win { .. }
                         | Action::RefreshMana { .. } => {
+                            broadcast_to_all(&state, ServerMessage::Action(action)).await;
+                        }
+                        Action::Win { .. } => {
+                            //clean App state
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
                         }
                         Action::StartTurn(player) => {
@@ -348,16 +555,20 @@ async fn main() {
         .init();
 
     let shared_state = Arc::new(AppState {
+        matchmaking_queue: Arc::new(Mutex::new(Vec::new())),
         current_live_games: DashMap::new(),
         games: DashMap::new(),
     });
 
-    let ws_routes = Router::new().route("/{user_id}", any(handle));
+    let game_routes = Router::new().route("/{game_id}/{user_id}", any(handle));
+    let matchmaking_routes = Router::new().route("/{user_id}", any(handle_matchmaking));
 
     let app = Router::new()
         .route("/collection", post(collection))
-        .route("/start", post(start_game))
-        .nest("/game", ws_routes)
+        //.route("/start", post(start_game))
+        .route("/user/{user_id}", get(find_current_game))
+        .nest("/matchmaking", matchmaking_routes)
+        .nest("/game", game_routes)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
 
@@ -390,6 +601,18 @@ async fn collection(
 struct StartGameInfo {
     game_id: String,
     user_id: String,
+}
+
+#[debug_handler]
+async fn find_current_game(
+    State(state): State<Arc<AppState>>,
+    Path(user_id): Path<Uuid>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let game_id = state
+        .current_live_games
+        .get(&user_id)
+        .map(|entry| *entry.value());
+    Ok(Json(serde_json::json!(game_id)))
 }
 
 #[debug_handler]

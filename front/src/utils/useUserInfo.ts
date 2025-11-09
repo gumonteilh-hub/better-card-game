@@ -3,6 +3,7 @@ import type { IDeck } from "../types/template";
 
 export interface IUserInfo {
 	name?: string;
+	userId: string;
 	deck?: IDeck;
 }
 
@@ -17,7 +18,12 @@ export const useUserInfo = () => {
 				setUserInfos(userInfo);
 			} catch (error) {
 				console.error(error);
+				const baseUserInfo: IUserInfo = { userId: crypto.randomUUID() };
+				setUserInfos(baseUserInfo);
 			}
+		} else {
+			const baseUserInfo: IUserInfo = { userId: crypto.randomUUID() };
+			setUserInfos(baseUserInfo);
 		}
 	}, []);
 

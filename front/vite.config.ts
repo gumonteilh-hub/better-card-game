@@ -26,6 +26,10 @@ export default defineConfig({
 				target: "ws://localhost:9999",
 				ws: true,
 			},
+			"/matchmaking": {
+				target: "ws://localhost:9999",
+				ws: true,
+			},
 		},
 	},
 });

@@ -14,37 +14,37 @@ const animationBefore: ActionType[] = ["Destroy", "Win"];
 
 type PlayerActionCommand =
 	| {
-			type: "playMonster";
-			value: {
-				cardId: number;
-				position: number;
-			};
-	  }
+		type: "playMonster";
+		value: {
+			cardId: number;
+			position: number;
+		};
+	}
 	| {
-			type: "playSpell";
-			value: {
-				cardId: number;
-			};
-	  }
+		type: "playSpell";
+		value: {
+			cardId: number;
+		};
+	}
 	| {
-			type: "endTurn";
-	  }
+		type: "endTurn";
+	}
 	| {
-			type: "attack";
-			value: {
-				initiator: number;
-				target: number | string;
-			};
-	  }
+		type: "attack";
+		value: {
+			initiator: number;
+			target: number | string;
+		};
+	}
 	| {
-			type: "move";
-			value: {
-				cardId: number;
-				position: number;
-			};
-	  };
+		type: "move";
+		value: {
+			cardId: number;
+			position: number;
+		};
+	};
 
-export const useGameEngine = (userId: string) => {
+export const useGameEngine = (userId: string, gameId: string) => {
 	const [gameState, setGameState] = useState<IGameState>();
 	const [actionQueue, setActionQueue] = useState<IAction[]>([]);
 	const [isAnimating, setIsAnimating] = useState(false);
@@ -55,7 +55,9 @@ export const useGameEngine = (userId: string) => {
 	const wsRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		const ws = new WebSocket(`ws://${window.location.host}/game/${userId}`);
+		const ws = new WebSocket(
+			`ws://${window.location.host}/game/${gameId}/${userId}`,
+		);
 		wsRef.current = ws;
 
 		ws.onmessage = (e: MessageEvent) => {
@@ -80,7 +82,7 @@ export const useGameEngine = (userId: string) => {
 			ws.close();
 			wsRef.current = null;
 		};
-	}, [userId]);
+	}, [userId, gameId]);
 
 	const attack = useCallback((initiator: number, target: number | string) => {
 		if (wsRef.current) {

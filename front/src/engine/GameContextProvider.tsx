@@ -19,9 +19,11 @@ const linkedPositions = [
 ];
 
 export const GameContextProvider = ({
+	gameId,
 	userId,
 	children,
 }: {
+	gameId: string;
 	userId: string;
 	children: JSX.Element;
 }) => {
@@ -34,7 +36,7 @@ export const GameContextProvider = ({
 		playSpell,
 		endTurn,
 		animationMap,
-	} = useGameEngine(userId);
+	} = useGameEngine(userId, gameId);
 	const [selectedCard, setSelectedCard] = useState<number>();
 	const [inputMode, setInputMode] = useState<IInputMode>("attack");
 

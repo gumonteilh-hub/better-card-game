@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeckSummary } from "../components/DeckSummary";
-import { findCurrentGame } from "../service/game.service";
+import { findCurrentGame, startGame } from "../service/game.service";
 import { type IUserInfo, useUserInfo } from "../utils/useUserInfo";
 
 export const Route = createFileRoute("/")({
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
 	const { userInfos, saveUserInfo } = useUserInfo();
 	const [currentGame, setCurrentGame] = useState<string | undefined>();
+	const navigate = useNavigate({ from: "/" });
 
 	useEffect(() => {
 		if (userInfos) {
@@ -24,6 +25,14 @@ function RouteComponent() {
 	if (!userInfos) {
 		return <>Loading</>;
 	}
+
+	const handlePlayVsIa = (): void => {
+		if (userInfos?.deck) {
+			startGame(userInfos.userId, userInfos.deck).then((res) => {
+				navigate({ to: `/game/${res.gameId}` });
+			});
+		}
+	};
 
 	return (
 		<div className="homepage">
@@ -41,20 +50,33 @@ function RouteComponent() {
 					</label>
 				</div>
 				<nav className="navigation-menu">
-					<ul>
-						{currentGame ? (
-							<Link to={"/game/$gameId"} params={{ gameId: currentGame }}>
+					{currentGame ? (
+						<li>
+							<Link
+								to={"/game/$gameId"}
+								params={{ gameId: currentGame }}
+								className="link link-resume"
+							>
 								Reprendre la partie
 							</Link>
-						) : (
-							<Matchmaking />
-						)}
-					</ul>
-					<ul>
+						</li>
+					) : (
+						<>
+							<li>
+								<button type="button" className="link" onClick={handlePlayVsIa}>
+									Jouer contre l'IA
+								</button>
+							</li>
+							<li>
+								<Matchmaking />
+							</li>
+						</>
+					)}
+					<li>
 						<Link className="link" to={"/collection"}>
 							Ma collection
 						</Link>
-					</ul>
+					</li>
 				</nav>
 			</div>
 			{userInfos?.deck && (
@@ -164,7 +186,7 @@ const Matchmaking = () => {
 					setOpen(true);
 				}}
 			>
-				Jouer !
+				Jouer en ligne
 			</button>
 
 			<dialog ref={dialogRef} className="matchmaking-dialog">

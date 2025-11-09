@@ -143,8 +143,9 @@
 
 /* Links/Buttons */
 .link {
+	width: 100%;
 	display: block;
-	padding: 1.25rem 2rem;
+	padding-block: 2rem;
 	border: none;
 	border-radius: 0.75rem;
 	font-size: 1.25rem;
@@ -195,7 +196,6 @@
 .link-play {
 	background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
 	font-size: 1.5rem;
-	padding: 1.5rem 2.5rem;
 	box-shadow: 0 6px 20px rgba(255, 140, 66, 0.6);
 	animation: pulse-play 2.5s ease-in-out infinite;
 }
@@ -214,6 +214,30 @@
 
 .link-play:hover {
 	box-shadow: 0 8px 35px rgba(255, 140, 66, 0.9);
+}
+
+/* Resume Button - Special Style */
+.link-resume {
+	background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+	font-size: 1.25rem;
+	box-shadow: 0 5px 18px rgba(78, 205, 196, 0.5);
+	animation: pulse-resume 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-resume {
+
+	0%,
+	100% {
+		box-shadow: 0 5px 18px rgba(78, 205, 196, 0.5);
+	}
+
+	50% {
+		box-shadow: 0 7px 28px rgba(78, 205, 196, 0.8);
+	}
+}
+
+.link-resume:hover {
+	box-shadow: 0 7px 30px rgba(78, 205, 196, 0.9);
 }
 
 /* Disabled Link */

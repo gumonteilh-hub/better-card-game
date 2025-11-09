@@ -37,22 +37,6 @@ pub fn get_collection(archetype: Archetype) -> Vec<CardTemplate> {
     collection::get_collection(archetype)
 }
 
-pub fn start_game(deck: UserDeck) -> Result<Game> {
-    let ia_deck = collection::get_ia_deck();
-    let ia_archetype = ia_deck.archetype;
-    let player_archetype = deck.archetype;
-    let mut game_state = Game::new(
-        deck,
-        ia_deck,
-        get_collection(player_archetype),
-        get_collection(ia_archetype),
-    )?;
-
-    game_state.compute_commands()?;
-
-    Ok(game_state)
-}
-
 pub fn play_monster(
     game_state: &mut Game,
     player: PlayerId,

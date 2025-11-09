@@ -46,7 +46,7 @@ fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
 pub struct Game {
     pub game_id: uuid::Uuid,
     pub player_id_a: usize,
-    pub player_id_b: usize, //IA
+    pub player_id_b: usize,
     pub entities: HashMap<InstanceId, CardInstance>,
     pub effect_queue: VecDeque<Effect>,
     pub players: HashMap<PlayerId, PlayerInstance>,
@@ -63,6 +63,7 @@ impl Game {
         deck_b: UserDeck,
         collection_a: Vec<CardTemplate>,
         collection_b: Vec<CardTemplate>,
+        vs_ia: bool,
     ) -> Result<Self> {
         let mut entity_id = 0;
 
@@ -125,7 +126,7 @@ impl Game {
             current_player: player_id_a,
             event_manager: EventManager::new(),
             winner_id: None,
-            vs_ia: true,
+            vs_ia,
         })
     }
 
@@ -266,10 +267,7 @@ impl Game {
 
     pub fn end_turn(&mut self, ending_player: PlayerId) -> Result<Vec<Action>> {
         let mut actions = Vec::new();
-        let starting_player = *self
-            .players.keys()
-            .find(|p| **p != ending_player)
-            .unwrap();
+        let starting_player = *self.players.keys().find(|p| **p != ending_player).unwrap();
 
         actions.push(Action::StartTurn(starting_player));
         self.current_player = starting_player;

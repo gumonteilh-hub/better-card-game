@@ -15,12 +15,15 @@ interface StartGameInfo {
 	userId: string;
 }
 
-export const startGame = async (deck: IDeck): Promise<StartGameInfo> => {
+export const startGame = async (
+	userId: string,
+	deck: IDeck,
+): Promise<StartGameInfo> => {
 	const body = {
 		archetype: deck.archetype,
 		cards: deck.cards.map((c) => c.id),
 	};
-	return apiFetch<StartGameInfo>("/api/start", {
+	return apiFetch<StartGameInfo>(`/api/ia/${userId}`, {
 		method: "POST",
 		body: JSON.stringify(body),
 	});

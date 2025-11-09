@@ -142,7 +142,14 @@ async fn create_pvp_game(
 
     // Spawn game task
     let (tx, rx) = mpsc::channel::<GameCommand>(100);
-    tokio::spawn(game_task(game_id, game, player_a_id, player_b_id, rx));
+    tokio::spawn(game_task(
+        game_id,
+        game,
+        player_a_id,
+        player_b_id,
+        rx,
+        state.clone(),
+    ));
 
     state.games.insert(game_id, GameHandle { tx });
     state.current_live_games.insert(player_a_id, game_id);
@@ -291,7 +298,10 @@ async fn handle_matchmaking_socket(socket: WebSocket, state: Arc<AppState>, user
     // Attendre fin des tasks
     tokio::select! {
         _ = (&mut send_task) => recv_task.abort(),
-        _ = (&mut recv_task) => send_task.abort(),
+        _ = (&mut recv_task) => {
+            drop(tx); // Fermer le channel pour que send_task se termine
+            let _ = send_task.await; // Attendre que send_task finisse d'envoyer tous les messages
+        },
     }
 
     tracing::info!("Matchmaking socket closed for user {}", user_id);
@@ -301,7 +311,7 @@ async fn handle_matchmaking_socket(socket: WebSocket, state: Arc<AppState>, user
 async fn handle(
     ws: WebSocketUpgrade,
     State(state): State<Arc<AppState>>,
-    Path((game_id, user_id)): Path<(Uuid, Uuid)>,
+    Path((_game_id, user_id)): Path<(Uuid, Uuid)>,
 ) -> Response {
     tracing::info!("WebSocket connection request from user {}", user_id);
 
@@ -390,6 +400,7 @@ async fn game_task(
     player_a_id: Uuid,
     player_b_id: Uuid,
     mut rx: mpsc::Receiver<GameCommand>,
+    app_state: Arc<AppState>,
 ) {
     tracing::info!("Game task started for game {}", game_id);
 
@@ -404,7 +415,7 @@ async fn game_task(
         player_channels: HashMap::new(),
     };
 
-    while let Some(cmd) = rx.recv().await {
+    'main_loop: while let Some(cmd) = rx.recv().await {
         match cmd {
             GameCommand::Connected { user_id, ws_tx } => {
                 tracing::info!("Player {} connected to game {}", user_id, game_id);
@@ -500,8 +511,8 @@ async fn game_task(
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
                         }
                         Action::Win { .. } => {
-                            //clean App state
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
+                            break 'main_loop;
                         }
                         Action::StartTurn(player) => {
                             let (user_id, _) = state
@@ -523,7 +534,10 @@ async fn game_task(
             }
         }
     }
-
+    tracing::info!("Game {} finished, cleaning up state", game_id);
+    app_state.current_live_games.remove(&player_a_id);
+    app_state.current_live_games.remove(&player_b_id);
+    app_state.games.remove(&game_id);
     tracing::info!("Game task ended for game {}", game_id);
 }
 
@@ -630,7 +644,14 @@ async fn start_game(
 
     let (tx, rx) = mpsc::channel::<GameCommand>(100);
 
-    tokio::spawn(game_task(game_id, game_state, player_1_id, player_2_id, rx));
+    tokio::spawn(game_task(
+        game_id,
+        game_state,
+        player_1_id,
+        player_2_id,
+        rx,
+        state.clone(),
+    ));
 
     state.games.insert(game_id, GameHandle { tx });
 

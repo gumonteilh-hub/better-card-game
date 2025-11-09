@@ -66,10 +66,7 @@ pub fn play_monster(
         player,
         game: player_game_view,
     });
-    let oponent = game_state
-        .players.keys()
-        .find(|p| **p != player)
-        .unwrap();
+    let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
@@ -86,10 +83,7 @@ pub fn play_spell(game_state: &mut Game, player: PlayerId, card_id: usize) -> Re
         player,
         game: player_game_view,
     });
-    let oponent = game_state
-        .players.keys()
-        .find(|p| **p != player)
-        .unwrap();
+    let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
@@ -107,10 +101,7 @@ pub fn end_turn(game_state: &mut Game, player: PlayerId) -> Result<Vec<Action>> 
         player,
         game: player_game_view,
     });
-    let oponent = game_state
-        .players.keys()
-        .find(|p| **p != player)
-        .unwrap();
+    let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
@@ -132,10 +123,7 @@ pub fn attack(
         player,
         game: player_game_view,
     });
-    let oponent = game_state
-        .players.keys()
-        .find(|p| **p != player)
-        .unwrap();
+    let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
@@ -157,10 +145,7 @@ pub fn move_card(
         player,
         game: player_game_view,
     });
-    let oponent = game_state
-        .players.keys()
-        .find(|p| **p != player)
-        .unwrap();
+    let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
     let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,

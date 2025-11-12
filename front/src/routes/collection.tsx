@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CardTemplate } from "../components/card/CardTemplate";
 import { DeckSummary } from "../components/DeckSummary";
 import { getCollection } from "../service/game.service";
-import type { ICardTemplate, TemplateId, Archetype } from "../types/template";
+import type { Archetype, ICardTemplate, TemplateId } from "../types/template";
 import { useUserInfo } from "../utils/useUserInfo";
 
 export const Route = createFileRoute("/collection")({
@@ -86,14 +86,16 @@ function RouteComponent() {
 	}, [selectedArchetype]);
 
 	function handleSave(): void {
-		saveUserInfo({
-			...userInfos,
-			deck: {
-				archetype: selectedArchetype,
-				cards: temporaryDeck,
-			},
-		});
-		navigate({ to: "/" });
+		if (userInfos) {
+			saveUserInfo({
+				...userInfos,
+				deck: {
+					archetype: selectedArchetype,
+					cards: temporaryDeck,
+				},
+			});
+			navigate({ to: "/" });
+		}
 	}
 
 	return (

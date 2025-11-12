@@ -1,5 +1,4 @@
-import type { IGameState, IGameUpdate } from "../types/game";
-import type { ICardTemplate, IDeck, Archetype } from "../types/template";
+import type { Archetype, ICardTemplate, IDeck } from "../types/template";
 import { apiFetch } from "./api";
 
 export const getCollection = async (
@@ -11,73 +10,27 @@ export const getCollection = async (
 	});
 };
 
-export const getGameInfo = (gameId: string) => {
-	return apiFetch<IGameState>(`/api/game/${gameId}`, {
-		method: "GET",
-	});
-};
+interface StartGameInfo {
+	gameId: string;
+	userId: string;
+}
 
-export const startGame = async (deck: IDeck): Promise<string> => {
+export const startGame = async (
+	userId: string,
+	deck: IDeck,
+): Promise<StartGameInfo> => {
 	const body = {
 		archetype: deck.archetype,
 		cards: deck.cards.map((c) => c.id),
 	};
-	return apiFetch<string>("/api/start", {
+	return apiFetch<StartGameInfo>(`/api/ia/${userId}`, {
 		method: "POST",
 		body: JSON.stringify(body),
 	});
 };
 
-export const playMonster = async (
-	gameId: string,
-	cardId: number,
-	position: number,
-): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(
-		`/api/game/${gameId}/play_monster/${cardId}/${position}`,
-		{
-			method: "POST",
-		},
-	);
-};
-
-export const playSpell = async (
-	gameId: string,
-	cardId: number,
-): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(`/api/game/${gameId}/play_spell/${cardId}`, {
-		method: "POST",
+export const findCurrentGame = async (userId: string): Promise<string> => {
+	return apiFetch<string>(`/api/user/${userId}`, {
+		method: "GET",
 	});
-};
-
-export const endTurn = async (gameId: string): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(`/api/game/${gameId}/end_turn`, {
-		method: "POST",
-	});
-};
-
-export const attack = async (
-	gameId: string,
-	cardId: number,
-	targetId: number | string,
-): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(
-		`/api/game/${gameId}/attack/${cardId}/${targetId}`,
-		{
-			method: "POST",
-		},
-	);
-};
-
-export const move = async (
-	gameId: string,
-	cardId: number,
-	targetPosition: number,
-): Promise<IGameUpdate> => {
-	return apiFetch<IGameUpdate>(
-		`/api/game/${gameId}/move/${cardId}/${targetPosition}`,
-		{
-			method: "POST",
-		},
-	);
 };

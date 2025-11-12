@@ -27,7 +27,7 @@ mod tests {
                 amount: 5,
             }],
         );
-        game.play_spell(heal_spell).unwrap();
+        game.play_spell(player_a, heal_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().hp, 25);
@@ -50,7 +50,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(heal_spell).unwrap();
+        game.play_spell(player_a, heal_spell).unwrap();
         game.compute_commands().unwrap();
 
         let monster = game.entities.get(&monster_id).unwrap();
@@ -79,7 +79,7 @@ mod tests {
                 amount: 10,
             }],
         );
-        game.play_spell(heal_spell).unwrap();
+        game.play_spell(player_a, heal_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().hp, 30);
@@ -102,7 +102,7 @@ mod tests {
                 amount: 10,
             }],
         );
-        game.play_spell(heal_spell).unwrap();
+        game.play_spell(player_a, heal_spell).unwrap();
         game.compute_commands().unwrap();
 
         let monster = game.entities.get(&monster_id).unwrap();

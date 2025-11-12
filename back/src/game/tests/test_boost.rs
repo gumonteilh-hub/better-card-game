@@ -39,7 +39,7 @@ fn test_boost_increases_attack_hp_and_max_hp() {
         }],
     );
 
-    let result = game.play_spell(spell_id);
+    let result = game.play_spell(player_a, spell_id);
     assert!(result.is_ok());
     game.compute_commands().unwrap();
 

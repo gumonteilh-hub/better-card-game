@@ -1,10 +1,19 @@
 import type { IAction, PlayerId } from "./action";
-import type { Race, Keywords, TemplateId, Archetype, Class } from "./template";
+import type { Archetype, Class, Keywords, Race, TemplateId } from "./template";
 
-export interface IGameUpdate {
-	actions: IAction[];
-	gameView: IGameState;
-}
+export type ServerMessage =
+	| {
+			type: "action";
+			value: IAction;
+	  }
+	| {
+			type: "error";
+			value: string;
+	  }
+	| {
+			type: "message";
+			value: string;
+	  };
 
 export interface IGameState {
 	gameId: string;

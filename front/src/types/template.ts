@@ -1,12 +1,12 @@
 export type Archetype =
 	| {
-		type: "race";
-		value: Race;
-	}
+			type: "race";
+			value: Race;
+	  }
 	| {
-		type: "class";
-		value: Class;
-	};
+			type: "class";
+			value: Class;
+	  };
 
 export type Race = "HUMAN" | "DRAGON" | "DEMON" | "COMMON";
 export type Class = "WARRIOR" | "MAGE" | "ROGUE" | "COMMON";

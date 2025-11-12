@@ -22,10 +22,9 @@ pub fn compute(
         }
 
         for position in SPAWN_POSITIONS {
-            if context
+            if !context
                 .get_field_with_position(target)
-                .get(&position)
-                .is_none()
+                .contains_key(&position)
             {
                 let new_instance_id = 10000 + context.entities.len();
                 let mut new_card = CardInstance::new(new_instance_id, target, template);

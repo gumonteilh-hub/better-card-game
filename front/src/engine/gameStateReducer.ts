@@ -10,6 +10,8 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 			return applyReceiveDamage(state, action);
 		case "Destroy":
 			return applyDestroy(state, action);
+		case "EnemyDraw":
+			return applyEnemyDraw(state, action);
 		case "Draw":
 			return applyDraw(state, action);
 		case "Heal":
@@ -22,7 +24,13 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 			return applyWin(state, action);
 		case "Boost":
 			return applyBoost(state, action);
-		default:
+		case "UpdateGameView":
+			return action.value.game;
+		case "BurnCard":
+		case "TriggerOnAttack":
+		case "TriggerOnPlay":
+		case "TriggerOnDeath":
+		case "StartTurn":
 			return state;
 	}
 };
@@ -210,25 +218,13 @@ const applyDraw = (
 	state: IGameState,
 	action: Extract<IAction, { type: "Draw" }>,
 ): IGameState => {
-	let newState = { ...state };
-	if (action.value.player === state.player.hero.id) {
-		newState = {
-			...newState,
-			player: {
-				...newState.player,
-				hand: [...newState.player.hand, action.value.card],
-			},
-		};
-	} else {
-		newState = {
-			...newState,
-			enemy: {
-				...newState.enemy,
-				hand: newState.enemy.hand + 1,
-			},
-		};
-	}
-	return newState;
+	return {
+		...state,
+		player: {
+			...state.player,
+			hand: [...state.player.hand, action.value.card],
+		},
+	};
 };
 
 const applyHeal = (
@@ -378,4 +374,10 @@ function applyBoost(
 			),
 		},
 	};
+}
+function applyEnemyDraw(
+	state: IGameState,
+	_: Extract<IAction, { type: "EnemyDraw" }>,
+): IGameState {
+	return { ...state, enemy: { ...state.enemy, hand: state.enemy.hand + 1 } };
 }

@@ -27,7 +27,7 @@ mod tests {
         assert_eq!(deck_count, 1);
         assert_eq!(game.get_hand(player_a).len(), 0);
 
-        game.next_turn().unwrap();
+        game.end_turn(player_a).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 1);
@@ -72,7 +72,7 @@ mod tests {
             }],
         );
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -107,7 +107,7 @@ mod tests {
         let hand_size_before = game.get_hand(player_a).len();
         assert_eq!(hand_size_before, 0);
 
-        let result = game.next_turn();
+        let result = game.end_turn(player_a);
 
         assert!(result.is_ok());
         game.compute_commands().unwrap();
@@ -147,7 +147,7 @@ mod tests {
             }],
         );
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0).unwrap();
         game.compute_commands().unwrap();
 
         let hand_count = game.get_hand(player_a).len();
@@ -188,7 +188,7 @@ mod tests {
 
         assert_eq!(game.get_hand(player_a).len(), 10);
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);

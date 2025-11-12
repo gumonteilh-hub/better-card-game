@@ -1,8 +1,11 @@
 use ::serde::Serialize;
 
-use crate::game::{
-    card::CardInstance,
-    types::{InstanceId, Location, PlayerId},
+use crate::{
+    PublicGameState,
+    game::{
+        card::CardInstance,
+        types::{InstanceId, Location, PlayerId},
+    },
 };
 
 #[derive(Debug, Serialize, Clone)]
@@ -29,6 +32,9 @@ pub enum Action {
         player: PlayerId,
         card: CardInstance,
     },
+    EnemyDraw {
+        player: PlayerId,
+    },
     Heal {
         target: InstanceId, // or PLayerId, todo update logic to make EntityId and PlayerId the same
         amount: usize,
@@ -54,4 +60,9 @@ pub enum Action {
     TriggerOnPlay(InstanceId),
     TriggerOnAttack(InstanceId),
     Win(PlayerId),
+    UpdateGameView {
+        player: PlayerId,
+        game: PublicGameState,
+    },
+    StartTurn(PlayerId),
 }

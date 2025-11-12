@@ -23,6 +23,9 @@ export const getAnimationDuration = (actionType: ActionType): number => {
 		case "IncreaseMaxMana":
 		case "RefreshMana":
 		case "BurnCard":
+		case "StartTurn":
+		case "UpdateGameView":
+		case "EnemyDraw":
 		case "Draw":
 			return 0;
 	}
@@ -109,6 +112,9 @@ export const computeAnimationState = (
 			case "BurnCard":
 			case "RefreshMana":
 			case "IncreaseMaxMana":
+			case "StartTurn":
+			case "UpdateGameView":
+			case "EnemyDraw":
 		}
 	}
 

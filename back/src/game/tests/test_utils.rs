@@ -37,6 +37,7 @@ pub fn create_test_game() -> Game {
         current_player: player_id_a,
         event_manager: EventManager::new(),
         winner_id: None,
+        vs_ia: true,
     }
 }
 

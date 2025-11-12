@@ -8,10 +8,10 @@ use super::types::Location;
 use crate::{
     collection::Archetype,
     error::{Error, Result},
-    game::card::CardInstance,
+    game::{card::CardInstance, types::PlayerId},
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct HeroInfo {
     pub id: usize,
@@ -20,7 +20,7 @@ pub struct HeroInfo {
     pub archetype: Archetype,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EnemyInfo {
     pub secret_card: bool,
@@ -32,7 +32,7 @@ pub struct EnemyInfo {
     pub deck_size: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerInfo {
     pub secret_card: Option<CardInstance>,
@@ -46,7 +46,7 @@ pub struct PlayerInfo {
     pub deck_size: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicGameState {
     pub game_id: Uuid,
@@ -58,39 +58,36 @@ pub struct PublicGameState {
 }
 
 impl PublicGameState {
-    pub fn new(game_state: &Game) -> Result<Self> {
-        let player_a = game_state
-            .players
-            .get(&game_state.player_id_a)
-            .ok_or_else(|| {
-                Error::Game(format!(
-                    "Player A with id {} not found",
-                    game_state.player_id_a
-                ))
-            })?;
-        let player_b = game_state
-            .players
-            .get(&game_state.player_id_b)
-            .ok_or_else(|| {
-                Error::Game(format!(
-                    "Player B with id {} not found",
-                    game_state.player_id_b
-                ))
-            })?;
+    // todo make use of player_id
+    pub fn new(game_state: &Game, player_id: PlayerId) -> Result<Self> {
+        let hero = game_state.players.get(&player_id).ok_or_else(|| {
+            Error::Game(format!(
+                "Player with id {} not found",
+                game_state.player_id_a
+            ))
+        })?;
 
-        let player_entities = game_state
+        let oponent_id = game_state.get_opponent(&player_id)?.player_id;
+        let oponent = game_state.players.get(&oponent_id).ok_or_else(|| {
+            Error::Game(format!(
+                "Player B with id {} not found",
+                game_state.player_id_b
+            ))
+        })?;
+
+        let hero_entities = game_state
             .entities
             .values()
-            .filter(|e| e.owner == game_state.player_id_a);
+            .filter(|e| e.owner == hero.player_id);
         let enemy_entities = game_state
             .entities
             .values()
-            .filter(|e| e.owner == game_state.player_id_b);
+            .filter(|e| e.owner == oponent.player_id);
 
-        let mut player_field = HashMap::new();
-        for entity in player_entities.clone() {
+        let mut hero_field = HashMap::new();
+        for entity in hero_entities.clone() {
             if let Location::Field(pos) = entity.location {
-                player_field.insert(pos, entity.clone());
+                hero_field.insert(pos, entity.clone());
             }
         }
 
@@ -105,7 +102,7 @@ impl PublicGameState {
             .clone()
             .filter(|e| matches!(e.location, Location::Hand))
             .count();
-        let player_hand = player_entities
+        let player_hand = hero_entities
             .clone()
             .filter(|e| matches!(e.location, Location::Hand))
             .cloned()
@@ -113,41 +110,41 @@ impl PublicGameState {
         let enemy_deck_size = enemy_entities
             .filter(|e| matches!(e.location, Location::Deck))
             .count();
-        let player_deck_size = player_entities
+        let player_deck_size = hero_entities
             .filter(|e| matches!(e.location, Location::Deck))
             .count();
 
         Ok(Self {
             game_id: game_state.game_id,
-            player_id: game_state.player_id_a, // Will be problematic later for multiplayer
+            player_id: player_id,
             enemy: EnemyInfo {
                 secret_card: false,
                 field: enemy_field,
-                max_mana: player_b.base_mana,
-                current_mana: player_b.mana,
+                max_mana: oponent.base_mana,
+                current_mana: oponent.mana,
                 hand: enemy_hand_size,
                 hero: HeroInfo {
-                    id: player_b.player_id,
-                    name: "Enemy IA".into(),
-                    hp: player_b.hp,
-                    archetype: player_b.archetype,
+                    id: oponent.player_id,
+                    name: "Enemy".into(),
+                    hp: oponent.hp,
+                    archetype: oponent.archetype,
                 },
                 deck_size: enemy_deck_size,
             },
             player: PlayerInfo {
                 secret_card: None,
-                field: player_field,
-                max_mana: player_a.base_mana,
-                current_mana: player_a.mana,
+                field: hero_field,
+                max_mana: hero.base_mana,
+                current_mana: hero.mana,
                 hand: player_hand,
                 hero: HeroInfo {
-                    id: player_a.player_id,
+                    id: hero.player_id,
                     name: "Player".into(),
-                    hp: player_a.hp,
-                    archetype: player_a.archetype,
+                    hp: hero.hp,
+                    archetype: hero.archetype,
                 },
-                max_move: player_a.max_move,
-                move_count: player_a.move_count,
+                max_move: hero.max_move,
+                move_count: hero.move_count,
                 deck_size: player_deck_size,
             },
             winner_id: game_state.winner_id,

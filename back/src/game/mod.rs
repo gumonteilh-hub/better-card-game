@@ -46,7 +46,7 @@ fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
 pub struct Game {
     pub game_id: uuid::Uuid,
     pub player_id_a: usize,
-    pub player_id_b: usize, //IA
+    pub player_id_b: usize,
     pub entities: HashMap<InstanceId, CardInstance>,
     pub effect_queue: VecDeque<Effect>,
     pub players: HashMap<PlayerId, PlayerInstance>,
@@ -54,6 +54,7 @@ pub struct Game {
     pub current_player: PlayerId,
     pub event_manager: EventManager,
     pub winner_id: Option<PlayerId>,
+    pub vs_ia: bool,
 }
 
 impl Game {
@@ -62,6 +63,7 @@ impl Game {
         deck_b: UserDeck,
         collection_a: Vec<CardTemplate>,
         collection_b: Vec<CardTemplate>,
+        vs_ia: bool,
     ) -> Result<Self> {
         let mut entity_id = 0;
 
@@ -124,16 +126,22 @@ impl Game {
             current_player: player_id_a,
             event_manager: EventManager::new(),
             winner_id: None,
+            vs_ia,
         })
     }
 
-    pub fn move_card(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
+    pub fn move_card(
+        &mut self,
+        player: PlayerId,
+        card_id: InstanceId,
+        position: usize,
+    ) -> Result<()> {
         let card = self
             .entities
             .get(&card_id)
             .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?;
 
-        if card.owner != self.current_player {
+        if card.owner != player {
             return Err(Error::Game("You can only move your monsters".into()));
         }
 
@@ -170,13 +178,7 @@ impl Game {
         Ok(())
     }
 
-    pub fn play_spell(&mut self, card_id: usize) -> Result<()> {
-        let owner = self
-            .entities
-            .get(&card_id)
-            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?
-            .owner;
-
+    pub fn play_spell(&mut self, owner: PlayerId, card_id: usize) -> Result<()> {
         let card_clone = self.get_entity(card_id)?.clone();
         let card_cost = card_clone.cost;
 
@@ -213,13 +215,12 @@ impl Game {
         Ok(())
     }
 
-    pub fn play_monster(&mut self, card_id: InstanceId, position: usize) -> Result<()> {
-        let owner = self
-            .entities
-            .get(&card_id)
-            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?
-            .owner;
-
+    pub fn play_monster(
+        &mut self,
+        owner: PlayerId,
+        card_id: InstanceId,
+        position: usize,
+    ) -> Result<()> {
         if self
             .get_field(owner)
             .iter()
@@ -264,24 +265,22 @@ impl Game {
         Ok(())
     }
 
-    pub fn next_turn(&mut self) -> Result<Vec<Action>> {
+    pub fn end_turn(&mut self, ending_player: PlayerId) -> Result<Vec<Action>> {
         let mut actions = Vec::new();
-        if self.current_player == self.player_id_a {
-            self.current_player = self.player_id_b;
-        } else {
-            self.current_player = self.player_id_a;
-        };
+        let starting_player = *self.players.keys().find(|p| **p != ending_player).unwrap();
 
+        actions.push(Action::StartTurn(starting_player));
+        self.current_player = starting_player;
         self.effect_queue.push_back(Effect::AutoDraw {
-            player: self.current_player,
+            player: starting_player,
             amount: 1,
         });
 
-        let current_player_instance = self.get_mut_player(self.current_player)?;
+        let current_player_instance = self.get_mut_player(starting_player)?;
 
         if current_player_instance.base_mana < 10 {
             self.effect_queue.push_back(Effect::IncreaseMaxMana {
-                initiator: self.current_player,
+                initiator: starting_player,
                 player: effects::PlayerTarget::Player,
                 amount: 1,
             });
@@ -289,14 +288,14 @@ impl Game {
 
         let base_mana = self.get_player(self.current_player)?.base_mana;
         self.effect_queue.push_back(Effect::RefreshMana {
-            initiator: self.current_player,
+            initiator: starting_player,
             player: effects::PlayerTarget::Player,
             amount: base_mana + 1,
         });
 
-        self.get_mut_player(self.current_player)?.move_count = 3;
+        self.get_mut_player(starting_player)?.move_count = 3;
 
-        for (_, monster) in self.get_mut_field(self.current_player) {
+        for (_, monster) in self.get_mut_field(starting_player) {
             match &mut monster.card_type {
                 card::CardTypeInstance::Monster(monster_instance) => {
                     monster_instance.attack_count = 0;
@@ -311,7 +310,7 @@ impl Game {
         let mut reset_turn_actions = self.compute_commands()?;
         actions.append(&mut reset_turn_actions);
 
-        if self.current_player == self.player_id_b {
+        if starting_player == self.player_id_b && self.vs_ia {
             let mut ia_actions = ia::ai_play_turn(self, self.player_id_b)?;
             actions.append(&mut ia_actions);
         }
@@ -329,7 +328,12 @@ impl Game {
         Ok(all_actions)
     }
 
-    pub fn attack(&mut self, initiator_id: InstanceId, target_id: InstanceId) -> Result<()> {
+    pub fn attack(
+        &mut self,
+        player: PlayerId,
+        initiator_id: InstanceId,
+        target_id: InstanceId,
+    ) -> Result<()> {
         let initiator = self
             .entities
             .get(&initiator_id)
@@ -409,6 +413,16 @@ impl Game {
                 Err(Error::Game("A spell can not attack".into()))
             }
         }
+    }
+
+    pub fn get_opponent(&self, player_id: &PlayerId) -> Result<&PlayerInstance> {
+        let oponent = self
+            .players
+            .iter()
+            .find(|(id, instance)| *id != player_id)
+            .ok_or_else(|| Error::Game("This monster has already attacked this turn".into()))?;
+
+        Ok(oponent.1)
     }
 
     pub fn get_mut_player(&mut self, player_id: PlayerId) -> Result<&mut PlayerInstance> {

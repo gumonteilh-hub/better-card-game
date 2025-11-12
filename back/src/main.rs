@@ -1,23 +1,32 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::{Arc, Mutex};
 
 use axum_macros::debug_handler;
 use back::{self, collection::Archetype, error::Error};
 
+use crate::server::{
+    handle_game::handle_game,
+    handle_matchmaking::{MatchmakingPlayer, handle_matchmaking},
+    initialize::{GameHandle, create_game_vs_ia},
+};
 use axum::{
     Json, Router,
     extract::{FromRequest, Path, Request, State, rejection::JsonRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::{any, get, post},
 };
-use serde::de::DeserializeOwned;
-use tokio::sync::Mutex;
+use dashmap::DashMap;
+use serde::{Serialize, de::DeserializeOwned};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use uuid::Uuid;
 
+mod server;
+
 struct AppState {
-    game_states: Mutex<HashMap<Uuid, back::Game>>,
+    current_live_games: DashMap<Uuid, Uuid>,
+    games: DashMap<Uuid, GameHandle>,
+    matchmaking_queue: Arc<Mutex<Vec<MatchmakingPlayer>>>,
 }
 
 #[tokio::main]
@@ -31,24 +40,20 @@ async fn main() {
         .init();
 
     let shared_state = Arc::new(AppState {
-        game_states: Mutex::new(HashMap::new()),
+        matchmaking_queue: Arc::new(Mutex::new(Vec::new())),
+        current_live_games: DashMap::new(),
+        games: DashMap::new(),
     });
 
-    let api = Router::new()
-        .route("/{game_id}", get(game_state))
-        .route("/{game_id}/attack/{initiator_id}/{target_id}", post(attack))
-        .route("/{game_id}/move/{card_id}/{target_pos}", post(move_card))
-        .route(
-            "/{game_id}/play_monster/{card_id}/{position}",
-            post(play_monster),
-        )
-        .route("/{game_id}/play_spell/{card_id}", post(play_spell))
-        .route("/{game_id}/end_turn", post(end_turn));
+    let game_routes = Router::new().route("/{game_id}/{user_id}", any(handle_game));
+    let matchmaking_routes = Router::new().route("/{user_id}", any(handle_matchmaking));
 
     let app = Router::new()
         .route("/collection", post(collection))
-        .route("/start", post(start_game))
-        .nest("/game", api)
+        .route("/ia/{user_id}", post(start_game_vs_ia))
+        .route("/user/{user_id}", get(find_current_game))
+        .nest("/ws/matchmaking", matchmaking_routes)
+        .nest("/ws/game", game_routes)
         .with_state(shared_state)
         .layer(TraceLayer::new_for_http());
 
@@ -56,7 +61,36 @@ async fn main() {
         .await
         .unwrap();
 
+    tracing::info!("Server listening on http://127.0.0.1:9999");
     axum::serve(listener, app).await.unwrap();
+}
+
+#[debug_handler]
+async fn find_current_game(
+    State(state): State<Arc<AppState>>,
+    Path(user_id): Path<Uuid>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let game_id = state
+        .current_live_games
+        .get(&user_id)
+        .map(|entry| *entry.value());
+    Ok(Json(serde_json::json!(game_id)))
+}
+
+#[debug_handler]
+async fn start_game_vs_ia(
+    State(state): State<Arc<AppState>>,
+    Path(user_id): Path<Uuid>,
+    LoggedJson(payload): LoggedJson<back::UserDeck>,
+) -> ApiResult<Json<serde_json::Value>> {
+    tracing::info!("Received start_game request with deck: {:?}", payload);
+
+    let game_id = create_game_vs_ia(&state, user_id, payload).await;
+
+    Ok(Json(serde_json::json!(StartGameInfo {
+        user_id: user_id.to_string(),
+        game_id: game_id.to_string(),
+    })))
 }
 
 #[debug_handler]
@@ -67,138 +101,15 @@ async fn collection(
         "Received get_collection request with archetype: {:?}",
         payload
     );
+
     Ok(Json(back::get_collection(payload)))
 }
 
-#[debug_handler]
-async fn start_game(
-    State(state): State<Arc<AppState>>,
-    LoggedJson(payload): LoggedJson<back::UserDeck>,
-) -> ApiResult<Json<String>> {
-    tracing::info!("Received start_game request with deck: {:?}", payload);
-    let game_state = back::start_game(payload)?;
-    let game_id = game_state.game_id.to_string();
-    state
-        .game_states
-        .lock()
-        .await
-        .insert(game_state.game_id, game_state);
-    tracing::info!("Game started successfully");
-    Ok(Json(game_id))
-}
-
-#[debug_handler]
-async fn play_spell(
-    State(state): State<Arc<AppState>>,
-    Path((game_id, card_id)): Path<(Uuid, usize)>,
-) -> ApiResult<Json<back::GameViewResponse>> {
-    tracing::info!(
-        "Received play_spell request for game: {}, with card_id: {}",
-        game_id,
-        card_id,
-    );
-    match state.game_states.lock().await.get_mut(&game_id) {
-        Some(game) => {
-            let game_view = back::play_spell(game, card_id)?;
-            tracing::info!("Play card performed successfully");
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
-}
-
-#[debug_handler]
-async fn play_monster(
-    State(state): State<Arc<AppState>>,
-    Path((game_id, card_id, position)): Path<(Uuid, usize, usize)>,
-) -> ApiResult<Json<back::GameViewResponse>> {
-    tracing::info!(
-        "Received play_monster request for game: {}, with card_id: {}, and position: {}",
-        game_id,
-        card_id,
-        position
-    );
-    match state.game_states.lock().await.get_mut(&game_id) {
-        Some(game) => {
-            let game_view = back::play_monster(game, card_id, position)?;
-            tracing::info!("Play card performed successfully");
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
-}
-
-#[debug_handler]
-async fn game_state(
-    State(state): State<Arc<AppState>>,
-    Path(game_id): Path<Uuid>,
-) -> ApiResult<Json<back::PublicGameState>> {
-    tracing::info!("Received get game_state  request for game: {}", game_id);
-    match state.game_states.lock().await.get(&game_id) {
-        Some(game) => {
-            let game_view = back::PublicGameState::new(game)?;
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
-}
-
-#[debug_handler]
-async fn attack(
-    State(state): State<Arc<AppState>>,
-    Path((game_id, initiator_id, target_id)): Path<(Uuid, usize, usize)>,
-) -> ApiResult<Json<back::GameViewResponse>> {
-    tracing::info!(
-        "Received attack request for game: {}, with initiator: {}, and target: {}",
-        game_id,
-        initiator_id,
-        target_id
-    );
-    match state.game_states.lock().await.get_mut(&game_id) {
-        Some(game) => {
-            let game_view = back::attack(game, initiator_id, target_id)?;
-            tracing::info!("Attack performed successfully");
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
-}
-
-#[debug_handler]
-async fn move_card(
-    State(state): State<Arc<AppState>>,
-    Path((game_id, card_id, target_pos)): Path<(Uuid, usize, usize)>,
-) -> ApiResult<Json<back::GameViewResponse>> {
-    tracing::info!(
-        "Received move_card request for game: {}, with card: {}, moving to position: {}",
-        game_id,
-        card_id,
-        target_pos
-    );
-    match state.game_states.lock().await.get_mut(&game_id) {
-        Some(game) => {
-            let game_view = back::move_card(game, card_id, target_pos)?;
-            tracing::info!("Move performed successfully");
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
-}
-
-#[debug_handler]
-async fn end_turn(
-    State(state): State<Arc<AppState>>,
-    Path(game_id): Path<Uuid>,
-) -> ApiResult<Json<back::GameViewResponse>> {
-    tracing::info!("Received end turn request for game: {}", game_id,);
-    match state.game_states.lock().await.get_mut(&game_id) {
-        Some(game) => {
-            let game_view = back::end_turn(game)?;
-            tracing::info!("End turn performed successfully");
-            Ok(Json(game_view))
-        }
-        None => Err(back::error::Error::GameNotStarted),
-    }
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct StartGameInfo {
+    game_id: String,
+    user_id: String,
 }
 
 struct LoggedJson<T>(pub T);

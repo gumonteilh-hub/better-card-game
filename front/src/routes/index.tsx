@@ -93,12 +93,12 @@ function RouteComponent() {
 
 type MatchmakingMessage =
 	| {
-		type: "waiting";
-	}
+			type: "waiting";
+	  }
 	| {
-		type: "gameFound";
-		gameId: string;
-	};
+			type: "gameFound";
+			gameId: string;
+	  };
 
 const Matchmaking = () => {
 	const { userInfos } = useUserInfo();

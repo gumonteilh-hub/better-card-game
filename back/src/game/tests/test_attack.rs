@@ -36,7 +36,7 @@ mod tests {
             assert_eq!(mb.attack, 3);
         }
 
-        game.attack(monster_a, monster_b).unwrap();
+        game.attack(player_a, monster_a, monster_b).unwrap();
         game.compute_commands().unwrap();
 
         let monster_a_instance = game.entities.get(&monster_a).unwrap();
@@ -66,7 +66,7 @@ mod tests {
             assert_eq!(ma.hp, 10);
         }
 
-        game.attack(monster_a, player_b).unwrap();
+        game.attack(player_a, monster_a, player_b).unwrap();
         game.compute_commands().unwrap();
 
         let player_b_hp_after = game.players.get(&player_b).unwrap().hp;
@@ -104,7 +104,7 @@ mod tests {
             assert_eq!(mb.hp, 10);
         }
 
-        game.attack(monster_a, monster_b).unwrap();
+        game.attack(player_a, monster_a, monster_b).unwrap();
         game.compute_commands().unwrap();
 
         let monster_b_instance = game.entities.get(&monster_b).unwrap();
@@ -132,7 +132,7 @@ mod tests {
             Location::Field(1)
         );
 
-        game.attack(monster_a, monster_b).unwrap();
+        game.attack(player_a, monster_a, monster_b).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(
@@ -166,7 +166,7 @@ mod tests {
             Location::Field(1)
         );
 
-        game.attack(monster_a, monster_b).unwrap();
+        game.attack(player_a, monster_a, monster_b).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(

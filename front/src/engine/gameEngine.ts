@@ -14,35 +14,35 @@ const animationBefore: ActionType[] = ["Destroy", "Win"];
 
 type PlayerActionCommand =
 	| {
-		type: "playMonster";
-		value: {
-			cardId: number;
-			position: number;
-		};
-	}
+			type: "playMonster";
+			value: {
+				cardId: number;
+				position: number;
+			};
+	  }
 	| {
-		type: "playSpell";
-		value: {
-			cardId: number;
-		};
-	}
+			type: "playSpell";
+			value: {
+				cardId: number;
+			};
+	  }
 	| {
-		type: "endTurn";
-	}
+			type: "endTurn";
+	  }
 	| {
-		type: "attack";
-		value: {
-			initiator: number;
-			target: number | string;
-		};
-	}
+			type: "attack";
+			value: {
+				initiator: number;
+				target: number | string;
+			};
+	  }
 	| {
-		type: "move";
-		value: {
-			cardId: number;
-			position: number;
-		};
-	};
+			type: "move";
+			value: {
+				cardId: number;
+				position: number;
+			};
+	  };
 
 export const useGameEngine = (userId: string, gameId: string) => {
 	const [gameState, setGameState] = useState<IGameState>();
@@ -65,6 +65,7 @@ export const useGameEngine = (userId: string, gameId: string) => {
 
 			switch (action.type) {
 				case "action": {
+					console.log({ action });
 					setActionQueue((prev) => [...prev, action.value]);
 					break;
 				}

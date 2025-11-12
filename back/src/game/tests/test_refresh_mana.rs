@@ -27,7 +27,7 @@ mod tests {
                 amount: 5,
             }],
         );
-        game.play_spell(refresh_spell).unwrap();
+        game.play_spell(player_a, refresh_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 8);
@@ -51,7 +51,7 @@ mod tests {
                 amount: 10,
             }],
         );
-        game.play_spell(refresh_spell).unwrap();
+        game.play_spell(player_a, refresh_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 10);
@@ -77,7 +77,7 @@ mod tests {
                 amount: 4,
             }],
         );
-        game.play_spell(refresh_spell).unwrap();
+        game.play_spell(player_a, refresh_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_b).unwrap().mana, 6);
@@ -113,7 +113,7 @@ mod tests {
                 },
             ],
         );
-        game.play_spell(multi_refresh_spell).unwrap();
+        game.play_spell(player_a, multi_refresh_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 10);
@@ -137,7 +137,7 @@ mod tests {
                 amount: 7,
             }],
         );
-        game.play_spell(refresh_spell).unwrap();
+        game.play_spell(player_a, refresh_spell).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 7);

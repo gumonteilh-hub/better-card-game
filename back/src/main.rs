@@ -66,25 +66,6 @@ async fn main() {
 }
 
 #[debug_handler]
-async fn collection(
-    LoggedJson(payload): LoggedJson<Archetype>,
-) -> ApiResult<Json<Vec<back::collection::types::CardTemplate>>> {
-    tracing::info!(
-        "Received get_collection request with archetype: {:?}",
-        payload
-    );
-
-    Ok(Json(back::get_collection(payload)))
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct StartGameInfo {
-    game_id: String,
-    user_id: String,
-}
-
-#[debug_handler]
 async fn find_current_game(
     State(state): State<Arc<AppState>>,
     Path(user_id): Path<Uuid>,
@@ -110,6 +91,25 @@ async fn start_game_vs_ia(
         user_id: user_id.to_string(),
         game_id: game_id.to_string(),
     })))
+}
+
+#[debug_handler]
+async fn collection(
+    LoggedJson(payload): LoggedJson<Archetype>,
+) -> ApiResult<Json<Vec<back::collection::types::CardTemplate>>> {
+    tracing::info!(
+        "Received get_collection request with archetype: {:?}",
+        payload
+    );
+
+    Ok(Json(back::get_collection(payload)))
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct StartGameInfo {
+    game_id: String,
+    user_id: String,
 }
 
 struct LoggedJson<T>(pub T);

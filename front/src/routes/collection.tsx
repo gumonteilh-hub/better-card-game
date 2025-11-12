@@ -86,14 +86,16 @@ function RouteComponent() {
 	}, [selectedArchetype]);
 
 	function handleSave(): void {
-		saveUserInfo({
-			...userInfos,
-			deck: {
-				archetype: selectedArchetype,
-				cards: temporaryDeck,
-			},
-		});
-		navigate({ to: "/" });
+		if (userInfos) {
+			saveUserInfo({
+				...userInfos,
+				deck: {
+					archetype: selectedArchetype,
+					cards: temporaryDeck,
+				},
+			});
+			navigate({ to: "/" });
+		}
 	}
 
 	return (

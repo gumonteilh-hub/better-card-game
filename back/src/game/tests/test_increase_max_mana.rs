@@ -25,7 +25,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().base_mana, 8);
@@ -48,7 +48,7 @@ mod tests {
                 amount: 2,
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().base_mana, 12);
@@ -73,7 +73,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().base_mana, 8);
@@ -98,7 +98,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().base_mana, 5);
@@ -121,7 +121,7 @@ mod tests {
                 amount: 2,
             }],
         );
-        game.play_spell(player_a, spell1).unwrap();
+        game.play_spell(player_a, spell1, None).unwrap();
         game.compute_commands().unwrap();
 
         let spell2 = create_test_spell(
@@ -133,7 +133,7 @@ mod tests {
                 amount: 2,
             }],
         );
-        game.play_spell(player_a, spell2).unwrap();
+        game.play_spell(player_a, spell2, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().base_mana, 9);

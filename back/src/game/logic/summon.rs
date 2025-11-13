@@ -61,6 +61,7 @@ mod tests {
             description: "Test".to_string(),
             race: Race::COMMON,
             class: Class::COMMON,
+            play_target: None,
             card_type: CardTypeTemplate::Monster(MonsterTemplate {
                 attack: 1,
                 hp: 1,

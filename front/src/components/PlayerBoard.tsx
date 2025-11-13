@@ -36,8 +36,6 @@ const PlayerBoard = ({
 	hand,
 	secredCard,
 }: IPlayerBoardProps) => {
-	const { playableCards } = useGameContext();
-
 	return (
 		<div className={`board ${side}`}>
 			<div className="left-panel">
@@ -50,25 +48,11 @@ const PlayerBoard = ({
 			</div>
 			<div className="middle-panel">
 				<Field field={field} side={side} />
-				<div className="hand">
-					{side === "player"
-						? hand.map((c, index) => (
-								<Draggable
-									cardType={c.cardType.type}
-									key={c.id}
-									id={`card-${c.id}`}
-									cardId={c.id}
-									enabled={playableCards?.includes(c.id) ?? false}
-									style={{ zIndex: index }}
-								>
-									<Card card={c} />
-								</Draggable>
-							))
-						: hand > 0 &&
-							[...Array(hand).keys()].map((index) => (
-								<CardBack key={index}></CardBack>
-							))}
-				</div>
+				{side === "player" ? (
+					<Hand side={side} hand={hand}></Hand>
+				) : (
+					<Hand side={side} hand={hand}></Hand>
+				)}
 			</div>
 
 			<div className="right-panel">
@@ -79,6 +63,38 @@ const PlayerBoard = ({
 					<Deck />
 				</div>
 			</div>
+		</div>
+	);
+};
+
+type IHandProps =
+	| {
+		side: "player";
+		hand: ICardInstance[];
+	}
+	| { side: "enemy"; hand: number };
+
+const Hand = ({ side, hand }: IHandProps) => {
+	const { playableCards } = useGameContext();
+	return (
+		<div className="hand">
+			{side === "player"
+				? hand.map((c, index) => (
+					<Draggable
+						cardType={c.cardType.type}
+						key={c.id}
+						id={`card-${c.id}`}
+						cardId={c.id}
+						enabled={playableCards?.includes(c.id) ?? false}
+						style={{ zIndex: index }}
+					>
+						<Card card={c} />
+					</Draggable>
+				))
+				: hand > 0 &&
+				[...Array(hand).keys()].map((index) => (
+					<CardBack key={index}></CardBack>
+				))}
 		</div>
 	);
 };

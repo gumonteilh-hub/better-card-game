@@ -43,8 +43,9 @@ pub fn play_monster(
     card_id: usize,
     position: usize,
 ) -> Result<Vec<Action>> {
-    game_state.play_monster(player, card_id, position)?;
-    let mut actions = game_state.compute_commands()?;
+    let mut actions = game_state.play_monster(player, card_id, position, None)?;
+    let compute_actions = game_state.compute_commands()?;
+    actions.extend(compute_actions);
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
@@ -60,7 +61,7 @@ pub fn play_monster(
 }
 
 pub fn play_spell(game_state: &mut Game, player: PlayerId, card_id: usize) -> Result<Vec<Action>> {
-    game_state.play_spell(player, card_id)?;
+    game_state.play_spell(player, card_id, None)?;
     let mut actions = game_state.compute_commands()?;
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {

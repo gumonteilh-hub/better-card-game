@@ -27,6 +27,29 @@ pub struct CardTemplate {
     pub race: Race,
     pub class: Class,
     pub card_type: CardTypeTemplate,
+    pub play_target: Option<PlayTarget>,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayTarget {
+    pub amount: usize,
+    pub matcher: TargetMatcher,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub enum Side {
+    Player,
+    Enemy,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub enum TargetMatcher {
+    Race(Race),
+    Class(Class),
+    Side(Side),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -51,7 +74,7 @@ pub struct MonsterTemplate {
     pub on_death: Vec<TemplateEffect>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub enum TemplateTarget {
     EnnemyPlayer,
     Player,
@@ -61,6 +84,10 @@ pub enum TemplateTarget {
     Ennemies,
     AllMonsters,
     All,
+    Choose,
+    Matching(TargetMatcher),
+    And(Box<TemplateTarget>, Box<TemplateTarget>),
+    Or(Box<TemplateTarget>, Box<TemplateTarget>),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -113,6 +140,16 @@ fn convert_template_target(target: &TemplateTarget) -> Target {
         TemplateTarget::Ennemies => Target::Ennemies,
         TemplateTarget::AllMonsters => Target::AllMonsters,
         TemplateTarget::All => Target::All,
+        TemplateTarget::Choose => Target::Ids(vec![]),
+        TemplateTarget::Matching(target_matcher) => Target::Matching(*target_matcher),
+        TemplateTarget::And(a, b) => Target::And(
+            Box::new(convert_template_target(a)),
+            Box::new(convert_template_target(b)),
+        ),
+        TemplateTarget::Or(a, b) => Target::Or(
+            Box::new(convert_template_target(a)),
+            Box::new(convert_template_target(b)),
+        ),
     }
 }
 

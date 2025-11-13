@@ -32,7 +32,7 @@ fn test_deal_damage_to_player() {
         }],
     );
 
-    let result = game.play_spell(player_a, spell_id);
+    let result = game.play_spell(player_a, spell_id, None);
     assert!(result.is_ok());
     game.compute_commands().unwrap();
 
@@ -66,7 +66,7 @@ fn test_deal_damage_to_monster() {
         }],
     );
 
-    let result = game.play_spell(player_a, spell_id);
+    let result = game.play_spell(player_a, spell_id, None);
     assert!(result.is_ok());
     game.compute_commands().unwrap();
 
@@ -100,7 +100,7 @@ fn test_monster_destroyed_when_hp_zero() {
         }],
     );
 
-    let result = game.play_spell(player_a, spell_id);
+    let result = game.play_spell(player_a, spell_id, None);
     assert!(result.is_ok());
 
     game.compute_commands().unwrap();
@@ -129,7 +129,7 @@ fn test_player_loses_when_hp_zero() {
         }],
     );
 
-    let result = game.play_spell(player_a, spell_id);
+    let result = game.play_spell(player_a, spell_id, None);
     assert!(result.is_ok());
 
     game.compute_commands().unwrap();

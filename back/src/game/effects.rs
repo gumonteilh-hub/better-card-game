@@ -1,12 +1,12 @@
 use crate::{
-    collection::types::CardTemplate,
+    collection::types::{CardTemplate, TargetMatcher},
     game::types::{InstanceId, PlayerId},
 };
 
 use super::events::EventType;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub enum Target {
     EnnemyPlayer,
     Player,
@@ -14,11 +14,13 @@ pub enum Target {
     ItSelf,
     Allies,
     Id(InstanceId),
-    //OneAlly,
-    //OneEnnemy,
     Ennemies,
     AllMonsters,
     All,
+    Ids(Vec<InstanceId>),
+    Matching(TargetMatcher),
+    And(Box<Target>, Box<Target>),
+    Or(Box<Target>, Box<Target>),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -64,10 +66,6 @@ pub enum Effect {
         initiator: InstanceId,
         target: Target,
         amount: usize,
-    },
-    SummonFromHand {
-        entity_id: InstanceId,
-        position: usize,
     },
     Attack {
         initiator: InstanceId,

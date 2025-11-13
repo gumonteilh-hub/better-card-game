@@ -166,46 +166,6 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 }
             }
         }
-        Effect::SummonFromHand {
-            entity_id,
-            position,
-        } => {
-            let entity = context.entities.get_mut(entity_id).ok_or_else(|| {
-                Error::Game(format!(
-                    "Entity with id {} not found for summon from hand",
-                    entity_id
-                ))
-            })?;
-
-            let base_location = entity.location.clone();
-
-            entity.location = Location::Field(*position);
-            actions.push(Action::Summon {
-                source: base_location,
-                destination: *position,
-                target: entity.clone(),
-                owner: entity.owner,
-            });
-            match &mut entity.card_type {
-                super::card::CardTypeInstance::Monster(monster_instance) => {
-                    if !monster_instance.on_play.is_empty() {
-                        actions.push(Action::TriggerOnPlay(*entity_id));
-                        context
-                            .effect_queue
-                            .extend(monster_instance.on_play.clone());
-                    }
-                    if monster_instance
-                        .keywords
-                        .contains(&super::card::Keyword::Charge)
-                    {
-                        monster_instance.asleep = false;
-                    }
-                }
-                super::card::CardTypeInstance::Spell(spell_instance) => {
-                    return Err(Error::Game("Can't summon a spell".into()));
-                }
-            }
-        }
         Effect::Attack { initiator, target } => {
             let targets = resolve_target(*initiator, target, context)?;
             for target_id in targets {
@@ -496,6 +456,7 @@ fn resolve_field_target(
                 vec![]
             }
         }
+        Target::Ids(ids) => ids.clone(),
         _ => vec![], // Not an entity target
     };
     Ok(targets)

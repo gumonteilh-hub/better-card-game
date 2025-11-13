@@ -2,7 +2,7 @@ use crate::{
     Race,
     collection::{
         Class,
-        types::{CardTemplate, CardTypeTemplate, TemplateId, convert_to_effect},
+        types::{CardTemplate, CardTypeTemplate, PlayTarget, TemplateId, convert_to_effect},
     },
     game::effects::Effect,
 };
@@ -29,6 +29,7 @@ pub struct CardInstance {
     pub owner: PlayerId,
     pub location: Location,
     pub card_type: CardTypeInstance,
+    pub play_target: Option<PlayTarget>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -111,6 +112,7 @@ impl CardInstance {
             description: template.description.clone(),
             race: template.race,
             class: template.class,
+            play_target: template.play_target,
             card_type,
         }
     }

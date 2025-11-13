@@ -2,7 +2,7 @@ use std::vec;
 
 use crate::{
     collection::types::{
-        CardTemplate, PlayerTemplateTarget, TemplateEffect, TemplateId, TemplateTarget,
+        CardTemplate, PlayTarget, PlayerTemplateTarget, TemplateEffect, TemplateId, TemplateTarget,
     },
     game::card::Keyword,
 };
@@ -17,7 +17,7 @@ mod dragon;
 mod human;
 pub mod types;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
+#[derive(Debug, Clone, Serialize, Deserialize, Copy, PartialEq)]
 pub enum Race {
     DRAGON,
     DEMON,
@@ -25,7 +25,7 @@ pub enum Race {
     COMMON,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
+#[derive(Debug, Clone, Serialize, Deserialize, Copy, PartialEq)]
 pub enum Class {
     WARRIOR,
     MAGE,
@@ -77,37 +77,49 @@ static ALL_COLLECTION: Lazy<Vec<CardTemplate>> = Lazy::new(|| {
 
 fn get_dragon_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::DRAGON) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::DRAGON) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_human_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::HUMAN) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::HUMAN) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_demon_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::DEMON) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::DEMON) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_warrior_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::WARRIOR) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::WARRIOR) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_rogue_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::ROGUE) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::ROGUE) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_mage_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::MAGE) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::MAGE) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
@@ -140,6 +152,7 @@ struct MonsterTemplateBuilder {
     on_death: Vec<TemplateEffect>,
     race: Race,
     class: Class,
+    play_target: Option<PlayTarget>,
 }
 impl MonsterTemplateBuilder {
     fn new(
@@ -163,6 +176,7 @@ impl MonsterTemplateBuilder {
             on_attack: vec![],
             on_play: vec![],
             on_death: vec![],
+            play_target: None,
             race,
             class,
         }
@@ -188,6 +202,16 @@ impl MonsterTemplateBuilder {
         self
     }
 
+    fn on_play_with_target_choice(
+        mut self,
+        effects: Vec<TemplateEffect>,
+        target: PlayTarget,
+    ) -> Self {
+        self.on_play = effects;
+        self.play_target = Some(target);
+        self
+    }
+
     fn build(self) -> CardTemplate {
         CardTemplate {
             id: self.id,
@@ -196,6 +220,7 @@ impl MonsterTemplateBuilder {
             description: self.desc,
             race: self.race,
             class: self.class,
+            play_target: self.play_target,
             card_type: types::CardTypeTemplate::Monster(types::MonsterTemplate {
                 attack: self.atk,
                 hp: self.hp,
@@ -229,6 +254,7 @@ struct SpellTemplateBuilder {
     race: Race,
     class: Class,
     effect: Vec<TemplateEffect>,
+    play_target: Option<PlayTarget>,
 }
 impl SpellTemplateBuilder {
     fn new(id: TemplateId, cost: usize, name: &str, desc: &str, race: Race, class: Class) -> Self {
@@ -240,11 +266,22 @@ impl SpellTemplateBuilder {
             class,
             race,
             effect: vec![],
+            play_target: None,
         }
     }
 
     fn effect(mut self, effects: Vec<TemplateEffect>) -> Self {
         self.effect = effects;
+        self
+    }
+
+    fn effect_with_target_choice(
+        mut self,
+        effects: Vec<TemplateEffect>,
+        target: PlayTarget,
+    ) -> Self {
+        self.effect = effects;
+        self.play_target = Some(target);
         self
     }
 
@@ -256,6 +293,7 @@ impl SpellTemplateBuilder {
             description: self.desc,
             race: self.race,
             class: self.class,
+            play_target: self.play_target,
             card_type: types::CardTypeTemplate::Spell(types::SpellTemplate {
                 effect: self.effect,
             }),

@@ -57,6 +57,7 @@ pub fn create_test_spell(game: &mut Game, owner: usize, mut effects: Vec<Effect>
         race: Race::COMMON,
         class: Class::COMMON,
         cost: 0,
+        play_target: None,
         owner,
         location: Location::Hand,
         card_type: CardTypeInstance::Spell(SpellInstance { effect: effects }),
@@ -108,13 +109,6 @@ pub fn update_effect_initiator(effect: Effect, initiator_id: usize) -> Effect {
             initiator: initiator_id,
             target,
         },
-        Effect::SummonFromHand {
-            entity_id,
-            position,
-        } => Effect::SummonFromHand {
-            entity_id,
-            position,
-        },
         Effect::AutoDraw { player, amount } => Effect::AutoDraw { player, amount },
         Effect::Win(player) => Effect::Win(player),
         Effect::Summon {
@@ -146,6 +140,7 @@ pub fn create_test_monster(
         class: Class::COMMON,
         cost: 0,
         owner,
+        play_target: None,
         location: Location::Field(position),
         card_type: CardTypeInstance::Monster(MonsterInstance {
             attack: 2,
@@ -180,6 +175,7 @@ pub fn create_test_monster_in_hand(
         race: Race::COMMON,
         class: Class::COMMON,
         cost: 0,
+        play_target: None,
         owner,
         location: Location::Hand,
         card_type: CardTypeInstance::Monster(MonsterInstance {
@@ -221,6 +217,7 @@ pub fn create_test_monster_with_on_death(
         race: Race::COMMON,
         class: Class::COMMON,
         cost: 0,
+        play_target: None,
         owner,
         location: Location::Field(position),
         card_type: CardTypeInstance::Monster(MonsterInstance {
@@ -254,6 +251,7 @@ pub fn create_test_monster_with_attack(
         description: "Test".to_string(),
         template_id: 9998,
         race: Race::COMMON,
+        play_target: None,
         class: Class::COMMON,
         cost: 0,
         owner,
@@ -292,6 +290,7 @@ pub fn create_test_monster_with_on_attack(
     let monster = CardInstance {
         id: monster_id,
         name: "Test Monster with On Attack".to_string(),
+        play_target: None,
         description: "Test".to_string(),
         template_id: 9997,
         race: Race::COMMON,
@@ -326,6 +325,7 @@ pub fn add_card_to_deck(game: &mut Game, owner: usize) -> usize {
         class: Class::COMMON,
         cost: 0,
         owner,
+        play_target: None,
         location: Location::Deck,
         card_type: CardTypeInstance::Monster(MonsterInstance {
             attack: 1,
@@ -353,6 +353,7 @@ pub fn add_card_to_hand(game: &mut Game, owner: usize) -> usize {
         race: Race::COMMON,
         class: Class::COMMON,
         cost: 0,
+        play_target: None,
         owner,
         location: Location::Hand,
         card_type: CardTypeInstance::Monster(MonsterInstance {

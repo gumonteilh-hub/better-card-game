@@ -72,7 +72,7 @@ mod tests {
             }],
         );
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(player_a, monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -147,7 +147,7 @@ mod tests {
             }],
         );
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(player_a, monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         let hand_count = game.get_hand(player_a).len();
@@ -188,7 +188,7 @@ mod tests {
 
         assert_eq!(game.get_hand(player_a).len(), 10);
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(player_a, monster, 0).unwrap();
+        game.play_monster(player_a, monster, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);

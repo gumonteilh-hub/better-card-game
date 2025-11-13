@@ -8,6 +8,7 @@ use crate::{
     },
 };
 
+mod passiv_boost;
 mod summon;
 
 pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>> {
@@ -121,6 +122,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     }
                 }
             }
+            context.effect_queue.push_back(Effect::ComputePassivBoosts);
         }
         Effect::Heal {
             initiator,
@@ -205,6 +207,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                     return Err(Error::Game("Can't summon a spell".into()));
                 }
             }
+            context.effect_queue.push_back(Effect::ComputePassivBoosts);
         }
         Effect::Attack { initiator, target } => {
             let targets = resolve_target(*initiator, target, context)?;
@@ -362,6 +365,7 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let summon_actions = summon::compute(context, initiator, side, target)?;
             actions.extend(summon_actions);
         }
+        Effect::ComputePassivBoosts => passiv_boost::compute(context),
     }
 
     Ok(actions)

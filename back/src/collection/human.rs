@@ -1,6 +1,6 @@
 use crate::collection::{
     Race, boost, monster, spell,
-    types::{CardTemplate, PlayerTemplateTarget, TemplateEffect},
+    types::{CardTemplate, PlayerTemplateTarget, TemplateEffect, TemplateTarget},
 };
 use once_cell::sync::Lazy;
 
@@ -72,6 +72,25 @@ static CHEVALIER: Lazy<CardTemplate> = Lazy::new(|| {
     .on_play(vec![TemplateEffect::Summon {
         side: PlayerTemplateTarget::Player,
         target: ECUYER.clone(),
+    }])
+    .build()
+});
+
+static COMMANDANT: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1006,
+        3,
+        "Commandant",
+        "tout les alliés ont +2/+2",
+        3,
+        3,
+        Race::HUMAN,
+        super::Class::COMMON,
+    )
+    .passiv_effect(vec![TemplateEffect::Boost {
+        target: TemplateTarget::Allies,
+        attack: 2,
+        hp: 2,
     }])
     .build()
 });

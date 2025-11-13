@@ -40,6 +40,9 @@ pub fn compute(
             }
         }
     }
+    context
+        .effect_queue
+        .push_back(crate::game::effects::Effect::ComputePassivBoosts);
     Ok(actions)
 }
 

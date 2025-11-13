@@ -1,6 +1,9 @@
 use crate::{
     collection::types::CardTemplate,
-    game::types::{InstanceId, PlayerId},
+    game::{
+        card::Keyword,
+        types::{InstanceId, PlayerId},
+    },
 };
 
 use super::events::EventType;
@@ -85,6 +88,16 @@ pub enum Effect {
         target: CardTemplate,
     },
     Win(PlayerId),
+    ComputePassivBoosts,
+}
+
+pub enum PassivEffect {
+    Boost {
+        hp: usize,
+        attack: usize,
+        keywords: Vec<Keyword>,
+        target: Target,
+    },
 }
 
 #[derive(Debug, Serialize, Clone)]

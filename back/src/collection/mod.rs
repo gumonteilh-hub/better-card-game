@@ -77,37 +77,49 @@ static ALL_COLLECTION: Lazy<Vec<CardTemplate>> = Lazy::new(|| {
 
 fn get_dragon_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::DRAGON) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::DRAGON) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_human_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::HUMAN) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::HUMAN) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_demon_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.race, Race::DEMON) || matches!(c.race, Race::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.race, Race::DEMON) || matches!(c.race, Race::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_warrior_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::WARRIOR) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::WARRIOR) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_rogue_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::ROGUE) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::ROGUE) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
 fn get_mage_cards() -> Vec<CardTemplate> {
     ALL_COLLECTION
-        .iter().filter(|&c| matches!(c.class, Class::MAGE) || matches!(c.class, Class::COMMON)).cloned()
+        .iter()
+        .filter(|&c| matches!(c.class, Class::MAGE) || matches!(c.class, Class::COMMON))
+        .cloned()
         .collect()
 }
 
@@ -135,6 +147,7 @@ struct MonsterTemplateBuilder {
     atk: usize,
     hp: usize,
     keywords: Vec<Keyword>,
+    passiv_effect: Vec<TemplateEffect>,
     on_play: Vec<TemplateEffect>,
     on_attack: Vec<TemplateEffect>,
     on_death: Vec<TemplateEffect>,
@@ -163,6 +176,7 @@ impl MonsterTemplateBuilder {
             on_attack: vec![],
             on_play: vec![],
             on_death: vec![],
+            passiv_effect: vec![],
             race,
             class,
         }
@@ -188,6 +202,11 @@ impl MonsterTemplateBuilder {
         self
     }
 
+    fn passiv_effect(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.passiv_effect = effects;
+        self
+    }
+
     fn build(self) -> CardTemplate {
         CardTemplate {
             id: self.id,
@@ -203,6 +222,7 @@ impl MonsterTemplateBuilder {
                 on_play: self.on_play,
                 on_attack: self.on_attack,
                 on_death: self.on_death,
+                passiv_effect: self.passiv_effect,
             }),
         }
     }

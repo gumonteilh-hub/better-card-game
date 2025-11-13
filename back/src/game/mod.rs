@@ -175,6 +175,8 @@ impl Game {
 
         card.location = Location::Field(position);
 
+        self.effect_queue.push_back(Effect::ComputePassivBoosts);
+
         Ok(())
     }
 
@@ -429,6 +431,11 @@ impl Game {
         self.players
             .get_mut(&player_id)
             .ok_or_else(|| Error::Game(format!("Player with id {} not found", player_id)))
+    }
+
+    /// get a cloned version of the playerInstances
+    pub fn get_players(&self) -> Vec<PlayerInstance> {
+        self.players.iter().map(|(_, p)| p.clone()).collect()
     }
 
     pub fn get_player(&mut self, player_id: PlayerId) -> Result<&PlayerInstance> {

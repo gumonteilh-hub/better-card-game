@@ -43,11 +43,9 @@ pub struct MonsterTemplate {
     pub attack: usize,
     pub hp: usize,
     pub keywords: Vec<Keyword>,
-    #[serde(default)]
+    pub passiv_effect: Vec<TemplateEffect>,
     pub on_play: Vec<TemplateEffect>,
-    #[serde(default)]
     pub on_attack: Vec<TemplateEffect>,
-    #[serde(default)]
     pub on_death: Vec<TemplateEffect>,
 }
 

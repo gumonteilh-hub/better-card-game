@@ -53,12 +53,29 @@ pub struct MonsterInstance {
     pub asleep: bool,
     pub attack_count: usize,
     pub keywords: Vec<Keyword>,
-    #[serde(default)]
+    pub passiv_boost: PassivBoost,
     pub on_play: Vec<Effect>,
-    #[serde(default)]
     pub on_attack: Vec<Effect>,
-    #[serde(default)]
     pub on_death: Vec<Effect>,
+    pub passiv_effect: Vec<PassivEffect>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PassivBoost {
+    attack: usize,
+    hp: usize,
+    keywords: Vec<Keyword>,
+}
+
+impl Default for PassivBoost {
+    fn default() -> Self {
+        Self {
+            attack: 0,
+            hp: 0,
+            keywords: vec![],
+        }
+    }
 }
 
 impl CardInstance {
@@ -72,6 +89,13 @@ impl CardInstance {
                     asleep: true,
                     attack_count: 0,
                     keywords: monster_template.keywords.clone(),
+                    passiv_boost: PassivBoost::default(),
+                    passiv_effect: monster_template
+                        .passiv_effect
+                        .clone()
+                        .iter()
+                        .map(|e| convert_to_effect(e, entity_id))
+                        .collect(),
                     on_play: monster_template
                         .on_play
                         .clone()

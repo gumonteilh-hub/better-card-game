@@ -42,3 +42,9 @@ mod test_end_turn;
 
 #[cfg(test)]
 mod test_win_conditions;
+
+#[cfg(test)]
+mod test_play_monster;
+
+#[cfg(test)]
+mod test_play_spell;

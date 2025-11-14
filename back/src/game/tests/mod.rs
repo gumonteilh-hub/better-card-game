@@ -36,3 +36,9 @@ mod test_move;
 
 #[cfg(test)]
 mod test_keywords;
+
+#[cfg(test)]
+mod test_end_turn;
+
+#[cfg(test)]
+mod test_win_conditions;

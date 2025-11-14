@@ -30,3 +30,9 @@ mod test_attack;
 
 #[cfg(test)]
 mod test_summon_from_hand;
+
+#[cfg(test)]
+mod test_move;
+
+#[cfg(test)]
+mod test_keywords;

@@ -29,4 +29,25 @@ mod test_refresh_mana;
 mod test_attack;
 
 #[cfg(test)]
+mod test_attack_validation;
+
+#[cfg(test)]
 mod test_summon_from_hand;
+
+#[cfg(test)]
+mod test_move;
+
+#[cfg(test)]
+mod test_keywords;
+
+#[cfg(test)]
+mod test_end_turn;
+
+#[cfg(test)]
+mod test_win_conditions;
+
+#[cfg(test)]
+mod test_play_monster;
+
+#[cfg(test)]
+mod test_play_spell;

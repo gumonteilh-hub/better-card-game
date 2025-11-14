@@ -221,6 +221,10 @@ impl Game {
         card_id: InstanceId,
         position: usize,
     ) -> Result<()> {
+        if self.get_field(owner).len() >= 8 {
+            return Err(Error::Game("Your board is already full".into()));
+        }
+
         if self
             .get_field(owner)
             .iter()
@@ -229,10 +233,6 @@ impl Game {
             return Err(Error::Game(
                 "This place on the field is not empty".to_string(),
             ));
-        }
-
-        if self.get_field(owner).len() >= 7 {
-            return Err(Error::Game("Your board is already full".into()));
         }
 
         let card = self.get_entity(card_id)?;

@@ -161,8 +161,8 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        // b) Modify state: fill the board with 7 monsters (positions 0-6)
-        for pos in 0..7 {
+        // b) Modify state: fill the board with 8 monsters (all positions 0-7)
+        for pos in 0..8 {
             create_test_monster(&mut game, player_a, pos, 5, 5);
         }
 
@@ -170,11 +170,11 @@ mod tests {
         let new_monster = create_test_monster_in_hand(&mut game, player_a, 2, 5, vec![], vec![]);
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
-        // Verify board has 7 monsters (at capacity)
-        assert_eq!(game.get_field(player_a).len(), 7);
+        // Verify board is full with 8 monsters
+        assert_eq!(game.get_field(player_a).len(), 8);
 
-        // c) Test: try to play 8th monster at empty position 7
-        let result = game.play_monster(player_a, new_monster, 7);
+        // c) Test: try to play 9th monster (no position available)
+        let result = game.play_monster(player_a, new_monster, 0);
 
         // d) Assert the play failed
         assert!(result.is_err());

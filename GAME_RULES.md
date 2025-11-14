@@ -8,8 +8,8 @@ Les monstres peuvent se déplacer sur le plateau ou attaquer, a chaque tour.
 
 Plateau:
 
-- 7 cases:
-    - 3 cases d’attaques:
+- 8 cases:
+    - 3 cases d'attaques:
         - les cartes sur ces cases peuvent attaquer.
     - 3 cases de défense:
         - les cartes sur ces cases ne peuvent pas attaquer.

@@ -29,6 +29,9 @@ mod test_refresh_mana;
 mod test_attack;
 
 #[cfg(test)]
+mod test_attack_validation;
+
+#[cfg(test)]
 mod test_summon_from_hand;
 
 #[cfg(test)]

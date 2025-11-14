@@ -3,8 +3,14 @@
 Concept:
 
 Un jeu de carte où le positionnement est une mécanique centrale.
-Plusieurs type de cases, attaque et défense. 
-Les monstres peuvent se déplacer sur le plateau ou attaquer, a chaque tour. 
+Plusieurs type de cases, attaque et défense.
+Les monstres peuvent se déplacer sur le plateau ou attaquer, a chaque tour.
+
+Ressources des joueurs:
+
+- Points de vie (HP): Chaque joueur commence avec 30 HP. Si un joueur atteint 0 HP, il perd la partie.
+- Mana: Les joueurs commencent avec 1 mana maximum et gagnent +1 mana maximum par tour, plafonné à 10 mana maximum.
+- Points de mouvement: Chaque joueur dispose de 3 points de mouvement par tour pour déplacer ses monstres sur le plateau.
 
 Plateau:
 
@@ -34,7 +40,7 @@ Tour de jeu:
 - Phase de jeu:
     - Le joueur peut invoquer des monstres
     - Le joueur peut utiliser des sorts
-    - Le joueur peut utiliser 1 point de mouvement pour déplacer un de ses monstres d’une case (en suivant les liens).
+    - Le joueur peut dépenser ses points de mouvement (3 par tour) pour déplacer ses monstres. Chaque déplacement d'une case vers une case adjacente liée coûte 1 point de mouvement.
 - Fin du tour
     - Résolution des effets de fin de tour
 

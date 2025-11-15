@@ -8,7 +8,6 @@
 mod tests {
     use super::super::test_utils::create_test_spell;
     use crate::game::effects::{Effect, Target};
-    use crate::game::types::Location;
 
     #[test]
     fn test_player_at_zero_hp_triggers_win_for_opponent() {
@@ -32,7 +31,7 @@ mod tests {
         );
 
         // c) Test as user would: play the spell to kill opponent
-        game.play_spell(player_a, damage_spell).unwrap();
+        game.play_spell(player_a, damage_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is at 0 HP and player A won
@@ -51,8 +50,7 @@ mod tests {
         assert_eq!(game.winner_id, None);
 
         // b) Modify state: directly queue a Win effect
-        game.effect_queue
-            .push_back(Effect::Win(player_a));
+        game.effect_queue.push_back(Effect::Win(player_a));
 
         // c) Test: execute the effect
         game.compute_commands().unwrap();
@@ -68,17 +66,18 @@ mod tests {
         let player_a = game.player_id_a;
 
         // b) Modify state: queue Win effect
-        game.effect_queue
-            .push_back(Effect::Win(player_a));
+        game.effect_queue.push_back(Effect::Win(player_a));
 
         // c) Test: execute and get actions
         let actions = game.compute_commands().unwrap();
 
         // d) Assert Action::Win is in the actions
         use crate::game::action::Action;
-        assert!(actions
-            .iter()
-            .any(|a| matches!(a, Action::Win(winner_id) if *winner_id == player_a)));
+        assert!(
+            actions
+                .iter()
+                .any(|a| matches!(a, Action::Win(winner_id) if *winner_id == player_a))
+        );
     }
 
     #[test]
@@ -102,7 +101,7 @@ mod tests {
         );
 
         // c) Test: deal exact lethal damage
-        game.play_spell(player_a, lethal_spell).unwrap();
+        game.play_spell(player_a, lethal_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is dead and player A won
@@ -131,7 +130,7 @@ mod tests {
         );
 
         // c) Test: deal overkill damage
-        game.play_spell(player_a, overkill_spell).unwrap();
+        game.play_spell(player_a, overkill_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is at 0 HP (saturating_sub prevents negative) and player A won
@@ -160,7 +159,7 @@ mod tests {
         );
 
         // c) Test: deal non-lethal damage
-        game.play_spell(player_a, damage_spell).unwrap();
+        game.play_spell(player_a, damage_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is still alive and no winner yet

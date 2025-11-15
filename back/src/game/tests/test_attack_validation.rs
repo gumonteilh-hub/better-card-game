@@ -12,10 +12,12 @@
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_utils::{create_test_game, create_test_monster, create_test_monster_with_attack};
+    use super::super::test_utils::{
+        create_test_game, create_test_monster, create_test_monster_with_attack,
+    };
     use crate::game::card::{CardInstance, CardTypeInstance, Keyword, MonsterInstance};
     use crate::game::types::Location;
-    use crate::{collection::Class, Race};
+    use crate::{Race, collection::Class};
 
     #[test]
     fn test_monster_must_be_on_field_to_attack() {
@@ -47,6 +49,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None,
         };
         game.entities.insert(monster_id, monster);
 
@@ -75,7 +78,9 @@ mod tests {
         let monster_b = create_test_monster(&mut game, player_b, 2, 5, 5);
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -102,7 +107,9 @@ mod tests {
         let monster_b = create_test_monster(&mut game, player_b, 1, 5, 5);
 
         // Manually set monster to asleep (helper creates them awake)
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = true;
         }
 
@@ -135,7 +142,9 @@ mod tests {
         let monster_c = create_test_monster(&mut game, player_b, 2, 5, 5);
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -183,6 +192,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None,
         };
         game.entities.insert(monster_id, monster);
 
@@ -228,6 +238,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None,
         };
         game.entities.insert(monster_id, monster);
 
@@ -260,7 +271,9 @@ mod tests {
         let monster_a = create_test_monster_with_attack(&mut game, player_a, 0, 5, 10, 10);
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -286,7 +299,9 @@ mod tests {
         let monster_b = create_test_monster(&mut game, player_a, 1, 5, 5);
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -313,7 +328,9 @@ mod tests {
         let _defender = create_test_monster(&mut game, player_b, 1, 5, 5); // Position 1 is a defense position
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -339,7 +356,9 @@ mod tests {
         let monster_a = create_test_monster_with_attack(&mut game, player_a, 0, 5, 10, 10);
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -362,7 +381,9 @@ mod tests {
         let _enemy_monster = create_test_monster(&mut game, player_b, 0, 5, 5); // Position 0 is attack-only, not defense
 
         // Make monster not asleep
-        if let CardTypeInstance::Monster(ref mut m) = game.entities.get_mut(&monster_a).unwrap().card_type {
+        if let CardTypeInstance::Monster(ref mut m) =
+            game.entities.get_mut(&monster_a).unwrap().card_type
+        {
             m.asleep = false;
         }
 
@@ -394,9 +415,8 @@ mod tests {
             cost: 3,
             owner: player_a,
             location: Location::Field(0), // Artificially on field
-            card_type: CardTypeInstance::Spell(SpellInstance {
-                effect: vec![],
-            }),
+            card_type: CardTypeInstance::Spell(SpellInstance { effect: vec![] }),
+            play_target: None,
         };
         game.entities.insert(spell_id, spell);
 

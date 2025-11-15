@@ -190,11 +190,15 @@ pub async fn game_task(
                 let player_id = state.user_id_player_id_mapping.get(&user_id).unwrap();
 
                 let result_actions = match action {
-                    PlayerActionCommand::PlayMonster { card_id, position } => {
-                        back::play_monster(&mut state.game, *player_id, card_id, position)
+                    PlayerActionCommand::PlayMonster {
+                        card_id,
+                        position,
+                        targets,
+                    } => {
+                        back::play_monster(&mut state.game, *player_id, card_id, position, targets)
                     }
-                    PlayerActionCommand::PlaySpell { card_id } => {
-                        back::play_spell(&mut state.game, *player_id, card_id)
+                    PlayerActionCommand::PlaySpell { card_id, targets } => {
+                        back::play_spell(&mut state.game, *player_id, card_id, targets)
                     }
                     PlayerActionCommand::EndTurn => state.game.end_turn(*player_id),
                     PlayerActionCommand::Attack { initiator, target } => {

@@ -1,6 +1,8 @@
 import { type JSX, useCallback, useMemo, useState } from "react";
 import { useGameEngine } from "../engine/gameEngine";
+import type { ICardInstance, IPlayTarget } from "../types/game";
 import { GameContext } from "../types/gameContext.type";
+import { useSelectTargetForEffect } from "./hooks/useSelectTargetForEffect";
 
 export const attackPositions = [0, 2, 3, 5, 6];
 export const defensePositions = [1, 2, 4, 5, 7];
@@ -17,6 +19,12 @@ const linkedPositions = [
 	[5, 7],
 	[5, 6],
 ];
+
+export interface ICardWithTarget {
+	card: ICardInstance;
+	position?: number;
+	target: IPlayTarget;
+}
 
 export const GameContextProvider = ({
 	gameId,
@@ -39,6 +47,13 @@ export const GameContextProvider = ({
 	} = useGameEngine(userId, gameId);
 	const [selectedCard, setSelectedCard] = useState<number>();
 	const [inputMode, setInputMode] = useState<IInputMode>("attack");
+	const {
+		selectedTargetsForEffect,
+		selectTargetForEffect,
+		playedCardWaitingForTargets,
+		playCardWithPotentialTargets,
+		cancelPlayerCardWaitingForTargets,
+	} = useSelectTargetForEffect(gameState);
 
 	const canAttackPlayer = useMemo(() => {
 		if (!gameState || !selectedCard || isAnimating || inputMode !== "attack")
@@ -134,6 +149,11 @@ export const GameContextProvider = ({
 				inputMode,
 				handleSetInputMode,
 				moveTargets,
+				playedCardWaitingForTargets,
+				playCardWithPotentialTargets,
+				selectedTargetsForEffect,
+				selectTargetForEffect,
+				cancelPlayerCardWaitingForTargets,
 			}}
 		>
 			{children}

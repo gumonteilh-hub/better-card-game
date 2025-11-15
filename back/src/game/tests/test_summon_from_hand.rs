@@ -27,7 +27,7 @@ mod tests {
         let monster = game.entities.get(&monster_id).unwrap();
         assert_eq!(monster.location, Location::Hand);
 
-        game.play_monster(player_a, monster_id, 2).unwrap();
+        game.play_monster(player_a, monster_id, 2, None).unwrap();
         game.compute_commands().unwrap();
 
         let monster = game.entities.get(&monster_id).unwrap();
@@ -59,7 +59,7 @@ mod tests {
         );
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
-        game.play_monster(player_a, monster_with_on_play_id, 0)
+        game.play_monster(player_a, monster_with_on_play_id, 0, None)
             .unwrap();
         game.compute_commands().unwrap();
 
@@ -82,7 +82,7 @@ mod tests {
         let enemy_monster_id = create_test_monster(&mut game, player_b, 1, 5, 5);
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
-        game.play_monster(player_a, monster_id, 0).unwrap();
+        game.play_monster(player_a, monster_id, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         {
@@ -116,7 +116,7 @@ mod tests {
         let enemy_monster_id = create_test_monster(&mut game, player_b, 1, 5, 5);
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
-        game.play_monster(player_a, charge_monster_id, 0).unwrap();
+        game.play_monster(player_a, charge_monster_id, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         let monster = game.entities.get(&charge_monster_id).unwrap();

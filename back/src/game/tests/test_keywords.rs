@@ -31,7 +31,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test as user would: summon the monster with Charge
-        game.play_monster(player_a, monster_id, 0).unwrap();
+        game.play_monster(player_a, monster_id, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert the monster is NOT asleep
@@ -61,7 +61,7 @@ mod tests {
 
         // Give player enough mana and summon
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(player_a, monster_with_charge, 0).unwrap();
+        game.play_monster(player_a, monster_with_charge, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         // Verify monster is on field and not asleep
@@ -112,6 +112,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None
         };
         game.entities.insert(monster_id, monster);
 
@@ -180,6 +181,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None
         };
         game.entities.insert(monster_id, monster);
 
@@ -231,6 +233,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None
         };
         game.entities.insert(monster_id, monster);
 

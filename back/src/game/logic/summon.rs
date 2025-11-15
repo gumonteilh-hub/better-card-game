@@ -27,7 +27,9 @@ pub fn compute(
                 .contains_key(&position)
             {
                 let new_instance_id = 10000 + context.entities.len();
-                let mut new_card = CardInstance::new(new_instance_id, target, template);
+                let oponent = context.get_opponent(&target)?;
+                let mut new_card =
+                    CardInstance::new(new_instance_id, target, template, oponent.player_id);
                 new_card.location = Location::Field(position);
                 context.entities.insert(new_instance_id, new_card.clone());
                 actions.push(Action::Summon {
@@ -61,6 +63,7 @@ mod tests {
             description: "Test".to_string(),
             race: Race::COMMON,
             class: Class::COMMON,
+            play_target: None,
             card_type: CardTypeTemplate::Monster(MonsterTemplate {
                 attack: 1,
                 hp: 1,

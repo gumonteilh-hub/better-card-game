@@ -27,7 +27,7 @@ mod tests {
                 target: Target::Id(monster),
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(
@@ -65,7 +65,7 @@ mod tests {
                 target: Target::Id(monster),
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(
@@ -112,7 +112,7 @@ mod tests {
                 target: Target::Id(monster),
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(
@@ -140,7 +140,7 @@ mod tests {
                 target: Target::Ennemies,
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(
@@ -172,7 +172,7 @@ mod tests {
                 target: Target::Id(monster),
             }],
         );
-        game.play_spell(player_a, spell).unwrap();
+        game.play_spell(player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(

@@ -9,6 +9,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_macros::debug_handler;
+use back::game::types::InstanceId;
 use futures::{SinkExt, StreamExt};
 use serde::Deserialize;
 use tokio::sync::mpsc;
@@ -26,10 +27,12 @@ pub enum PlayerActionCommand {
         #[serde(rename = "cardId")]
         card_id: usize,
         position: usize,
+        targets: Option<Vec<InstanceId>>,
     },
     PlaySpell {
         #[serde(rename = "cardId")]
         card_id: usize,
+        targets: Option<Vec<InstanceId>>,
     },
     EndTurn,
     Attack {

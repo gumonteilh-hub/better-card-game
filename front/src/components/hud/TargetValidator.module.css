@@ -1,0 +1,229 @@
+@keyframes slideUpFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+	}
+	50% {
+		box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+	}
+}
+
+@keyframes glow {
+	0%,
+	100% {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.3),
+			0 0 20px rgba(34, 197, 94, 0.3);
+	}
+	50% {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.3),
+			0 0 30px rgba(34, 197, 94, 0.5);
+	}
+}
+
+.container {
+	display: flex;
+	z-index: 1;
+	background: linear-gradient(
+		135deg,
+		rgba(30, 30, 40, 0.98) 0%,
+		rgba(20, 20, 30, 0.98) 100%
+	);
+	border: 2px solid rgba(100, 100, 120, 0.5);
+	border-radius: 16px;
+	box-shadow:
+		0 8px 24px rgba(0, 0, 0, 0.3),
+		0 0 20px rgba(34, 197, 94, 0.3);
+	overflow: visible;
+	min-width: 300px;
+	min-height: 90px;
+	animation:
+		slideUpFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+		glow 2s ease-in-out infinite;
+	backdrop-filter: blur(10px);
+}
+
+.quantityContainer {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+}
+
+.counter {
+	font-size: 1.8rem;
+	font-weight: bold;
+	color: #60a5fa;
+	text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+.validateContainer {
+	flex: 1;
+	display: flex;
+	padding: 1rem;
+	align-items: stretch;
+	justify-content: center;
+	gap: 0.75rem;
+}
+
+.cancelButton {
+	aspect-ratio: 1;
+	background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+	color: white;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 2rem;
+	font-weight: bold;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+	box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.cancelButton::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	transform: translate(-50%, -50%);
+	transition:
+		width 0.6s,
+		height 0.6s;
+}
+
+.cancelButton:hover {
+	background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+.cancelButton:hover::before {
+	width: 300px;
+	height: 300px;
+}
+
+.cancelButton:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+.confirmButton {
+	flex: 1;
+	background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+	color: white;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 1.3rem;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	padding: 1rem 2rem;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+	box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+	animation: pulse 2s ease-in-out infinite;
+}
+
+.confirmButton::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	transform: translate(-50%, -50%);
+	transition:
+		width 0.6s,
+		height 0.6s;
+}
+
+.confirmButton:hover {
+	background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+}
+
+.confirmButton:hover::before {
+	width: 300px;
+	height: 300px;
+}
+
+.confirmButton:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+}
+
+.confirmButton:disabled {
+	background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+	cursor: not-allowed;
+	opacity: 0.6;
+	animation: none;
+	box-shadow: 0 4px 12px rgba(75, 85, 99, 0.3);
+	transform: none;
+}
+
+.confirmButton:disabled::before {
+	display: none;
+}
+
+.confirmButton:disabled:hover {
+	background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+	transform: none;
+	box-shadow: 0 4px 12px rgba(75, 85, 99, 0.3);
+}
+
+.warningMessage {
+	position: absolute;
+	bottom: -2.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fbbf24;
+	font-size: 0.9rem;
+	font-weight: 700;
+	text-shadow:
+		0 0 10px rgba(251, 191, 36, 0.8),
+		0 2px 4px rgba(0, 0, 0, 0.5);
+	white-space: nowrap;
+	animation: fadeIn 0.3s ease-in-out;
+	z-index: 10;
+	background: rgba(20, 20, 30, 0.95);
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-5px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+}

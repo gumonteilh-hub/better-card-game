@@ -1,6 +1,9 @@
 import { createContext } from "react";
 import type { AnimationState } from "../engine/animationEngine";
-import type { IInputMode } from "../engine/GameContextProvider";
+import type {
+	ICardWithTarget,
+	IInputMode,
+} from "../engine/GameContextProvider";
 import type { IGameState } from "./game";
 
 export interface IGameContext {
@@ -8,8 +11,12 @@ export interface IGameContext {
 	selectedCard?: number;
 	isAnimating: boolean;
 	endTurn: () => void;
-	playSpell: (cardId: number) => void;
-	playMonster: (cardId: number, position: number) => void;
+	playSpell: (cardId: number, targets: number[] | undefined) => void;
+	playMonster: (
+		cardId: number,
+		position: number,
+		targets: number[] | undefined,
+	) => void;
 	handleTargetSelect: (cardId: number | string) => void;
 	handleMoveSelect: (pos: number) => void;
 	playableCards: number[];
@@ -19,6 +26,11 @@ export interface IGameContext {
 	inputMode: IInputMode;
 	handleSetInputMode: (inputMode: IInputMode) => void;
 	moveTargets: number[];
+	playedCardWaitingForTargets?: ICardWithTarget;
+	playCardWithPotentialTargets: (cardId: number, position: number) => void;
+	selectedTargetsForEffect: number[];
+	selectTargetForEffect: (cardId: number) => void;
+	cancelPlayerCardWaitingForTargets: () => void;
 }
 
 export const GameContext = createContext<IGameContext | null>(null);

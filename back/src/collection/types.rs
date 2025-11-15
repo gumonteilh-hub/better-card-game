@@ -6,7 +6,7 @@ use crate::{
     game::{
         card::Keyword,
         effects::{Effect, PlayerTarget, Target},
-        types::InstanceId,
+        types::{InstanceId, PlayerId},
     },
 };
 
@@ -27,6 +27,68 @@ pub struct CardTemplate {
     pub race: Race,
     pub class: Class,
     pub card_type: CardTypeTemplate,
+    pub play_target: Option<PlayTargetTemplate>,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayTargetTemplate {
+    pub strict: bool,
+    pub amount: usize,
+    pub matcher: TargetMatcherTemplate,
+}
+
+impl PlayTargetTemplate {
+    pub fn convert(&self, owner: PlayerId, oponent_id: PlayerId) -> PlayTarget {
+        PlayTarget {
+            strict: self.strict,
+            amount: self.amount,
+            matcher: self.matcher.convert(owner, oponent_id),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayTarget {
+    pub strict: bool,
+    pub amount: usize,
+    pub matcher: TargetMatcher,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
+pub enum TargetMatcher {
+    Race(Race),
+    Class(Class),
+    Owner(PlayerId),
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub enum Side {
+    Player,
+    Enemy,
+}
+
+#[derive(Debug, Clone, Serialize, Copy)]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
+pub enum TargetMatcherTemplate {
+    Race(Race),
+    Class(Class),
+    Side(Side),
+}
+impl TargetMatcherTemplate {
+    pub fn convert(&self, owner: PlayerId, oponent_id: PlayerId) -> TargetMatcher {
+        match self {
+            TargetMatcherTemplate::Race(race) => TargetMatcher::Race(*race),
+            TargetMatcherTemplate::Class(class) => TargetMatcher::Class(*class),
+            TargetMatcherTemplate::Side(side) => match side {
+                Side::Player => TargetMatcher::Owner(owner),
+                Side::Enemy => TargetMatcher::Owner(oponent_id),
+            },
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -51,7 +113,7 @@ pub struct MonsterTemplate {
     pub on_death: Vec<TemplateEffect>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub enum TemplateTarget {
     EnnemyPlayer,
     Player,
@@ -61,6 +123,10 @@ pub enum TemplateTarget {
     Ennemies,
     AllMonsters,
     All,
+    Choose,
+    Matching(TargetMatcherTemplate),
+    And(Box<TemplateTarget>, Box<TemplateTarget>),
+    Or(Box<TemplateTarget>, Box<TemplateTarget>),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -113,6 +179,16 @@ fn convert_template_target(target: &TemplateTarget) -> Target {
         TemplateTarget::Ennemies => Target::Ennemies,
         TemplateTarget::AllMonsters => Target::AllMonsters,
         TemplateTarget::All => Target::All,
+        TemplateTarget::Choose => Target::Ids(vec![]),
+        TemplateTarget::Matching(target_matcher) => Target::Matching(*target_matcher),
+        TemplateTarget::And(a, b) => Target::And(
+            Box::new(convert_template_target(a)),
+            Box::new(convert_template_target(b)),
+        ),
+        TemplateTarget::Or(a, b) => Target::Or(
+            Box::new(convert_template_target(a)),
+            Box::new(convert_template_target(b)),
+        ),
     }
 }
 

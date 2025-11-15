@@ -116,7 +116,7 @@ impl PublicGameState {
 
         Ok(Self {
             game_id: game_state.game_id,
-            player_id: player_id,
+            player_id,
             enemy: EnemyInfo {
                 secret_card: false,
                 field: enemy_field,

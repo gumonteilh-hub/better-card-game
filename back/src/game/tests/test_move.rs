@@ -140,6 +140,7 @@ mod tests {
                 on_attack: vec![],
                 on_death: vec![],
             }),
+            play_target: None
         };
         game.entities.insert(monster_id, monster);
 

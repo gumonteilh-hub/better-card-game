@@ -69,9 +69,9 @@ const PlayerBoard = ({
 
 type IHandProps =
 	| {
-		side: "player";
-		hand: ICardInstance[];
-	}
+			side: "player";
+			hand: ICardInstance[];
+	  }
 	| { side: "enemy"; hand: number };
 
 const Hand = ({ side, hand }: IHandProps) => {
@@ -80,21 +80,21 @@ const Hand = ({ side, hand }: IHandProps) => {
 		<div className="hand">
 			{side === "player"
 				? hand.map((c, index) => (
-					<Draggable
-						cardType={c.cardType.type}
-						key={c.id}
-						id={`card-${c.id}`}
-						cardId={c.id}
-						enabled={playableCards?.includes(c.id) ?? false}
-						style={{ zIndex: index }}
-					>
-						<Card card={c} />
-					</Draggable>
-				))
+						<Draggable
+							cardType={c.cardType.type}
+							key={c.id}
+							id={`card-${c.id}`}
+							cardId={c.id}
+							enabled={playableCards?.includes(c.id) ?? false}
+							style={{ zIndex: index }}
+						>
+							<Card card={c} />
+						</Draggable>
+					))
 				: hand > 0 &&
-				[...Array(hand).keys()].map((index) => (
-					<CardBack key={index}></CardBack>
-				))}
+					[...Array(hand).keys()].map((index) => (
+						<CardBack key={index}></CardBack>
+					))}
 		</div>
 	);
 };

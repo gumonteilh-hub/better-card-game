@@ -10,6 +10,7 @@ use crate::{
 };
 
 pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Vec<Action>> {
+    let mut actions = Vec::new();
     let field_size = game_state.get_field(player_id).len();
     if field_size < 7 {
         let current_mana = game_state.get_mut_player(player_id)?.mana;
@@ -36,12 +37,15 @@ pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Ve
         free_positions.sort_by_key(|&pos| (pos as i32 - 3).abs());
 
         for (card_id, &position) in cards_to_play.iter().zip(&free_positions) {
-            game_state.play_monster(player_id, *card_id, position, None)?;
+            let summon_actions = game_state.play_monster(player_id, *card_id, position, None)?;
+            let on_play_actions = game_state.compute_commands()?;
+
+            actions.extend(summon_actions);
+            actions.extend(on_play_actions);
         }
     }
 
-    let summon_actions = game_state.compute_commands()?;
-    Ok(summon_actions)
+    Ok(actions)
 }
 
 fn maximize_mana_spend(

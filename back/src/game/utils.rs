@@ -8,10 +8,7 @@ pub fn match_entity(
     match matcher {
         crate::collection::types::TargetMatcher::Race(race) => entity.race == race,
         crate::collection::types::TargetMatcher::Class(class) => entity.class == class,
-        crate::collection::types::TargetMatcher::Side(side) => match side {
-            crate::collection::types::Side::Player => entity.owner == owner,
-            crate::collection::types::Side::Enemy => entity.owner != owner,
-        },
+        crate::collection::types::TargetMatcher::Owner(player_id) => entity.owner == player_id,
     }
 }
 
@@ -35,7 +32,7 @@ fn replace_target_ids(
 
 pub(crate) fn map_to_choosen_target(
     effect: &super::effects::Effect,
-    selecteds: &Vec<InstanceId>,
+    selecteds: &[InstanceId],
 ) -> super::effects::Effect {
     match effect {
         super::effects::Effect::Heal {

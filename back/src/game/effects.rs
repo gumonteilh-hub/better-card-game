@@ -1,5 +1,5 @@
 use crate::{
-    collection::types::{CardTemplate, TargetMatcher},
+    collection::types::{CardTemplate, TargetMatcherTemplate},
     game::types::{InstanceId, PlayerId},
 };
 
@@ -18,7 +18,7 @@ pub enum Target {
     AllMonsters,
     All,
     Ids(Vec<InstanceId>),
-    Matching(TargetMatcher),
+    Matching(TargetMatcherTemplate),
     And(Box<Target>, Box<Target>),
     Or(Box<Target>, Box<Target>),
 }

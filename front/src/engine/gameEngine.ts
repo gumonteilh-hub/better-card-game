@@ -18,12 +18,14 @@ type PlayerActionCommand =
 			value: {
 				cardId: number;
 				position: number;
+				targets: number[] | undefined;
 			};
 	  }
 	| {
 			type: "playSpell";
 			value: {
 				cardId: number;
+				targets: number[] | undefined;
 			};
 	  }
 	| {
@@ -65,7 +67,6 @@ export const useGameEngine = (userId: string, gameId: string) => {
 
 			switch (action.type) {
 				case "action": {
-					console.log({ action });
 					setActionQueue((prev) => [...prev, action.value]);
 					break;
 				}
@@ -96,16 +97,19 @@ export const useGameEngine = (userId: string, gameId: string) => {
 		}
 	}, []);
 
-	const playMonster = useCallback((cardId: number, position: number) => {
-		if (wsRef.current) {
-			wsRef.current.send(
-				JSON.stringify({
-					type: "playMonster",
-					value: { cardId, position },
-				} satisfies PlayerActionCommand),
-			);
-		}
-	}, []);
+	const playMonster = useCallback(
+		(cardId: number, position: number, targets: number[] | undefined) => {
+			if (wsRef.current) {
+				wsRef.current.send(
+					JSON.stringify({
+						type: "playMonster",
+						value: { cardId, position, targets },
+					} satisfies PlayerActionCommand),
+				);
+			}
+		},
+		[],
+	);
 
 	const move = useCallback((cardId: number, position: number) => {
 		if (wsRef.current) {
@@ -118,16 +122,19 @@ export const useGameEngine = (userId: string, gameId: string) => {
 		}
 	}, []);
 
-	const playSpell = useCallback((cardId: number) => {
-		if (wsRef.current) {
-			wsRef.current.send(
-				JSON.stringify({
-					type: "playSpell",
-					value: { cardId },
-				} satisfies PlayerActionCommand),
-			);
-		}
-	}, []);
+	const playSpell = useCallback(
+		(cardId: number, targets: number[] | undefined) => {
+			if (wsRef.current) {
+				wsRef.current.send(
+					JSON.stringify({
+						type: "playSpell",
+						value: { cardId, targets },
+					} satisfies PlayerActionCommand),
+				);
+			}
+		},
+		[],
+	);
 
 	const endTurn = useCallback(() => {
 		if (wsRef.current) {

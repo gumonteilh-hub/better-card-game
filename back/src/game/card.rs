@@ -63,7 +63,12 @@ pub struct MonsterInstance {
 }
 
 impl CardInstance {
-    pub fn new(entity_id: usize, player_id: usize, template: &CardTemplate) -> Self {
+    pub fn new(
+        entity_id: usize,
+        player_id: PlayerId,
+        template: &CardTemplate,
+        oponent_id: PlayerId,
+    ) -> Self {
         let card_type = match &template.card_type {
             CardTypeTemplate::Monster(monster_template) => {
                 CardTypeInstance::Monster(MonsterInstance {
@@ -112,7 +117,9 @@ impl CardInstance {
             description: template.description.clone(),
             race: template.race,
             class: template.class,
-            play_target: template.play_target,
+            play_target: template
+                .play_target
+                .map(|t| t.convert(player_id, oponent_id)),
             card_type,
         }
     }

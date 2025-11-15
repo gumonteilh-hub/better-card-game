@@ -25,6 +25,7 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 		case "Boost":
 			return applyBoost(state, action);
 		case "UpdateGameView":
+			console.log(action.value.game);
 			return action.value.game;
 		case "BurnCard":
 		case "TriggerOnAttack":

@@ -9,6 +9,7 @@ import {
 import type { Active, RectMap } from "@dnd-kit/core/dist/store";
 import type { Coordinates } from "@dnd-kit/core/dist/types";
 import { createFileRoute } from "@tanstack/react-router";
+import { TargetValidator } from "../../components/hud/TargetValidator";
 import PlayerBoard from "../../components/PlayerBoard";
 import { GameContextProvider } from "../../engine/GameContextProvider";
 import { useGameContext } from "../../utils/useGameContext";
@@ -32,8 +33,15 @@ function RouteComponent() {
 }
 
 const Game = () => {
-	const { gameState, isAnimating, endTurn, playMonster, playSpell } =
-		useGameContext();
+	const {
+		gameState,
+		isAnimating,
+		endTurn,
+		playMonster,
+		playSpell,
+		playCardWithPotentialTargets,
+		playedCardWaitingForTargets,
+	} = useGameContext();
 
 	// biome-ignore lint/suspicious/noExplicitAny: <type inherited from dnd-kit>
 	const handleDragEnd = (event: any) => {
@@ -44,11 +52,25 @@ const Game = () => {
 			active &&
 			over.data.current.accepts.includes(active.data.current.type)
 		) {
-			if (active.data.current.type === "monster") {
-				playMonster(active.data.current.id, over.data.current.position);
-			}
-			if (active.data.current.type === "spell") {
-				playSpell(active.data.current.id);
+			const played_card = gameState.player.hand.find(
+				(c) => c.id === active.data.current.id,
+			);
+			if (played_card?.playTarget) {
+				playCardWithPotentialTargets(
+					played_card.id,
+					over.data?.current?.position,
+				);
+			} else {
+				if (active.data.current.type === "monster") {
+					playMonster(
+						active.data.current.id,
+						over.data.current.position,
+						undefined,
+					);
+				}
+				if (active.data.current.type === "spell") {
+					playSpell(active.data.current.id, undefined);
+				}
 			}
 		}
 	};
@@ -97,9 +119,13 @@ const Game = () => {
 					hero={gameState.enemy.hero}
 				></PlayerBoard>
 				<div className="middle-part">
-					<button onClick={handleEndTurn} type="button">
-						end turn
-					</button>
+					{playedCardWaitingForTargets ? (
+						<TargetValidator />
+					) : (
+						<button onClick={handleEndTurn} type="button">
+							end turn
+						</button>
+					)}
 				</div>
 				<PlayerBoard
 					side="player"

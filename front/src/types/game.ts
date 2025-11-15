@@ -66,7 +66,27 @@ export type ICardInstance = {
 	owner: PlayerId;
 	location: Location;
 	cardType: ICardTypeInstance;
+	playTarget?: IPlayTarget;
 };
+
+export interface IPlayTarget {
+	amount: number;
+	matcher: TargetMatcher;
+}
+
+export type TargetMatcher =
+	| {
+			type: "race";
+			value: Race;
+	  }
+	| {
+			type: "class";
+			value: Class;
+	  }
+	| {
+			type: "owner";
+			value: PlayerId;
+	  };
 
 export type ICardTypeInstance = IMonsterCardInstance | ISpellCardInstance;
 

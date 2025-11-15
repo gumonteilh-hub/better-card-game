@@ -91,7 +91,7 @@ impl Game {
                 .ok_or_else(|| Error::Game(format!("Template with id {} not found", card)))?;
             entities.insert(
                 entity_id,
-                CardInstance::new(entity_id, player_id_a, template),
+                CardInstance::new(entity_id, player_id_a, template, player_id_b),
             );
             entity_id += 1;
         }
@@ -102,7 +102,7 @@ impl Game {
                 .ok_or_else(|| Error::Game(format!("Template with id {} not found", card)))?;
             entities.insert(
                 entity_id,
-                CardInstance::new(entity_id, player_id_b, template),
+                CardInstance::new(entity_id, player_id_b, template, player_id_a),
             );
             entity_id += 1;
         }

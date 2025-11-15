@@ -2,7 +2,8 @@ use std::vec;
 
 use crate::{
     collection::types::{
-        CardTemplate, PlayTarget, PlayerTemplateTarget, TemplateEffect, TemplateId, TemplateTarget,
+        CardTemplate, PlayTargetTemplate, PlayerTemplateTarget, TemplateEffect, TemplateId,
+        TemplateTarget,
     },
     game::card::Keyword,
 };
@@ -11,11 +12,11 @@ pub use common::get_ia_deck;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
+pub mod types;
 mod common;
 mod demon;
 mod dragon;
 mod human;
-pub mod types;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Copy, PartialEq)]
 pub enum Race {
@@ -152,7 +153,7 @@ struct MonsterTemplateBuilder {
     on_death: Vec<TemplateEffect>,
     race: Race,
     class: Class,
-    play_target: Option<PlayTarget>,
+    play_target: Option<PlayTargetTemplate>,
 }
 impl MonsterTemplateBuilder {
     fn new(
@@ -205,7 +206,7 @@ impl MonsterTemplateBuilder {
     fn on_play_with_target_choice(
         mut self,
         effects: Vec<TemplateEffect>,
-        target: PlayTarget,
+        target: PlayTargetTemplate,
     ) -> Self {
         self.on_play = effects;
         self.play_target = Some(target);
@@ -254,7 +255,7 @@ struct SpellTemplateBuilder {
     race: Race,
     class: Class,
     effect: Vec<TemplateEffect>,
-    play_target: Option<PlayTarget>,
+    play_target: Option<PlayTargetTemplate>,
 }
 impl SpellTemplateBuilder {
     fn new(id: TemplateId, cost: usize, name: &str, desc: &str, race: Race, class: Class) -> Self {
@@ -278,7 +279,7 @@ impl SpellTemplateBuilder {
     fn effect_with_target_choice(
         mut self,
         effects: Vec<TemplateEffect>,
-        target: PlayTarget,
+        target: PlayTargetTemplate,
     ) -> Self {
         self.effect = effects;
         self.play_target = Some(target);

@@ -1,6 +1,6 @@
 import { type JSX, useMemo } from "react";
 import type { ICardInstance } from "../../types/game";
-import { attackReady } from "../../utils/gameRules";
+import { attackReady, isValidTarget } from "../../utils/gameRules";
 import { useGameContext } from "../../utils/useGameContext";
 import styles from "./ActionWrapper.module.css";
 import { TargetWrapper } from "./TargetWrapper";
@@ -18,8 +18,16 @@ export const ActionWrapper = ({
 	side,
 	card,
 }: IActionWrapperProps) => {
-	const { handleSelectCard, selectedCard, isAnimating, inputMode, gameState } =
-		useGameContext();
+	const {
+		handleSelectCard,
+		selectedCard,
+		isAnimating,
+		inputMode,
+		gameState,
+		playedCardWaitingForTargets,
+		selectTargetForEffect,
+		selectedTargetsForEffect,
+	} = useGameContext();
 
 	const canMove = useMemo(
 		() =>
@@ -41,8 +49,40 @@ export const ActionWrapper = ({
 		[inputMode, selectedCard],
 	);
 
+	const canBeTargetted = useMemo(
+		() => isValidTarget(card, playedCardWaitingForTargets),
+		[card, playedCardWaitingForTargets],
+	);
+
 	if (isAnimating) {
 		return children;
+	}
+
+	if (playedCardWaitingForTargets) {
+		if (canBeTargetted) {
+			if (selectedTargetsForEffect.includes(card.id)) {
+				return (
+					<button
+						className={styles.selectedTargetButton}
+						type="button"
+						onClick={() => selectTargetForEffect(card.id)}
+					>
+						{children}
+					</button>
+				);
+			}
+			return (
+				<button
+					className={styles.startAttackButton}
+					type="button"
+					onClick={() => selectTargetForEffect(card.id)}
+				>
+					{children}
+				</button>
+			);
+		} else {
+			return children;
+		}
 	}
 
 	if (side === "player") {

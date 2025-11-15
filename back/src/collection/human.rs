@@ -14,6 +14,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
         FANFARE.clone(),
         ECUYER.clone(),
         ARCHER.clone(),
+        SACRIFIEUR.clone(),
     ]
 }
 
@@ -85,7 +86,7 @@ static ARCHER: Lazy<CardTemplate> = Lazy::new(|| {
         1005,
         2,
         "Archer",
-        "On play: Choisie un monstre adverse : le detruit",
+        "On play: (optionel) Choisie un monstre adverse : le detruit",
         4,
         4,
         Race::HUMAN,
@@ -96,8 +97,33 @@ static ARCHER: Lazy<CardTemplate> = Lazy::new(|| {
             target: TemplateTarget::Choose,
         }],
         PlayTargetTemplate {
+            strict: false,
             amount: 1,
             matcher: TargetMatcherTemplate::Side(Side::Enemy),
+        },
+    )
+    .build()
+});
+
+static SACRIFIEUR: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1006,
+        2,
+        "SACRIFIEUR",
+        "On play: Choisie un monstre allier a sacrifier",
+        4,
+        4,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_play_with_target_choice(
+        vec![TemplateEffect::Destroy {
+            target: TemplateTarget::Choose,
+        }],
+        PlayTargetTemplate {
+            strict: true,
+            amount: 1,
+            matcher: TargetMatcherTemplate::Side(Side::Player),
         },
     )
     .build()

@@ -10,6 +10,17 @@ export const TargetValidator = () => {
 		playMonster,
 	} = useGameContext();
 
+	console.log({ playedCardWaitingForTargets });
+
+	const isButtonDisabled =
+		playedCardWaitingForTargets?.card.playTarget?.strict &&
+		playedCardWaitingForTargets.card.playTarget.amount !==
+			selectedTargetsForEffect.length;
+
+	const remainingTargets =
+		(playedCardWaitingForTargets?.card.playTarget?.amount ?? 0) -
+		selectedTargetsForEffect.length;
+
 	function handleConfirm(): void {
 		if (playedCardWaitingForTargets) {
 			if (playedCardWaitingForTargets.card.cardType.type === "monster") {
@@ -50,13 +61,23 @@ export const TargetValidator = () => {
 				>
 					✕
 				</button>
-				<button
-					type="button"
-					onClick={handleConfirm}
-					className={styles.confirmButton}
-				>
-					Confirmer
-				</button>
+				<div style={{ position: "relative", flex: 1 }}>
+					<button
+						type="button"
+						disabled={isButtonDisabled}
+						onClick={handleConfirm}
+						className={styles.confirmButton}
+					>
+						Confirmer
+					</button>
+					{isButtonDisabled && remainingTargets > 0 && (
+						<span className={styles.warningMessage}>
+							Sélectionnez {remainingTargets} cible
+							{remainingTargets > 1 ? "s" : ""} supplémentaire
+							{remainingTargets > 1 ? "s" : ""}
+						</span>
+					)}
+				</div>
 			</div>
 		</div>
 	);

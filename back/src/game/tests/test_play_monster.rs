@@ -264,6 +264,7 @@ mod tests {
                 on_death: vec![],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 2,
                 matcher: TargetMatcher::Owner(player_b),
             }),
@@ -342,6 +343,7 @@ mod tests {
                 on_death: vec![],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 1,
                 matcher: TargetMatcher::Owner(player_b),
             }),
@@ -441,6 +443,7 @@ mod tests {
                 on_death: vec![],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 1,
                 matcher: TargetMatcher::Owner(player_b), // Only enemy targets
             }),
@@ -456,6 +459,150 @@ mod tests {
         assert_eq!(
             result.unwrap_err().to_string(),
             "Game Logic Error: You selected a target that doesn't match the card conditions"
+        );
+    }
+
+    #[test]
+    fn test_play_monster_with_strict_target_exact_amount() {
+        // a) Initialize
+        let mut game = create_test_game();
+        let player_a = game.player_id_a;
+        let player_b = game.player_id_b;
+
+        // b) Modify state: create enemy monsters to target and a monster with strict play_target
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, MonsterInstance};
+        use crate::game::effects::{Effect, Target};
+        use crate::{Race, collection::Class};
+
+        let enemy_monster_1 = create_test_monster(&mut game, player_b, 0, 3, 5);
+        let enemy_monster_2 = create_test_monster(&mut game, player_b, 1, 3, 5);
+
+        // Create a monster that REQUIRES exactly 2 enemy targets (strict mode)
+        let monster_id = game.entities.len() + 100;
+
+        let monster = CardInstance {
+            id: monster_id,
+            name: "Strict Targeter".to_string(),
+            description: "Requires exactly 2 targets".to_string(),
+            template_id: 9999,
+            race: Race::COMMON,
+            class: Class::COMMON,
+            cost: 3,
+            owner: player_a,
+            location: Location::Hand,
+            card_type: CardTypeInstance::Monster(MonsterInstance {
+                attack: 2,
+                hp: 3,
+                max_hp: 3,
+                asleep: true,
+                attack_count: 0,
+                keywords: vec![],
+                on_play: vec![Effect::DealDamage {
+                    initiator: monster_id,
+                    target: Target::Ids(vec![]),
+                    amount: 2,
+                }],
+                on_attack: vec![],
+                on_death: vec![],
+            }),
+            play_target: Some(PlayTarget {
+                strict: true,
+                amount: 2,
+                matcher: TargetMatcher::Owner(player_b),
+            }),
+        };
+        game.entities.insert(monster_id, monster);
+        game.players.get_mut(&player_a).unwrap().mana = 5;
+
+        // c) Test: play the monster with exactly 2 targets (strict requirement)
+        let result = game.play_monster(
+            player_a,
+            monster_id,
+            0,
+            Some(vec![enemy_monster_1, enemy_monster_2]),
+        );
+
+        // d) Assert the play succeeded
+        assert!(result.is_ok());
+        assert_eq!(
+            game.entities.get(&monster_id).unwrap().location,
+            Location::Field(0)
+        );
+
+        // Verify effect was queued with the selected targets
+        assert_eq!(game.effect_queue.len(), 1);
+        if let Some(Effect::DealDamage { target, amount, .. }) = game.effect_queue.front() {
+            assert_eq!(*amount, 2);
+            assert!(
+                matches!(target, Target::Ids(ids) if ids.len() == 2 && ids.contains(&enemy_monster_1) && ids.contains(&enemy_monster_2))
+            );
+        } else {
+            panic!("Expected DealDamage effect in queue");
+        }
+    }
+
+    #[test]
+    fn test_play_monster_with_strict_target_wrong_amount() {
+        // a) Initialize
+        let mut game = create_test_game();
+        let player_a = game.player_id_a;
+        let player_b = game.player_id_b;
+
+        // b) Modify state: create enemy monsters and a monster with strict play_target
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, MonsterInstance};
+        use crate::game::effects::{Effect, Target};
+        use crate::{Race, collection::Class};
+
+        let enemy_monster_1 = create_test_monster(&mut game, player_b, 0, 3, 5);
+        let _enemy_monster_2 = create_test_monster(&mut game, player_b, 1, 3, 5);
+
+        // Create a monster that REQUIRES exactly 2 enemy targets (strict mode)
+        let monster_id = game.entities.len() + 100;
+
+        let monster = CardInstance {
+            id: monster_id,
+            name: "Strict Targeter".to_string(),
+            description: "Requires exactly 2 targets".to_string(),
+            template_id: 9999,
+            race: Race::COMMON,
+            class: Class::COMMON,
+            cost: 3,
+            owner: player_a,
+            location: Location::Hand,
+            card_type: CardTypeInstance::Monster(MonsterInstance {
+                attack: 2,
+                hp: 3,
+                max_hp: 3,
+                asleep: true,
+                attack_count: 0,
+                keywords: vec![],
+                on_play: vec![Effect::DealDamage {
+                    initiator: monster_id,
+                    target: Target::Ids(vec![]),
+                    amount: 2,
+                }],
+                on_attack: vec![],
+                on_death: vec![],
+            }),
+            play_target: Some(PlayTarget {
+                strict: true,
+                amount: 2,
+                matcher: TargetMatcher::Owner(player_b),
+            }),
+        };
+        game.entities.insert(monster_id, monster);
+        game.players.get_mut(&player_a).unwrap().mana = 5;
+
+        // c) Test: play the monster with only 1 target (should fail because strict requires exactly 2)
+        let result = game.play_monster(player_a, monster_id, 0, Some(vec![enemy_monster_1]));
+
+        // d) Assert the play failed with the correct error message
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Game Logic Error: Wrong quantity of targets selected (required: 2)"
         );
     }
 }

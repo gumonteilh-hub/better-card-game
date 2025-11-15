@@ -54,21 +54,7 @@ pub fn play_monster(
     let on_play_effect = if let CardTypeInstance::Monster(monster) = &card.card_type {
         if let Some(target) = card.play_target {
             if let Some(selecteds) = selected_targets {
-                if selecteds.len() > target.amount {
-                    return Err(Error::Game(format!(
-                        "You selected too much targets, max targets {}",
-                        &target.amount
-                    )));
-                }
-                for select in selecteds.clone() {
-                    let entity = context.get_entity(select)?;
-                    if !crate::game::utils::match_entity(owner, entity, target.matcher) {
-                        return Err(Error::Game(
-                            "You selected a target that doesn't match the card conditions"
-                                .to_string(),
-                        ));
-                    }
-                }
+                validate_target(target, &selecteds, owner, context)?;
                 monster
                     .on_play
                     .iter()
@@ -111,4 +97,32 @@ pub fn play_monster(
     }
 
     Ok(actions)
+}
+
+pub(super) fn validate_target(
+    target: crate::collection::types::PlayTarget,
+    selecteds: &[InstanceId],
+    owner: PlayerId,
+    context: &crate::Game,
+) -> crate::error::Result<()> {
+    if target.strict && selecteds.len() != target.amount {
+        return Err(Error::Game(format!(
+            "Wrong quantity of targets selected (required: {})",
+            &target.amount
+        )));
+    } else if selecteds.len() > target.amount {
+        return Err(Error::Game(format!(
+            "Too many targets selected (maximum: {})",
+            &target.amount
+        )));
+    }
+    for &select in selecteds.iter() {
+        let entity = context.get_entity(select)?;
+        if !crate::game::utils::match_entity(owner, entity, target.matcher) {
+            return Err(Error::Game(
+                "You selected a target that doesn't match the card conditions".to_string(),
+            ));
+        }
+    }
+    Ok(())
 }

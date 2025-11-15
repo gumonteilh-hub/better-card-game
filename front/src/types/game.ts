@@ -70,6 +70,7 @@ export type ICardInstance = {
 };
 
 export interface IPlayTarget {
+	strict: boolean;
 	amount: number;
 	matcher: TargetMatcher;
 }

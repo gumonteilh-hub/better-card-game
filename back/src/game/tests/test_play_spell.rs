@@ -253,10 +253,10 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: create enemy monsters to target and a spell with play_target
-        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
-        use crate::collection::types::{PlayTarget, TargetMatcher};
-        use crate::{Race, collection::Class};
         use super::super::test_utils::create_test_monster;
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
+        use crate::{Race, collection::Class};
 
         let enemy_monster_1 = create_test_monster(&mut game, player_b, 0, 3, 5);
         let enemy_monster_2 = create_test_monster(&mut game, player_b, 1, 3, 5);
@@ -282,6 +282,7 @@ mod tests {
                 }],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 2,
                 matcher: TargetMatcher::Owner(player_b),
             }),
@@ -293,8 +294,12 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the spell with targets
-        game.play_spell(player_a, spell_id, Some(vec![enemy_monster_1, enemy_monster_2]))
-            .unwrap();
+        game.play_spell(
+            player_a,
+            spell_id,
+            Some(vec![enemy_monster_1, enemy_monster_2]),
+        )
+        .unwrap();
 
         // d) Assert spell went to graveyard
         assert_eq!(
@@ -306,7 +311,9 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 1);
         if let Some(Effect::DealDamage { target, amount, .. }) = game.effect_queue.front() {
             assert_eq!(*amount, 3);
-            assert!(matches!(target, Target::Ids(ids) if ids.len() == 2 && ids.contains(&enemy_monster_1) && ids.contains(&enemy_monster_2)));
+            assert!(
+                matches!(target, Target::Ids(ids) if ids.len() == 2 && ids.contains(&enemy_monster_1) && ids.contains(&enemy_monster_2))
+            );
         } else {
             panic!("Expected DealDamage effect in queue");
         }
@@ -320,8 +327,8 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: create a spell with play_target
-        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
         use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
         use crate::{Race, collection::Class};
 
         let spell_id = game.entities.len() + 100;
@@ -344,6 +351,7 @@ mod tests {
                 }],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 1,
                 matcher: TargetMatcher::Owner(player_b),
             }),
@@ -416,10 +424,10 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: create a spell with play_target that requires enemy targets
-        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
-        use crate::collection::types::{PlayTarget, TargetMatcher};
-        use crate::{Race, collection::Class};
         use super::super::test_utils::create_test_monster;
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
+        use crate::{Race, collection::Class};
 
         // Create a friendly monster and an enemy monster
         let friendly_monster = create_test_monster(&mut game, player_a, 0, 3, 5);
@@ -445,6 +453,7 @@ mod tests {
                 }],
             }),
             play_target: Some(PlayTarget {
+                strict: false,
                 amount: 1,
                 matcher: TargetMatcher::Owner(player_b), // Only enemy targets
             }),
@@ -460,6 +469,133 @@ mod tests {
         assert_eq!(
             result.unwrap_err().to_string(),
             "Game Logic Error: You selected a target that doesn't match the card conditions"
+        );
+    }
+
+    #[test]
+    fn test_play_spell_with_strict_target_exact_amount() {
+        // a) Initialize
+        let mut game = super::super::test_utils::create_test_game();
+        let player_a = game.player_id_a;
+        let player_b = game.player_id_b;
+
+        // b) Modify state: create enemy monsters to target and a spell with strict play_target
+        use super::super::test_utils::create_test_monster;
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
+        use crate::{Race, collection::Class};
+
+        let enemy_monster_1 = create_test_monster(&mut game, player_b, 0, 3, 5);
+        let enemy_monster_2 = create_test_monster(&mut game, player_b, 1, 3, 5);
+
+        // Create a spell that REQUIRES exactly 2 enemy targets (strict mode)
+        let spell_id = game.entities.len() + 100;
+
+        let spell = CardInstance {
+            id: spell_id,
+            name: "Strict Target Spell".to_string(),
+            description: "Requires exactly 2 targets".to_string(),
+            template_id: 9999,
+            race: Race::COMMON,
+            class: Class::COMMON,
+            cost: 4,
+            owner: player_a,
+            location: Location::Hand,
+            card_type: CardTypeInstance::Spell(SpellInstance {
+                effect: vec![Effect::DealDamage {
+                    initiator: spell_id,
+                    target: Target::Ids(vec![]),
+                    amount: 3,
+                }],
+            }),
+            play_target: Some(PlayTarget {
+                strict: true,
+                amount: 2,
+                matcher: TargetMatcher::Owner(player_b),
+            }),
+        };
+        game.entities.insert(spell_id, spell);
+        game.players.get_mut(&player_a).unwrap().mana = 5;
+
+        // c) Test: play the spell with exactly 2 targets (strict requirement)
+        let result = game.play_spell(
+            player_a,
+            spell_id,
+            Some(vec![enemy_monster_1, enemy_monster_2]),
+        );
+
+        // d) Assert the play succeeded
+        assert!(result.is_ok());
+        assert_eq!(
+            game.entities.get(&spell_id).unwrap().location,
+            Location::Graveyard
+        );
+
+        // Verify effect was queued with the selected targets
+        assert_eq!(game.effect_queue.len(), 1);
+        if let Some(Effect::DealDamage { target, amount, .. }) = game.effect_queue.front() {
+            assert_eq!(*amount, 3);
+            assert!(
+                matches!(target, Target::Ids(ids) if ids.len() == 2 && ids.contains(&enemy_monster_1) && ids.contains(&enemy_monster_2))
+            );
+        } else {
+            panic!("Expected DealDamage effect in queue");
+        }
+    }
+
+    #[test]
+    fn test_play_spell_with_strict_target_wrong_amount() {
+        // a) Initialize
+        let mut game = super::super::test_utils::create_test_game();
+        let player_a = game.player_id_a;
+        let player_b = game.player_id_b;
+
+        // b) Modify state: create enemy monsters and a spell with strict play_target
+        use super::super::test_utils::create_test_monster;
+        use crate::collection::types::{PlayTarget, TargetMatcher};
+        use crate::game::card::{CardInstance, CardTypeInstance, SpellInstance};
+        use crate::{Race, collection::Class};
+
+        let enemy_monster_1 = create_test_monster(&mut game, player_b, 0, 3, 5);
+        let _enemy_monster_2 = create_test_monster(&mut game, player_b, 1, 3, 5);
+
+        // Create a spell that REQUIRES exactly 2 enemy targets (strict mode)
+        let spell_id = game.entities.len() + 100;
+
+        let spell = CardInstance {
+            id: spell_id,
+            name: "Strict Target Spell".to_string(),
+            description: "Requires exactly 2 targets".to_string(),
+            template_id: 9999,
+            race: Race::COMMON,
+            class: Class::COMMON,
+            cost: 4,
+            owner: player_a,
+            location: Location::Hand,
+            card_type: CardTypeInstance::Spell(SpellInstance {
+                effect: vec![Effect::DealDamage {
+                    initiator: spell_id,
+                    target: Target::Ids(vec![]),
+                    amount: 3,
+                }],
+            }),
+            play_target: Some(PlayTarget {
+                strict: true,
+                amount: 2,
+                matcher: TargetMatcher::Owner(player_b),
+            }),
+        };
+        game.entities.insert(spell_id, spell);
+        game.players.get_mut(&player_a).unwrap().mana = 5;
+
+        // c) Test: play the spell with only 1 target (should fail because strict requires exactly 2)
+        let result = game.play_spell(player_a, spell_id, Some(vec![enemy_monster_1]));
+
+        // d) Assert the play failed with the correct error message
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Game Logic Error: Wrong quantity of targets selected (required: 2)"
         );
     }
 }

@@ -33,18 +33,7 @@ pub fn play_spell(
         CardTypeInstance::Spell(spell_instance) => {
             if let Some(target) = card_clone.play_target {
                 if let Some(selecteds) = selected_targets {
-                    if selecteds.len() > target.amount {
-                        return Err(Error::Game(format!(
-                            "You selected too much targets, max targets {}",
-                            &target.amount
-                        )));
-                    }
-                    for select in selecteds.clone() {
-                        let entity = context.get_entity(select)?;
-                        if !crate::game::utils::match_entity(owner, entity, target.matcher) {
-                            return Err(Error::Game("You selected a target that doesn't match the card conditions".to_string()));
-                        }
-                    }
+                    super::play_monster::validate_target(target, &selecteds, owner, context)?;
                     let effects = spell_instance.effect.iter().map(|effect| {
                         crate::game::utils::map_to_choosen_target(effect, &selecteds)
                     });

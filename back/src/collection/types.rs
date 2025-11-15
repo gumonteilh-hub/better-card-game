@@ -33,6 +33,7 @@ pub struct CardTemplate {
 #[derive(Debug, Clone, Serialize, Copy)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayTargetTemplate {
+    pub strict: bool,
     pub amount: usize,
     pub matcher: TargetMatcherTemplate,
 }
@@ -40,6 +41,7 @@ pub struct PlayTargetTemplate {
 impl PlayTargetTemplate {
     pub fn convert(&self, owner: PlayerId, oponent_id: PlayerId) -> PlayTarget {
         PlayTarget {
+            strict: self.strict,
             amount: self.amount,
             matcher: self.matcher.convert(owner, oponent_id),
         }
@@ -49,6 +51,7 @@ impl PlayTargetTemplate {
 #[derive(Debug, Clone, Serialize, Copy)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayTarget {
+    pub strict: bool,
     pub amount: usize,
     pub matcher: TargetMatcher,
 }

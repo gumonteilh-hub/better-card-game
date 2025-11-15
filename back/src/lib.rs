@@ -41,109 +41,109 @@ pub fn get_collection(archetype: Archetype) -> Vec<CardTemplate> {
 }
 
 pub fn play_monster(
-    game_state: &mut Game,
+    mut game_state: Game,
     player: PlayerId,
     card_id: usize,
     position: usize,
     targets: Option<Vec<InstanceId>>,
-) -> Result<Vec<Action>> {
+) -> Result<(Vec<Action>, Game)> {
     let mut actions = game_state.play_monster(player, card_id, position, targets)?;
     let compute_actions = game_state.compute_commands()?;
     actions.extend(compute_actions);
-    let player_game_view = PublicGameState::new(game_state, player)?;
+    let player_game_view = PublicGameState::new(&game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
     let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
-    let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
+    let oponent_game_view = PublicGameState::new(&game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
         game: oponent_game_view,
     });
-    Ok(actions)
+    Ok((actions, game_state))
 }
 
 pub fn play_spell(
-    game_state: &mut Game,
+    mut game_state: Game,
     player: PlayerId,
     card_id: usize,
     targets: Option<Vec<InstanceId>>,
-) -> Result<Vec<Action>> {
+) -> Result<(Vec<Action>, Game)> {
     game_state.play_spell(player, card_id, targets)?;
     let mut actions = game_state.compute_commands()?;
-    let player_game_view = PublicGameState::new(game_state, player)?;
+    let player_game_view = PublicGameState::new(&game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
     let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
-    let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
+    let oponent_game_view = PublicGameState::new(&game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
         game: oponent_game_view,
     });
-    Ok(actions)
+    Ok((actions, game_state))
 }
 
-pub fn end_turn(game_state: &mut Game, player: PlayerId) -> Result<Vec<Action>> {
+pub fn end_turn(mut game_state: Game, player: PlayerId) -> Result<(Vec<Action>, Game)> {
     let mut actions = game_state.end_turn(player)?;
     let other_actions = game_state.compute_commands()?;
     actions.extend(other_actions);
-    let player_game_view = PublicGameState::new(game_state, player)?;
+    let player_game_view = PublicGameState::new(&game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
     let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
-    let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
+    let oponent_game_view = PublicGameState::new(&game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
         game: oponent_game_view,
     });
-    Ok(actions)
+    Ok((actions, game_state))
 }
 
 pub fn attack(
-    game_state: &mut Game,
+    mut game_state: Game,
     player: PlayerId,
     initiator: usize,
     target: usize,
-) -> Result<Vec<Action>> {
+) -> Result<(Vec<Action>, Game)> {
     game_state.attack(player, initiator, target)?;
     let mut actions = game_state.compute_commands()?;
-    let player_game_view = PublicGameState::new(game_state, player)?;
+    let player_game_view = PublicGameState::new(&game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
     let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
-    let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
+    let oponent_game_view = PublicGameState::new(&game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
         game: oponent_game_view,
     });
-    Ok(actions)
+    Ok((actions, game_state))
 }
 
 pub fn move_card(
-    game_state: &mut Game,
+    mut game_state: Game,
     player: PlayerId,
     card_id: usize,
     position: usize,
-) -> Result<Vec<Action>> {
+) -> Result<(Vec<Action>, Game)> {
     game_state.move_card(player, card_id, position)?;
     let mut actions = game_state.compute_commands()?;
-    let player_game_view = PublicGameState::new(game_state, player)?;
+    let player_game_view = PublicGameState::new(&game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
     let oponent = game_state.players.keys().find(|p| **p != player).unwrap();
-    let oponent_game_view = PublicGameState::new(game_state, *oponent)?;
+    let oponent_game_view = PublicGameState::new(&game_state, *oponent)?;
     actions.push(Action::UpdateGameView {
         player: *oponent,
         game: oponent_game_view,
     });
-    Ok(actions)
+    Ok((actions, game_state))
 }

@@ -188,29 +188,37 @@ pub async fn game_task(
                 }
 
                 let player_id = state.user_id_player_id_mapping.get(&user_id).unwrap();
+                let cloned_game_state = state.game.clone();
 
-                let result_actions = match action {
+                let result = match action {
                     PlayerActionCommand::PlayMonster {
                         card_id,
                         position,
                         targets,
-                    } => {
-                        back::play_monster(&mut state.game, *player_id, card_id, position, targets)
-                    }
+                    } => back::play_monster(
+                        cloned_game_state,
+                        *player_id,
+                        card_id,
+                        position,
+                        targets,
+                    ),
                     PlayerActionCommand::PlaySpell { card_id, targets } => {
-                        back::play_spell(&mut state.game, *player_id, card_id, targets)
+                        back::play_spell(cloned_game_state, *player_id, card_id, targets)
                     }
-                    PlayerActionCommand::EndTurn => state.game.end_turn(*player_id),
+                    PlayerActionCommand::EndTurn => back::end_turn(cloned_game_state, *player_id),
                     PlayerActionCommand::Attack { initiator, target } => {
-                        back::attack(&mut state.game, *player_id, initiator, target)
+                        back::attack(cloned_game_state, *player_id, initiator, target)
                     }
                     PlayerActionCommand::Move { card_id, position } => {
-                        back::move_card(&mut state.game, *player_id, card_id, position)
+                        back::move_card(cloned_game_state, *player_id, card_id, position)
                     }
                 };
 
-                let actions = match result_actions {
-                    Ok(actions) => actions,
+                let actions = match result {
+                    Ok((actions, new_state)) => {
+                        state.game = new_state;
+                        actions
+                    }
                     Err(error) => {
                         broadcast_to_player(
                             &state,

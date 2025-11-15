@@ -51,3 +51,6 @@ mod test_play_monster;
 
 #[cfg(test)]
 mod test_play_spell;
+
+#[cfg(test)]
+mod test_public_game_state;

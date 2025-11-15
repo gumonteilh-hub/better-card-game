@@ -67,52 +67,48 @@ impl PublicGameState {
             ))
         })?;
 
-        let oponent_id = game_state.get_opponent(&player_id)?.player_id;
-        let oponent = game_state.players.get(&oponent_id).ok_or_else(|| {
+        let opponent_id = game_state.get_opponent(&player_id)?.player_id;
+        let opponent = game_state.players.get(&opponent_id).ok_or_else(|| {
             Error::Game(format!(
                 "Player B with id {} not found",
                 game_state.player_id_b
             ))
         })?;
 
-        let hero_entities = game_state
-            .entities
-            .values()
-            .filter(|e| e.owner == hero.player_id);
-        let enemy_entities = game_state
-            .entities
-            .values()
-            .filter(|e| e.owner == oponent.player_id);
-
+        // Single pass optimization: process all entities in one iteration
         let mut hero_field = HashMap::new();
-        for entity in hero_entities.clone() {
-            if let Location::Field(pos) = entity.location {
-                hero_field.insert(pos, entity.clone());
-            }
-        }
-
         let mut enemy_field = HashMap::new();
-        for entity in enemy_entities.clone() {
-            if let Location::Field(pos) = entity.location {
-                enemy_field.insert(pos, entity.clone());
+        let mut player_hand = Vec::new();
+        let mut enemy_hand_size = 0;
+        let mut player_deck_size = 0;
+        let mut enemy_deck_size = 0;
+
+        for entity in game_state.entities.values() {
+            match (entity.owner == hero.player_id, &entity.location) {
+                // Hero entities
+                (true, Location::Field(pos)) => {
+                    hero_field.insert(*pos, entity.clone());
+                }
+                (true, Location::Hand) => {
+                    player_hand.push(entity.clone());
+                }
+                (true, Location::Deck) => {
+                    player_deck_size += 1;
+                }
+                // Enemy entities
+                (false, Location::Field(pos)) => {
+                    enemy_field.insert(*pos, entity.clone());
+                }
+                (false, Location::Hand) => {
+                    enemy_hand_size += 1;
+                }
+                (false, Location::Deck) => {
+                    enemy_deck_size += 1;
+                }
+                // Other locations (Graveyard, etc.) - ignore
+                _ => {}
             }
         }
-
-        let enemy_hand_size = enemy_entities
-            .clone()
-            .filter(|e| matches!(e.location, Location::Hand))
-            .count();
-        let player_hand = hero_entities
-            .clone()
-            .filter(|e| matches!(e.location, Location::Hand))
-            .cloned()
-            .collect();
-        let enemy_deck_size = enemy_entities
-            .filter(|e| matches!(e.location, Location::Deck))
-            .count();
-        let player_deck_size = hero_entities
-            .filter(|e| matches!(e.location, Location::Deck))
-            .count();
 
         Ok(Self {
             game_id: game_state.game_id,
@@ -120,14 +116,14 @@ impl PublicGameState {
             enemy: EnemyInfo {
                 secret_card: false,
                 field: enemy_field,
-                max_mana: oponent.base_mana,
-                current_mana: oponent.mana,
+                max_mana: opponent.base_mana,
+                current_mana: opponent.mana,
                 hand: enemy_hand_size,
                 hero: HeroInfo {
-                    id: oponent.player_id,
+                    id: opponent.player_id,
                     name: "Enemy".into(),
-                    hp: oponent.hp,
-                    archetype: oponent.archetype,
+                    hp: opponent.hp,
+                    archetype: opponent.archetype,
                 },
                 deck_size: enemy_deck_size,
             },

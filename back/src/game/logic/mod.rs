@@ -9,6 +9,14 @@ use crate::{
 };
 
 mod summon;
+mod draw;
+mod damage;
+mod destroy;
+mod heal;
+mod attack;
+mod win;
+mod mana;
+mod boost;
 
 pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>> {
     let mut actions: Vec<Action> = Vec::new();
@@ -18,273 +26,58 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             player,
             amount,
         } => {
-            let initiator_owner = context.get_entity(*initiator)?.owner;
-            let opponent_id = get_opponent_player_id(initiator_owner, context)?;
-            let targets = resolve_player_target(*initiator, player, context)?;
-            for player_id in targets {
-                for _ in 0..*amount {
-                    if let Some(card_id) = context
-                        .entities
-                        .iter()
-                        .find(|(_, card)| {
-                            card.owner == player_id && card.location == Location::Deck
-                        })
-                        .map(|(id, _)| *id)
-                    {
-                        let hand_full = context.get_hand(player_id).len() >= 10;
-                        if let Some(card) = context.entities.get_mut(&card_id) {
-                            if !hand_full {
-                                card.location = Location::Hand;
-                                actions.push(Action::Draw {
-                                    player: player_id,
-                                    card: card.clone(),
-                                });
-                                let oponent = context.get_opponent(&player_id)?;
-                                actions.push(Action::EnemyDraw {
-                                    player: oponent.player_id,
-                                });
-                            } else {
-                                card.location = Location::Graveyard;
-                                actions.push(Action::BurnCard {
-                                    player: player_id,
-                                    card: card.id,
-                                });
-                            }
-                        }
-                    } else {
-                        // Todo implement fatigue
-                    }
-                }
-            }
+            let make_draw_actions = draw::compute_make_draw(context, initiator, player, amount)?;
+            actions.extend(make_draw_actions);
         }
         Effect::DealDamage {
             initiator,
             target,
             amount,
         } => {
-            let player_targets = resolve_target_player_only(*initiator, target, context)?;
-            for target_id in player_targets {
-                let target = context.get_mut_player(target_id)?;
-                target.hp = target.hp.saturating_sub(*amount);
-                if target.hp == 0 {
-                    let winner_id = get_opponent_player_id(target_id, context)?;
-                    context.effect_queue.push_back(Effect::Win(winner_id));
-                }
-                actions.push(Action::ReceiveDamage {
-                    target: target_id,
-                    amount: *amount,
-                });
-            }
-
-            let entity_targets = resolve_field_target(*initiator, target, context)?;
-            for target_id in entity_targets {
-                let target = context.get_mut_entity(target_id)?;
-                match &mut target.card_type {
-                    super::card::CardTypeInstance::Monster(monster_instance) => {
-                        monster_instance.hp = monster_instance.hp.saturating_sub(*amount);
-                        if monster_instance.hp == 0 {
-                            context.effect_queue.push_back(Effect::Destroy {
-                                initiator: *initiator,
-                                target: Target::Id(target_id),
-                            });
-                        }
-                        actions.push(Action::ReceiveDamage {
-                            target: target_id,
-                            amount: *amount,
-                        });
-                    }
-                    super::card::CardTypeInstance::Spell(spell_instance) => {
-                        return Err(Error::Game("Can't deal damage to a spell".into()));
-                    }
-                }
-            }
+            let deal_damage_actions = damage::compute(context, initiator, target, amount)?;
+            actions.extend(deal_damage_actions);
         }
         Effect::Destroy { initiator, target } => {
-            let targets = resolve_field_target(*initiator, target, context)?;
-            for target in targets {
-                let target_entity = context.entities.get_mut(&target).ok_or_else(|| {
-                    Error::Game(format!("Entity with id {} not found for destroy", target))
-                })?;
-                target_entity.location = Location::Graveyard;
-                match &target_entity.card_type {
-                    super::card::CardTypeInstance::Monster(monster_instance) => {
-                        if !monster_instance.on_death.is_empty() {
-                            actions.push(Action::TriggerOnDeath(target));
-                            context
-                                .effect_queue
-                                .extend(monster_instance.on_death.clone());
-                        }
-                        actions.push(Action::Destroy { target });
-                    }
-                    super::card::CardTypeInstance::Spell(spell_instance) => {
-                        return Err(Error::Game("Can't destroy a spell".into()));
-                    }
-                }
-            }
+            let destroy_actions = destroy::compute(context, initiator, target)?;
+            actions.extend(destroy_actions);
         }
         Effect::Heal {
             initiator,
             target,
             amount,
         } => {
-            let player_targets = resolve_target_player_only(*initiator, target, context)?;
-            for player_id in player_targets {
-                let player = context.get_mut_player(player_id)?;
-                let max_hp = 30;
-                let old_hp = player.hp;
-                player.hp = (player.hp + *amount).min(max_hp);
-                let effective_heal = player.hp - old_hp;
-
-                if effective_heal > 0 {
-                    actions.push(Action::Heal {
-                        target: player_id,
-                        amount: effective_heal,
-                    });
-                }
-            }
-
-            let entity_targets = resolve_field_target(*initiator, target, context)?;
-            for target_id in entity_targets {
-                let entity = context.get_mut_entity(target_id)?;
-                match &mut entity.card_type {
-                    super::card::CardTypeInstance::Monster(monster_instance) => {
-                        let max_hp = monster_instance.max_hp;
-                        let old_hp = monster_instance.hp;
-                        monster_instance.hp = (monster_instance.hp + *amount).min(max_hp);
-                        let effective_heal = monster_instance.hp - old_hp;
-
-                        if effective_heal > 0 {
-                            actions.push(Action::Heal {
-                                target: target_id,
-                                amount: effective_heal,
-                            });
-                        }
-                    }
-                    super::card::CardTypeInstance::Spell(spell_instance) => {
-                        return Err(Error::Game("Can't heal a spell".into()));
-                    }
-                }
-            }
+            let heal_actions = heal::compute(context, initiator, target, amount)?;
+            actions.extend(heal_actions);
         }
         Effect::Attack { initiator, target } => {
-            let targets = resolve_target(*initiator, target, context)?;
-            for target_id in targets {
-                let initiator_entity = context.entities.get_mut(initiator).ok_or_else(|| {
-                    Error::Game(format!("Entity with id {} not found for attack", initiator))
-                })?;
-                match &initiator_entity.card_type {
-                    super::card::CardTypeInstance::Monster(monster_instance) => {
-                        if !monster_instance.on_attack.is_empty() {
-                            actions.push(Action::TriggerOnAttack(initiator_entity.id));
-                            context
-                                .effect_queue
-                                .extend(monster_instance.on_attack.clone());
-                        }
-                        context.effect_queue.push_back(Effect::DealDamage {
-                            initiator: *initiator,
-                            target: Target::Id(target_id),
-                            amount: monster_instance.attack,
-                        });
-                    }
-                    super::card::CardTypeInstance::Spell(spell_instance) => {
-                        return Err(Error::Game("Can't attack with a spell".into()));
-                    }
-                }
-
-                if !is_player_id(target_id) {
-                    let target_entity = context.get_entity(target_id)?;
-                    match &target_entity.card_type {
-                        super::card::CardTypeInstance::Monster(monster_instance) => {
-                            context.effect_queue.push_back(Effect::DealDamage {
-                                initiator: target_id,
-                                target: Target::Id(*initiator),
-                                amount: monster_instance.attack,
-                            });
-                        }
-                        super::card::CardTypeInstance::Spell(spell_instance) => {
-                            return Err(Error::Game("Can't attack a spell".into()));
-                        }
-                    }
-                }
-                actions.push(Action::Attack {
-                    initiator: *initiator,
-                    target: target_id,
-                });
-            }
+            let attack_actions = attack::compute(context, initiator, target)?;
+            actions.extend(attack_actions);
         }
         Effect::Win(player_id) => {
-            context.winner_id = Some(*player_id);
-            actions.push(Action::Win(*player_id));
+            let win_actions = win::compute(context, player_id)?;
+            actions.extend(win_actions);
         }
         Effect::AutoDraw { player, amount } => {
-            for _ in 0..*amount {
-                if let Some(card_id) = context
-                    .entities
-                    .iter()
-                    .find(|(_, card)| card.owner == *player && card.location == Location::Deck)
-                    .map(|(id, _)| *id)
-                {
-                    let hand_not_full = context.get_hand(*player).len() < 10;
-                    if let Some(card) = context.entities.get_mut(&card_id) {
-                        if hand_not_full {
-                            card.location = Location::Hand;
-                            actions.push(Action::Draw {
-                                player: *player,
-                                card: card.clone(),
-                            });
-                            let oponent = context.get_opponent(player)?;
-                            actions.push(Action::EnemyDraw {
-                                player: oponent.player_id,
-                            });
-                        } else {
-                            card.location = Location::Graveyard;
-                            actions.push(Action::BurnCard {
-                                player: *player,
-                                card: card.id,
-                            });
-                        }
-                    }
-                } else {
-                    // Todo implement fatigue
-                }
-            }
+            let auto_draw_actions = draw::compute_auto_draw(context, player, amount)?;
+            actions.extend(auto_draw_actions);
         }
         Effect::IncreaseMaxMana {
             initiator,
             player,
             amount,
         } => {
-            let targets = resolve_player_target(*initiator, player, context)?;
-            for target in targets {
-                context.get_mut_player(target)?.base_mana += amount;
-                actions.push(Action::IncreaseMaxMana {
-                    player: target,
-                    amount: *amount,
-                });
-            }
+            let increase_max_mana_actions =
+                mana::compute_increase_max_mana(context, initiator, player, amount)?;
+            actions.extend(increase_max_mana_actions);
         }
         Effect::RefreshMana {
             initiator,
             player,
             amount,
         } => {
-            let targets = resolve_player_target(*initiator, player, context)?;
-            for target in targets {
-                let player = context.get_mut_player(target)?;
-                let effective_refresh;
-                if player.mana + amount >= player.base_mana {
-                    effective_refresh = player.base_mana - player.mana;
-                    player.mana = player.base_mana;
-                } else {
-                    effective_refresh = *amount;
-                    player.mana += amount;
-                }
-
-                actions.push(Action::RefreshMana {
-                    player: target,
-                    amount: effective_refresh,
-                });
-            }
+            let refresh_mana_actions =
+                mana::compute_refresh_mana(context, initiator, player, amount)?;
+            actions.extend(refresh_mana_actions);
         }
         Effect::Boost {
             initiator,
@@ -292,27 +85,8 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             hp,
             target,
         } => {
-            let targets = resolve_field_target(*initiator, target, context)?;
-
-            for target_id in targets {
-                let target = context.get_mut_entity(target_id)?;
-                match &mut target.card_type {
-                    super::card::CardTypeInstance::Monster(monster_instance) => {
-                        monster_instance.attack += attack;
-                        monster_instance.hp += hp;
-                        monster_instance.max_hp += hp;
-
-                        actions.push(Action::Boost {
-                            target: target_id,
-                            attack: *attack,
-                            hp: *hp,
-                        });
-                    }
-                    super::card::CardTypeInstance::Spell(spell_instance) => {
-                        return Err(Error::Game("Can't boost a spell".into()));
-                    }
-                }
-            }
+            let boost_actions = boost::compute(context, initiator, attack, hp, target)?;
+            actions.extend(boost_actions);
         }
         Effect::Summon {
             initiator,
@@ -331,7 +105,7 @@ fn is_player_id(id: usize) -> bool {
     id < 2
 }
 
-fn resolve_target(
+pub(super) fn resolve_target(
     initiator: InstanceId,
     target: &Target,
     context: &Game,
@@ -344,7 +118,7 @@ fn resolve_target(
 
     Ok(targets)
 }
-fn resolve_target_player_only(
+pub(super) fn resolve_target_player_only(
     initiator: InstanceId,
     target: &Target,
     context: &Game,
@@ -372,7 +146,7 @@ fn resolve_target_player_only(
     Ok(targets)
 }
 
-fn resolve_player_target(
+pub(super) fn resolve_player_target(
     initiator: InstanceId,
     target: &PlayerTarget,
     context: &Game,
@@ -399,7 +173,7 @@ fn resolve_player_target(
     Ok(targets)
 }
 
-fn get_opponent_player_id(player_id: PlayerId, context: &Game) -> Result<PlayerId> {
+pub(super) fn get_opponent_player_id(player_id: PlayerId, context: &Game) -> Result<PlayerId> {
     context
         .players
         .keys()
@@ -413,7 +187,7 @@ fn get_opponent_player_id(player_id: PlayerId, context: &Game) -> Result<PlayerI
         })
 }
 
-fn resolve_field_target(
+pub(super) fn resolve_field_target(
     initiator: InstanceId,
     target: &Target,
     context: &Game,

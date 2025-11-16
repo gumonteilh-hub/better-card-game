@@ -29,7 +29,7 @@ mod tests {
         add_card_to_deck(&mut game, player_b);
 
         // c) Test as user would: end player A's turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert the current player is now player B
         assert_eq!(game.current_player, player_b);
@@ -53,7 +53,7 @@ mod tests {
         );
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert the card moved to hand
         assert_eq!(
@@ -75,7 +75,7 @@ mod tests {
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert base_mana increased to 4
         assert_eq!(game.players.get(&player_b).unwrap().base_mana, 4);
@@ -94,7 +94,7 @@ mod tests {
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert base_mana stayed at 10 (not 11)
         assert_eq!(game.players.get(&player_b).unwrap().base_mana, 10);
@@ -117,7 +117,7 @@ mod tests {
         assert_eq!(game.players.get(&player_b).unwrap().mana, 2);
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert mana refreshed to base_mana (which increased to 6)
         assert_eq!(game.players.get(&player_b).unwrap().base_mana, 6);
@@ -140,7 +140,7 @@ mod tests {
         assert_eq!(game.players.get(&player_b).unwrap().move_count, 0);
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert movement points reset to 3
         assert_eq!(game.players.get(&player_b).unwrap().move_count, 3);
@@ -173,7 +173,7 @@ mod tests {
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert all attack counts are reset to 0
         if let CardTypeInstance::Monster(m) = &game.entities.get(&monster_1).unwrap().card_type {
@@ -211,7 +211,7 @@ mod tests {
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
-        game.end_turn(player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert all monsters are now awake (asleep = false)
         if let CardTypeInstance::Monster(m) = &game.entities.get(&monster_1).unwrap().card_type {

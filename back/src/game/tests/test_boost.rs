@@ -39,7 +39,7 @@ fn test_boost_increases_attack_hp_and_max_hp() {
         }],
     );
 
-    let result = game.play_spell(player_a, spell_id, None);
+    let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None);
     assert!(result.is_ok());
     game.compute_commands().unwrap();
 

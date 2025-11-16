@@ -3,11 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     Race,
     collection::Class,
-    game::{
-        card::Keyword,
-        effects::{Effect, PlayerTarget, Target},
-        types::{InstanceId, PlayerId},
-    },
+    game::{card::Keyword, types::PlayerId},
 };
 
 pub type TemplateId = usize;
@@ -36,16 +32,6 @@ pub struct PlayTargetTemplate {
     pub strict: bool,
     pub amount: usize,
     pub matcher: TargetMatcherTemplate,
-}
-
-impl PlayTargetTemplate {
-    pub fn convert(&self, owner: PlayerId, oponent_id: PlayerId) -> PlayTarget {
-        PlayTarget {
-            strict: self.strict,
-            amount: self.amount,
-            matcher: self.matcher.convert(owner, oponent_id),
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Copy)]
@@ -77,18 +63,6 @@ pub enum TargetMatcherTemplate {
     Race(Race),
     Class(Class),
     Side(Side),
-}
-impl TargetMatcherTemplate {
-    pub fn convert(&self, owner: PlayerId, oponent_id: PlayerId) -> TargetMatcher {
-        match self {
-            TargetMatcherTemplate::Race(race) => TargetMatcher::Race(*race),
-            TargetMatcherTemplate::Class(class) => TargetMatcher::Class(*class),
-            TargetMatcherTemplate::Side(side) => match side {
-                Side::Player => TargetMatcher::Owner(owner),
-                Side::Enemy => TargetMatcher::Owner(oponent_id),
-            },
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -167,74 +141,12 @@ pub enum TemplateEffect {
         side: PlayerTemplateTarget,
         target: CardTemplate,
     },
-}
-
-fn convert_template_target(target: &TemplateTarget) -> Target {
-    match target {
-        TemplateTarget::EnnemyPlayer => Target::EnnemyPlayer,
-        TemplateTarget::Player => Target::Player,
-        TemplateTarget::BothPlayers => Target::BothPlayers,
-        TemplateTarget::ItSelf => Target::ItSelf,
-        TemplateTarget::Allies => Target::Allies,
-        TemplateTarget::Ennemies => Target::Ennemies,
-        TemplateTarget::AllMonsters => Target::AllMonsters,
-        TemplateTarget::All => Target::All,
-        TemplateTarget::Choose => Target::Ids(vec![]),
-        TemplateTarget::Matching(target_matcher) => Target::Matching(*target_matcher),
-        TemplateTarget::And(a, b) => Target::And(
-            Box::new(convert_template_target(a)),
-            Box::new(convert_template_target(b)),
-        ),
-        TemplateTarget::Or(a, b) => Target::Or(
-            Box::new(convert_template_target(a)),
-            Box::new(convert_template_target(b)),
-        ),
-    }
-}
-
-fn convert_template_player_target(target: &PlayerTemplateTarget) -> PlayerTarget {
-    match target {
-        PlayerTemplateTarget::EnnemyPlayer => PlayerTarget::EnnemyPlayer,
-        PlayerTemplateTarget::Player => PlayerTarget::Player,
-        PlayerTemplateTarget::BothPlayers => PlayerTarget::BothPlayers,
-    }
-}
-
-pub fn convert_to_effect(teff: &TemplateEffect, initiator_id: InstanceId) -> Effect {
-    match teff {
-        TemplateEffect::MakeDraw { player, amount } => Effect::MakeDraw {
-            initiator: initiator_id,
-            player: convert_template_player_target(player),
-            amount: *amount,
-        },
-        TemplateEffect::Heal { target, amount } => Effect::Heal {
-            initiator: initiator_id,
-            target: convert_template_target(target),
-            amount: *amount,
-        },
-        TemplateEffect::Destroy { target } => Effect::Destroy {
-            initiator: initiator_id,
-            target: convert_template_target(target),
-        },
-        TemplateEffect::DealDamage { target, amount } => Effect::DealDamage {
-            initiator: initiator_id,
-            target: convert_template_target(target),
-            amount: *amount,
-        },
-        TemplateEffect::Attack { target } => Effect::Attack {
-            initiator: initiator_id,
-            target: convert_template_target(target),
-        },
-        TemplateEffect::Boost { target, attack, hp } => Effect::Boost {
-            initiator: initiator_id,
-            target: convert_template_target(target),
-            attack: *attack,
-            hp: *hp,
-        },
-        TemplateEffect::Summon { side, target } => Effect::Summon {
-            initiator: initiator_id,
-            side: convert_template_player_target(side),
-            target: target.clone(),
-        },
-    }
+    IncreaseMaxMana {
+        player: PlayerTemplateTarget,
+        amount: usize,
+    },
+    RefreshMana {
+        player: PlayerTemplateTarget,
+        amount: usize,
+    },
 }

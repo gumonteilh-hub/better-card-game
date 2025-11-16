@@ -56,7 +56,7 @@ mod tests {
         let target = create_test_monster(&mut game, player_b, 1, 5, 5);
 
         // c) Test: try to attack with monster in hand
-        let result = game.attack(player_a, monster_id, target);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, target);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -85,7 +85,7 @@ mod tests {
         }
 
         // c) Test: try to attack from defense-only position
-        let result = game.attack(player_a, monster_a, monster_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, monster_b);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -119,7 +119,7 @@ mod tests {
         }
 
         // c) Test: try to attack with asleep monster
-        let result = game.attack(player_a, monster_a, monster_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, monster_b);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -149,10 +149,10 @@ mod tests {
         }
 
         // First attack succeeds
-        game.attack(player_a, monster_a, monster_b).unwrap();
+        crate::game::user_actions::attack::attack(&mut game, player_a, monster_a, monster_b).unwrap();
 
         // c) Test: try to attack again
-        let result = game.attack(player_a, monster_a, monster_c);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, monster_c);
 
         // d) Assert the second attack failed
         assert!(result.is_err());
@@ -200,8 +200,8 @@ mod tests {
         let target2 = create_test_monster(&mut game, player_b, 2, 5, 5);
 
         // c) Test: attack twice with Windfury monster
-        let result1 = game.attack(player_a, monster_id, target1);
-        let result2 = game.attack(player_a, monster_id, target2);
+        let result1 = crate::game::user_actions::attack::attack(&mut game, player_a, monster_id, target1);
+        let result2 = crate::game::user_actions::attack::attack(&mut game, player_a, monster_id, target2);
 
         // d) Assert both attacks succeeded
         assert!(result1.is_ok());
@@ -247,11 +247,11 @@ mod tests {
         let target3 = create_test_monster(&mut game, player_b, 4, 5, 5);
 
         // Attack twice (should succeed)
-        game.attack(player_a, monster_id, target1).unwrap();
-        game.attack(player_a, monster_id, target2).unwrap();
+        crate::game::user_actions::attack::attack(&mut game, player_a, monster_id, target1).unwrap();
+        crate::game::user_actions::attack::attack(&mut game, player_a, monster_id, target2).unwrap();
 
         // c) Test: try to attack a third time
-        let result = game.attack(player_a, monster_id, target3);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, target3);
 
         // d) Assert the third attack failed
         assert!(result.is_err());
@@ -278,7 +278,7 @@ mod tests {
         }
 
         // c) Test: try to attack own player
-        let result = game.attack(player_a, monster_a, player_a);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, player_a);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -306,7 +306,7 @@ mod tests {
         }
 
         // c) Test: try to attack own monster
-        let result = game.attack(player_a, monster_a, monster_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, monster_b);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -335,7 +335,7 @@ mod tests {
         }
 
         // c) Test: try to attack enemy player while they have defense
-        let result = game.attack(player_a, monster_a, player_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, player_b);
 
         // d) Assert the attack failed
         assert!(result.is_err());
@@ -363,7 +363,7 @@ mod tests {
         }
 
         // c) Test: attack enemy player (should succeed)
-        let result = game.attack(player_a, monster_a, player_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, player_b);
 
         // d) Assert the attack succeeded
         assert!(result.is_ok());
@@ -388,7 +388,7 @@ mod tests {
         }
 
         // c) Test: attack enemy player (should succeed because enemy has no defense)
-        let result = game.attack(player_a, monster_a, player_b);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_a, player_b);
 
         // d) Assert the attack succeeded
         assert!(result.is_ok());
@@ -423,7 +423,7 @@ mod tests {
         let target = create_test_monster(&mut game, player_b, 1, 5, 5);
 
         // c) Test: try to attack with spell
-        let result = game.attack(player_a, spell_id, target);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, spell_id, target);
 
         // d) Assert the attack failed
         assert!(result.is_err());

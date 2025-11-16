@@ -5,7 +5,7 @@ pub mod events;
 pub mod logic;
 pub mod player;
 pub mod types;
-mod user_actions;
+pub mod user_actions;
 mod utils;
 pub mod view;
 
@@ -14,35 +14,18 @@ mod tests;
 
 use std::collections::{HashMap, VecDeque};
 
+use crate::UserDeck;
 use crate::collection::types::CardTemplate;
 use crate::error::{Error, Result};
 use crate::game::action::Action;
-use crate::game::card::{CardInstance, Keyword};
-use crate::game::effects::{Effect, Target};
+use crate::game::card::CardInstance;
+use crate::game::effects::Effect;
 use crate::game::logic::execute_effect;
 use crate::game::types::Location;
-use crate::{UserDeck, ia};
 
 use self::events::EventManager;
 use self::player::PlayerInstance;
 use self::types::{InstanceId, PlayerId};
-
-pub const DEFENSE_POSITIONS: [usize; 5] = [1, 2, 4, 5, 7];
-pub const ATTACK_POSITIONS: [usize; 5] = [0, 2, 3, 5, 6];
-
-fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
-    match position {
-        0 => Ok(vec![1, 2]),
-        1 => Ok(vec![0, 2]),
-        2 => Ok(vec![0, 1, 3, 4]),
-        3 => Ok(vec![2, 4, 5]),
-        4 => Ok(vec![2, 3, 5]),
-        5 => Ok(vec![3, 4, 6, 7]),
-        6 => Ok(vec![5, 7]),
-        7 => Ok(vec![5, 6]),
-        _ => Err(Error::Game("Invalid starting position".into())),
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct Game {
@@ -132,134 +115,10 @@ impl Game {
         })
     }
 
-    pub fn move_card(
-        &mut self,
-        player: PlayerId,
-        card_id: InstanceId,
-        position: usize,
-    ) -> Result<()> {
-        let card = self
-            .entities
-            .get(&card_id)
-            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?;
-
-        if card.owner != player {
-            return Err(Error::Game("You can only move your monsters".into()));
-        }
-
-        let starting_position = match card.location {
-            Location::Field(pos) => pos,
-            _ => return Err(Error::Game("Card must be on the field".into())),
-        };
-
-        if !get_linked_positions(starting_position)?.contains(&position) {
-            return Err(Error::Game("Target position is not valid".into()));
-        }
-
-        if self
-            .get_field_with_position(card.owner)
-            .contains_key(&position)
-        {
-            return Err(Error::Game("You can't move to a position not empty".into()));
-        }
-
-        if self.get_player(self.current_player)?.move_count == 0 {
-            return Err(Error::Game("You don't have any move left".into()));
-        }
-
-        let owner = self.get_mut_player(self.current_player)?;
-        owner.move_count -= 1;
-
-        let card = self
-            .entities
-            .get_mut(&card_id)
-            .ok_or_else(|| Error::Game(format!("Card with id {} not found", card_id)))?;
-
-        card.location = Location::Field(position);
-
-        Ok(())
-    }
-
-    pub fn play_spell(
-        &mut self,
-        owner: PlayerId,
-        card_id: usize,
-        selected_targets: Option<Vec<InstanceId>>,
-    ) -> Result<()> {
-        user_actions::play_spell::play_spell(self, owner, card_id, selected_targets)?;
-        Ok(())
-    }
-
-    pub fn play_monster(
-        &mut self,
-        owner: PlayerId,
-        card_id: InstanceId,
-        position: usize,
-        selected_targets: Option<Vec<InstanceId>>,
-    ) -> Result<Vec<Action>> {
-        let actions = user_actions::play_monster::play_monster(
-            self,
-            owner,
-            card_id,
-            position,
-            selected_targets,
-        )?;
-        Ok(actions)
-    }
-
-    pub fn end_turn(&mut self, ending_player: PlayerId) -> Result<Vec<Action>> {
-        let mut actions = Vec::new();
-        let starting_player = *self.players.keys().find(|p| **p != ending_player).unwrap();
-
-        actions.push(Action::StartTurn(starting_player));
-        self.current_player = starting_player;
-        self.effect_queue.push_back(Effect::AutoDraw {
-            player: starting_player,
-            amount: 1,
-        });
-
-        let current_player_instance = self.get_mut_player(starting_player)?;
-
-        if current_player_instance.base_mana < 10 {
-            self.effect_queue.push_back(Effect::IncreaseMaxMana {
-                initiator: starting_player,
-                player: effects::PlayerTarget::Player,
-                amount: 1,
-            });
-        }
-
-        let base_mana = self.get_player(self.current_player)?.base_mana;
-        self.effect_queue.push_back(Effect::RefreshMana {
-            initiator: starting_player,
-            player: effects::PlayerTarget::Player,
-            amount: base_mana + 1,
-        });
-
-        self.get_mut_player(starting_player)?.move_count = 3;
-
-        for (_, monster) in self.get_mut_field(starting_player) {
-            match &mut monster.card_type {
-                card::CardTypeInstance::Monster(monster_instance) => {
-                    monster_instance.attack_count = 0;
-                    monster_instance.asleep = false;
-                }
-                card::CardTypeInstance::Spell(spell_instance) => {
-                    return Err(Error::Game("There shouldn't be spell on the field".into()));
-                }
-            }
-        }
-
-        let mut reset_turn_actions = self.compute_commands()?;
-        actions.append(&mut reset_turn_actions);
-
-        if starting_player == self.player_id_b && self.vs_ia {
-            let mut ia_actions = ia::ai_play_turn(self, self.player_id_b)?;
-            actions.append(&mut ia_actions);
-        }
-        Ok(actions)
-    }
-
-    // Pure logic, no checks, checks should be done before pushing a command
+    // compute all the effects in the effect_queue of the game
+    // even the generated effects by other effects are compute
+    // after the method is called, expect the game_state being up to date and the effect queue to
+    // be empty
     pub fn compute_commands(&mut self) -> Result<Vec<Action>> {
         let mut all_actions = Vec::new();
         while let Some(effect) = self.effect_queue.pop_front() {
@@ -268,93 +127,6 @@ impl Game {
         }
 
         Ok(all_actions)
-    }
-
-    pub fn attack(
-        &mut self,
-        player: PlayerId,
-        initiator_id: InstanceId,
-        target_id: InstanceId,
-    ) -> Result<()> {
-        let initiator = self
-            .entities
-            .get(&initiator_id)
-            .ok_or_else(|| Error::Game(format!("Attacker with id {} not found", initiator_id)))?;
-
-        if target_id == 0 || target_id == 1 {
-            if initiator.owner == target_id {
-                return Err(Error::Game("You can't attack your own player".into()));
-            }
-            if self
-                .get_field_with_position(target_id)
-                .iter()
-                .any(|(pos, _)| DEFENSE_POSITIONS.contains(pos))
-            {
-                return Err(Error::Game(
-                    "You can't attack the enemy player if he has a monster in defense".into(),
-                ));
-            }
-        } else {
-            let target = self
-                .entities
-                .get(&target_id)
-                .ok_or_else(|| Error::Game(format!("Target with id {} not found", target_id)))?;
-
-            if initiator.owner == target.owner {
-                return Err(Error::Game("You can't attack your own monster".into()));
-            }
-        }
-        match initiator.location {
-            Location::Field(pos) => {
-                if !ATTACK_POSITIONS.contains(&pos) {
-                    return Err(Error::Game(
-                        "This monster must be on an attack slot to attack".into(),
-                    ));
-                }
-            }
-            _ => {
-                return Err(Error::Game(
-                    "This monster must be on the field to attack".into(),
-                ));
-            }
-        };
-        let initiator = self
-            .entities
-            .get_mut(&initiator_id)
-            .ok_or_else(|| Error::Game(format!("Attacker with id {} not found", initiator_id)))?;
-
-        match &mut initiator.card_type {
-            card::CardTypeInstance::Monster(monster_instance) => {
-                if monster_instance.asleep {
-                    return Err(Error::Game(
-                        "This monster can't attack on his first turn".into(),
-                    ));
-                }
-
-                if monster_instance.keywords.contains(&Keyword::Windfury) {
-                    if monster_instance.attack_count > 1 {
-                        return Err(Error::Game(
-                            "This monster has already attacked this turn".into(),
-                        ));
-                    }
-                } else if monster_instance.attack_count > 0 {
-                    return Err(Error::Game(
-                        "This monster has already attacked this turn".into(),
-                    ));
-                }
-
-                self.effect_queue.push_back(Effect::Attack {
-                    initiator: initiator_id,
-                    target: Target::Id(target_id),
-                });
-                monster_instance.attack_count += 1;
-
-                Ok(())
-            }
-            card::CardTypeInstance::Spell(spell_instance) => {
-                Err(Error::Game("A spell can not attack".into()))
-            }
-        }
     }
 
     pub fn get_opponent(&self, player_id: &PlayerId) -> Result<&PlayerInstance> {
@@ -395,6 +167,9 @@ impl Game {
         Ok(entity)
     }
 
+    /// return the monsters on the field of the player with player_id
+    /// as a map were the key is the position of the field and the value an immutable reference ok
+    /// the monster
     pub fn get_field_with_position(&self, player_id: PlayerId) -> HashMap<usize, &CardInstance> {
         let mut result: HashMap<usize, &CardInstance> = HashMap::new();
 

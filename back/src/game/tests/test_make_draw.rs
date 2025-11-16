@@ -44,7 +44,7 @@ mod tests {
                 amount: 2,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 2);
@@ -75,7 +75,7 @@ mod tests {
                 amount: 12,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -151,7 +151,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -195,7 +195,7 @@ mod tests {
                 amount: 3,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         let hand_size_after = game.get_hand(player_a).len();
@@ -229,7 +229,7 @@ mod tests {
                 amount: 2,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_b).len(), 2);
@@ -268,7 +268,7 @@ mod tests {
                 amount: 5,
             }],
         );
-        game.play_spell(player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 2);

@@ -1,10 +1,11 @@
 use crate::{
     error::{Error, Result},
     game::{
-        ATTACK_POSITIONS, DEFENSE_POSITIONS, Game,
+        Game,
         action::Action,
         card::{Keyword, MonsterInstance},
         types::{InstanceId, PlayerId},
+        user_actions::attack::{ATTACK_POSITIONS, DEFENSE_POSITIONS},
     },
     ia::{
         CREATURE_VALUE_ATK_WEIGHT, CREATURE_VALUE_HP_WEIGHT, FACE_DAMAGE_VALUE, IaBehavior,
@@ -223,7 +224,7 @@ fn execute_greedy_attack_strategy(
 
         match best_attack {
             Some((attacker_id, target_id, _score)) => {
-                game.attack(player_id, attacker_id, target_id)?;
+                crate::game::user_actions::attack::attack(game, player_id, attacker_id, target_id)?;
 
                 let mut actions = game.compute_commands()?;
                 all_actions.append(&mut actions);

@@ -15,6 +15,9 @@ pub fn get_collection() -> Vec<CardTemplate> {
         ECUYER.clone(),
         ARCHER.clone(),
         SACRIFIEUR.clone(),
+        ACCELERATEUR.clone(),
+        SUPER_ACCELERATEUR.clone(),
+        RAFRAICHISSEUR.clone(),
     ]
 }
 
@@ -126,5 +129,65 @@ static SACRIFIEUR: Lazy<CardTemplate> = Lazy::new(|| {
             matcher: TargetMatcherTemplate::Side(Side::Player),
         },
     )
+    .build()
+});
+
+static RAFRAICHISSEUR: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1007,
+        2,
+        "Rafraichisseur de mana",
+        "On play: rafraichis 2 cristaux de mana",
+        4,
+        4,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_play(vec![TemplateEffect::RefreshMana {
+        player: PlayerTemplateTarget::Player,
+        amount: 2,
+    }])
+    .build()
+});
+
+static ACCELERATEUR: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1008,
+        2,
+        "accelerateur de mana",
+        "On play: Gagne 2 cristaux de mana vide",
+        4,
+        4,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_play(vec![TemplateEffect::IncreaseMaxMana {
+        player: PlayerTemplateTarget::Player,
+        amount: 2,
+    }])
+    .build()
+});
+
+static SUPER_ACCELERATEUR: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1009,
+        2,
+        "SUPER accelerateur de mana",
+        "On play: Gagne 2 cristaux de mana pleins",
+        4,
+        4,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_play(vec![
+        TemplateEffect::IncreaseMaxMana {
+            player: PlayerTemplateTarget::Player,
+            amount: 2,
+        },
+        TemplateEffect::RefreshMana {
+            player: PlayerTemplateTarget::Player,
+            amount: 2,
+        },
+    ])
     .build()
 });

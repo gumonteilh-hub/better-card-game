@@ -31,7 +31,7 @@ mod tests {
         );
 
         // c) Test as user would: play the spell to kill opponent
-        game.play_spell(player_a, damage_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, damage_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is at 0 HP and player A won
@@ -101,7 +101,7 @@ mod tests {
         );
 
         // c) Test: deal exact lethal damage
-        game.play_spell(player_a, lethal_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, lethal_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is dead and player A won
@@ -130,7 +130,7 @@ mod tests {
         );
 
         // c) Test: deal overkill damage
-        game.play_spell(player_a, overkill_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, overkill_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is at 0 HP (saturating_sub prevents negative) and player A won
@@ -159,7 +159,7 @@ mod tests {
         );
 
         // c) Test: deal non-lethal damage
-        game.play_spell(player_a, damage_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, damage_spell, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert player B is still alive and no winner yet

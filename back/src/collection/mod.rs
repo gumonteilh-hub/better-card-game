@@ -17,6 +17,7 @@ mod common;
 mod demon;
 mod dragon;
 mod human;
+mod template_converter;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Copy, PartialEq)]
 pub enum Race {

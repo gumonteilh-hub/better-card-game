@@ -40,31 +40,22 @@ pub fn get_collection(archetype: Archetype) -> Vec<CardTemplate> {
     collection::get_collection(archetype)
 }
 
-/// Helper function to append game view updates for both players to the actions vector
-/// This eliminates code duplication across all public game functions
 fn append_game_view_updates(
     game_state: &Game,
     player: PlayerId,
     actions: &mut Vec<Action>,
 ) -> Result<()> {
-    // Create and push game view for the current player
     let player_game_view = PublicGameState::new(game_state, player)?;
     actions.push(Action::UpdateGameView {
         player,
         game: player_game_view,
     });
 
-    // Find the opponent player
-    let opponent = game_state
-        .players
-        .keys()
-        .find(|p| **p != player)
-        .ok_or_else(|| error::Error::Game(format!("Opponent not found for player {:?}", player)))?;
+    let opponent = game_state.get_opponent(&player)?;
 
-    // Create and push game view for the opponent
-    let opponent_game_view = PublicGameState::new(game_state, *opponent)?;
+    let opponent_game_view = PublicGameState::new(game_state, opponent.player_id)?;
     actions.push(Action::UpdateGameView {
-        player: *opponent,
+        player: opponent.player_id,
         game: opponent_game_view,
     });
 
@@ -78,7 +69,13 @@ pub fn play_monster(
     position: usize,
     targets: Option<Vec<InstanceId>>,
 ) -> Result<(Vec<Action>, Game)> {
-    let mut actions = game_state.play_monster(player, card_id, position, targets)?;
+    let mut actions = game::user_actions::play_monster::play_monster(
+        &mut game_state,
+        player,
+        card_id,
+        position,
+        targets,
+    )?;
     let compute_actions = game_state.compute_commands()?;
     actions.extend(compute_actions);
     append_game_view_updates(&game_state, player, &mut actions)?;
@@ -91,14 +88,14 @@ pub fn play_spell(
     card_id: usize,
     targets: Option<Vec<InstanceId>>,
 ) -> Result<(Vec<Action>, Game)> {
-    game_state.play_spell(player, card_id, targets)?;
+    game::user_actions::play_spell::play_spell(&mut game_state, player, card_id, targets)?;
     let mut actions = game_state.compute_commands()?;
     append_game_view_updates(&game_state, player, &mut actions)?;
     Ok((actions, game_state))
 }
 
 pub fn end_turn(mut game_state: Game, player: PlayerId) -> Result<(Vec<Action>, Game)> {
-    let mut actions = game_state.end_turn(player)?;
+    let mut actions = game::user_actions::end_turn::end_turn(&mut game_state, player)?;
     let other_actions = game_state.compute_commands()?;
     actions.extend(other_actions);
     append_game_view_updates(&game_state, player, &mut actions)?;
@@ -111,7 +108,7 @@ pub fn attack(
     initiator: usize,
     target: usize,
 ) -> Result<(Vec<Action>, Game)> {
-    game_state.attack(player, initiator, target)?;
+    game::user_actions::attack::attack(&mut game_state, player, initiator, target)?;
     let mut actions = game_state.compute_commands()?;
     append_game_view_updates(&game_state, player, &mut actions)?;
     Ok((actions, game_state))
@@ -123,7 +120,7 @@ pub fn move_card(
     card_id: usize,
     position: usize,
 ) -> Result<(Vec<Action>, Game)> {
-    game_state.move_card(player, card_id, position)?;
+    game::user_actions::move_card::move_card(&mut game_state, player, card_id, position)?;
     let mut actions = game_state.compute_commands()?;
     append_game_view_updates(&game_state, player, &mut actions)?;
     Ok((actions, game_state))

@@ -2,7 +2,7 @@ use crate::{
     Race,
     collection::{
         Class,
-        types::{CardTemplate, CardTypeTemplate, PlayTarget, TemplateId, convert_to_effect},
+        types::{CardTemplate, CardTypeTemplate, PlayTarget, TemplateId},
     },
     game::effects::Effect,
 };
@@ -80,30 +80,26 @@ impl CardInstance {
                     keywords: monster_template.keywords.clone(),
                     on_play: monster_template
                         .on_play
-                        .clone()
                         .iter()
-                        .map(|e| convert_to_effect(e, entity_id))
+                        .map(|e| e.clone().convert(entity_id))
                         .collect(),
                     on_attack: monster_template
                         .on_attack
-                        .clone()
                         .iter()
-                        .map(|e| convert_to_effect(e, entity_id))
+                        .map(|e| e.clone().convert(entity_id))
                         .collect(),
                     on_death: monster_template
                         .on_death
-                        .clone()
                         .iter()
-                        .map(|e| convert_to_effect(e, entity_id))
+                        .map(|e| e.clone().convert(entity_id))
                         .collect(),
                 })
             }
             CardTypeTemplate::Spell(spell_template) => CardTypeInstance::Spell(SpellInstance {
                 effect: spell_template
                     .effect
-                    .clone()
                     .iter()
-                    .map(|e| convert_to_effect(e, entity_id))
+                    .map(|e| e.clone().convert(entity_id))
                     .collect(),
             }),
         };

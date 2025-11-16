@@ -31,7 +31,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test as user would: summon the monster with Charge
-        game.play_monster(player_a, monster_id, 0, None).unwrap();
+        crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         // d) Assert the monster is NOT asleep
@@ -61,7 +61,7 @@ mod tests {
 
         // Give player enough mana and summon
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.play_monster(player_a, monster_with_charge, 0, None).unwrap();
+        crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_with_charge, 0, None).unwrap();
         game.compute_commands().unwrap();
 
         // Verify monster is on field and not asleep
@@ -71,7 +71,7 @@ mod tests {
         );
 
         // c) Test: attack immediately with the just-summoned monster
-        let result = game.attack(player_a, monster_with_charge, enemy_monster);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_with_charge, enemy_monster);
 
         // d) Assert the attack succeeded (no error)
         assert!(result.is_ok());
@@ -130,11 +130,11 @@ mod tests {
 
         // c) Test: attack twice with Windfury monster
         // First attack
-        game.attack(player_a, monster_id, enemy_1).unwrap();
+        crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, enemy_1).unwrap();
         game.compute_commands().unwrap();
 
         // Second attack
-        let result = game.attack(player_a, monster_id, enemy_2);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, enemy_2);
 
         // d) Assert both attacks succeeded
         assert!(result.is_ok());
@@ -190,7 +190,7 @@ mod tests {
         let enemy = create_test_monster_with_attack(&mut game, player_b, 1, 2, 10, 10);
 
         // c) Test: try to attack a third time
-        let result = game.attack(player_a, monster_id, enemy);
+        let result = crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, enemy);
 
         // d) Assert the third attack failed
         assert!(result.is_err());
@@ -242,7 +242,7 @@ mod tests {
         let enemy = create_test_monster_with_attack(&mut game, player_b, 1, 2, 10, 10);
 
         // c) Test: perform first attack and check counter
-        game.attack(player_a, monster_id, enemy).unwrap();
+        crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, enemy).unwrap();
 
         // d) Assert attack_count incremented to 1
         if let CardTypeInstance::Monster(monster) =
@@ -254,7 +254,7 @@ mod tests {
         game.compute_commands().unwrap();
 
         // Perform second attack
-        game.attack(player_a, monster_id, enemy).unwrap();
+        crate::game::user_actions::attack::attack(&mut game,player_a, monster_id, enemy).unwrap();
 
         // Assert attack_count incremented to 2
         if let CardTypeInstance::Monster(monster) =

@@ -47,7 +47,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to play spell from deck
-        let result = game.play_spell(player_a, spell_id, None);
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None);
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -91,7 +91,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 3; // Only 3 mana
 
         // c) Test: try to play expensive spell without enough mana
-        let result = game.play_spell(player_a, spell_id, None);
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None);
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -126,7 +126,7 @@ mod tests {
         assert_eq!(game.players.get(&player_a).unwrap().mana, 5);
 
         // c) Test: play the spell
-        game.play_spell(player_a, spell_id, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None).unwrap();
 
         // d) Assert mana was consumed (5 - 3 = 2)
         assert_eq!(game.players.get(&player_a).unwrap().mana, 2);
@@ -145,7 +145,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to cast monster as spell
-        let result = game.play_spell(player_a, monster_id, None);
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, monster_id, None);
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -185,7 +185,7 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the spell
-        game.play_spell(player_a, spell_id, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None).unwrap();
 
         // d) Assert effects were queued (2 effects)
         assert_eq!(game.effect_queue.len(), 2);
@@ -236,7 +236,7 @@ mod tests {
         );
 
         // c) Test: play the spell
-        game.play_spell(player_a, spell_id, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None).unwrap();
 
         // d) Assert spell went to graveyard
         assert_eq!(
@@ -294,7 +294,7 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the spell with targets
-        game.play_spell(
+        crate::game::user_actions::play_spell::play_spell(&mut game,
             player_a,
             spell_id,
             Some(vec![enemy_monster_1, enemy_monster_2]),
@@ -363,7 +363,7 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the spell without providing targets
-        game.play_spell(player_a, spell_id, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, None).unwrap();
 
         // d) Assert spell went to graveyard
         assert_eq!(
@@ -405,7 +405,7 @@ mod tests {
         let enemy_monster = create_test_monster(&mut game, player_b, 0, 3, 5);
 
         // c) Test: try to play the spell with targets (should fail or ignore)
-        let result = game.play_spell(player_a, spell_id, Some(vec![enemy_monster]));
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, Some(vec![enemy_monster]));
 
         // d) Assert: This should either fail with an error or succeed by ignoring the targets
         // Based on the code, it should succeed and ignore the targets
@@ -462,7 +462,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to play the spell targeting a friendly monster (should fail)
-        let result = game.play_spell(player_a, spell_id, Some(vec![friendly_monster]));
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, Some(vec![friendly_monster]));
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -518,7 +518,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: play the spell with exactly 2 targets (strict requirement)
-        let result = game.play_spell(
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,
             player_a,
             spell_id,
             Some(vec![enemy_monster_1, enemy_monster_2]),
@@ -589,7 +589,7 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: play the spell with only 1 target (should fail because strict requires exactly 2)
-        let result = game.play_spell(player_a, spell_id, Some(vec![enemy_monster_1]));
+        let result = crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell_id, Some(vec![enemy_monster_1]));
 
         // d) Assert the play failed with the correct error message
         assert!(result.is_err());

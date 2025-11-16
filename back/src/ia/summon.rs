@@ -37,7 +37,7 @@ pub fn summon_max_cards(game_state: &mut Game, player_id: PlayerId) -> Result<Ve
         free_positions.sort_by_key(|&pos| (pos as i32 - 3).abs());
 
         for (card_id, &position) in cards_to_play.iter().zip(&free_positions) {
-            let summon_actions = game_state.play_monster(player_id, *card_id, position, None)?;
+            let summon_actions = crate::game::user_actions::play_monster::play_monster(game_state, player_id, *card_id, position, None)?;
             let on_play_actions = game_state.compute_commands()?;
 
             actions.extend(summon_actions);

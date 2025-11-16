@@ -20,6 +20,8 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 			return applyIncreaseMaxMana(state, action);
 		case "RefreshMana":
 			return applyRefreshMana(state, action);
+		case "SetAbsoluteMaxMana":
+			return applySetAbsoluteMaxMana(state, action);
 		case "Win":
 			return applyWin(state, action);
 		case "Boost":
@@ -316,6 +318,29 @@ function applyRefreshMana(
 			enemy: {
 				...state.enemy,
 				currentMana: state.enemy.currentMana + action.value.amount,
+			},
+		};
+	}
+}
+
+function applySetAbsoluteMaxMana(
+	state: IGameState,
+	action: Extract<IAction, { type: "SetAbsoluteMaxMana" }>,
+): IGameState {
+	if (action.value.player === state.player.hero.id) {
+		return {
+			...state,
+			player: {
+				...state.player,
+				absoluteMaxMana: action.value.amount,
+			},
+		};
+	} else {
+		return {
+			...state,
+			enemy: {
+				...state.enemy,
+				absoluteMaxMana: action.value.amount,
 			},
 		};
 	}

@@ -79,6 +79,15 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
                 mana::compute_refresh_mana(context, initiator, player, amount)?;
             actions.extend(refresh_mana_actions);
         }
+        Effect::SetAbsoluteMaxMana {
+            initiator,
+            player,
+            amount,
+        } => {
+            let set_absolute_max_mana_actions =
+                mana::compute_set_absolute_max_mana(context, initiator, player, amount)?;
+            actions.extend(set_absolute_max_mana_actions);
+        }
         Effect::Boost {
             initiator,
             attack,

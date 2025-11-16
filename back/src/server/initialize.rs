@@ -246,6 +246,7 @@ pub async fn game_task(
                         }
                         Action::Boost { .. }
                         | Action::IncreaseMaxMana { .. }
+                        | Action::SetAbsoluteMaxMana { .. }
                         | Action::BurnCard { .. }
                         | Action::Heal { .. }
                         | Action::Destroy { .. }

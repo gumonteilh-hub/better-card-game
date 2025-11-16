@@ -24,6 +24,10 @@ pub enum Action {
         player: PlayerId,
         amount: usize,
     },
+    SetAbsoluteMaxMana {
+        player: PlayerId,
+        amount: usize,
+    },
     BurnCard {
         player: PlayerId,
         card: InstanceId,

@@ -105,6 +105,11 @@ pub fn update_effect_initiator(effect: Effect, initiator_id: usize) -> Effect {
             player,
             amount,
         },
+        Effect::SetAbsoluteMaxMana { player, amount, .. } => Effect::SetAbsoluteMaxMana {
+            initiator: initiator_id,
+            player,
+            amount,
+        },
         Effect::Attack { initiator, target } => Effect::Attack {
             initiator: initiator_id,
             target,

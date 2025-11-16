@@ -79,6 +79,11 @@ impl TemplateEffect {
                 player: player.convert(),
                 amount,
             },
+            Self::SetAbsoluteMaxMana { player, amount } => Effect::SetAbsoluteMaxMana {
+                initiator: initiator_id,
+                player: player.convert(),
+                amount,
+            },
         }
     }
 }

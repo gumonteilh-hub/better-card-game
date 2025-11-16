@@ -155,10 +155,10 @@ pub mod tests {
         let mut game = create_test_game();
 
         // Modify player mana
-        game.players.get_mut(&0).unwrap().base_mana = 5;
+        game.players.get_mut(&0).unwrap().max_mana = 5;
         game.players.get_mut(&0).unwrap().mana = 3; // Player A has spent 2 mana
 
-        game.players.get_mut(&1).unwrap().base_mana = 7;
+        game.players.get_mut(&1).unwrap().max_mana = 7;
         game.players.get_mut(&1).unwrap().mana = 7; // Player B has full mana
 
         // Create public view for player A

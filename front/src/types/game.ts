@@ -28,6 +28,7 @@ export interface IPlayerInfo {
 	secretCard?: ICardInstance;
 	field: Record<number, ICardInstance>;
 	maxMana: number;
+	absoluteMaxMana: number;
 	currentMana: number;
 	moveCount: number;
 	maxMove: number;
@@ -40,6 +41,7 @@ export interface IEnemyInfo {
 	secretCard: boolean;
 	field: Record<number, ICardInstance>;
 	maxMana: number;
+	absoluteMaxMana: number;
 	currentMana: number;
 	hand: number;
 	hero: IHeroInfo;

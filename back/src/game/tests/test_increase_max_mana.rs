@@ -1,6 +1,6 @@
 // FUNCTIONAL RULES: IncreaseMaxMana Effect
 //
-// 1. Permanently increases player's maximum mana (base_mana)
+// 1. Permanently increases player's maximum mana (max_mana)
 // 2. Current mana may not increase immediately
 // 3. Can target self or opponent player
 
@@ -10,11 +10,11 @@ mod tests {
     use crate::game::effects::{Effect, PlayerTarget};
 
     #[test]
-    fn test_increases_base_mana_permanently() {
+    fn test_increases_max_mana_permanently() {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 5;
+        game.players.get_mut(&player_a).unwrap().max_mana = 5;
 
         let spell = create_test_spell(
             &mut game,
@@ -28,7 +28,7 @@ mod tests {
         crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 8);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 8);
     }
 
     #[test]
@@ -36,7 +36,7 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 10;
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
         game.players.get_mut(&player_a).unwrap().mana = 3;
 
         let spell = create_test_spell(
@@ -51,7 +51,7 @@ mod tests {
         crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 12);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 12);
         assert_eq!(game.players.get(&player_a).unwrap().mana, 3);
     }
 
@@ -61,8 +61,8 @@ mod tests {
         let player_a = game.player_id_a;
         let player_b = game.player_id_b;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 5;
-        game.players.get_mut(&player_b).unwrap().base_mana = 5;
+        game.players.get_mut(&player_a).unwrap().max_mana = 5;
+        game.players.get_mut(&player_b).unwrap().max_mana = 5;
 
         let spell = create_test_spell(
             &mut game,
@@ -76,8 +76,8 @@ mod tests {
         crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 8);
-        assert_eq!(game.players.get(&player_b).unwrap().base_mana, 5);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 8);
+        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 5);
     }
 
     #[test]
@@ -86,8 +86,8 @@ mod tests {
         let player_a = game.player_id_a;
         let player_b = game.player_id_b;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 5;
-        game.players.get_mut(&player_b).unwrap().base_mana = 5;
+        game.players.get_mut(&player_a).unwrap().max_mana = 5;
+        game.players.get_mut(&player_b).unwrap().max_mana = 5;
 
         let spell = create_test_spell(
             &mut game,
@@ -101,8 +101,8 @@ mod tests {
         crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell, None).unwrap();
         game.compute_commands().unwrap();
 
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 5);
-        assert_eq!(game.players.get(&player_b).unwrap().base_mana, 8);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 5);
+        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 8);
     }
 
     #[test]
@@ -110,7 +110,7 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 5;
+        game.players.get_mut(&player_a).unwrap().max_mana = 5;
 
         let spell1 = create_test_spell(
             &mut game,
@@ -136,6 +136,6 @@ mod tests {
         crate::game::user_actions::play_spell::play_spell(&mut game,player_a, spell2, None).unwrap();
         game.compute_commands().unwrap();
 
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 9);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 9);
     }
 }

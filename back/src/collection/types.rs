@@ -148,4 +148,8 @@ pub enum TemplateEffect {
         player: PlayerTemplateTarget,
         amount: usize,
     },
+    SetAbsoluteMaxMana {
+        player: PlayerTemplateTarget,
+        amount: usize,
+    },
 }

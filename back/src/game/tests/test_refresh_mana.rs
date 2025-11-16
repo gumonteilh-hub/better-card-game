@@ -1,9 +1,9 @@
 // FUNCTIONAL RULES: RefreshMana Effect
 //
-// 1. Restores available mana up to player's base_mana maximum
-// 2. Cannot exceed base_mana (excess is wasted)
+// 1. Restores available mana up to player's max_mana maximum
+// 2. Cannot exceed max_mana (excess is wasted)
 // 3. Can target self or opponent player
-// 4. Multiple refreshes in one turn stack (still capped at base_mana)
+// 4. Multiple refreshes in one turn stack (still capped at max_mana)
 
 #[cfg(test)]
 mod tests {
@@ -15,7 +15,7 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 10;
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
         game.players.get_mut(&player_a).unwrap().mana = 3;
 
         let refresh_spell = create_test_spell(
@@ -31,15 +31,15 @@ mod tests {
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 8);
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 10);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 10);
     }
 
     #[test]
-    fn test_refresh_mana_cannot_exceed_base_mana() {
+    fn test_refresh_mana_cannot_exceed_max_mana() {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 10;
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
         game.players.get_mut(&player_a).unwrap().mana = 7;
 
         let refresh_spell = create_test_spell(
@@ -55,7 +55,7 @@ mod tests {
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 10);
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 10);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 10);
     }
 
     #[test]
@@ -65,7 +65,7 @@ mod tests {
         let player_b = game.player_id_b;
 
         game.players.get_mut(&player_a).unwrap().mana = 5;
-        game.players.get_mut(&player_b).unwrap().base_mana = 8;
+        game.players.get_mut(&player_b).unwrap().max_mana = 8;
         game.players.get_mut(&player_b).unwrap().mana = 2;
 
         let refresh_spell = create_test_spell(
@@ -85,11 +85,11 @@ mod tests {
     }
 
     #[test]
-    fn test_multiple_refreshes_stack_capped_at_base_mana() {
+    fn test_multiple_refreshes_stack_capped_at_max_mana() {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 10;
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
         game.players.get_mut(&player_a).unwrap().mana = 2;
 
         let multi_refresh_spell = create_test_spell(
@@ -117,7 +117,7 @@ mod tests {
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 10);
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 10);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 10);
     }
 
     #[test]
@@ -125,7 +125,7 @@ mod tests {
         let mut game = create_test_game();
         let player_a = game.player_id_a;
 
-        game.players.get_mut(&player_a).unwrap().base_mana = 7;
+        game.players.get_mut(&player_a).unwrap().max_mana = 7;
         game.players.get_mut(&player_a).unwrap().mana = 0;
 
         let refresh_spell = create_test_spell(
@@ -141,6 +141,6 @@ mod tests {
         game.compute_commands().unwrap();
 
         assert_eq!(game.players.get(&player_a).unwrap().mana, 7);
-        assert_eq!(game.players.get(&player_a).unwrap().base_mana, 7);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 7);
     }
 }

@@ -48,6 +48,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: None,
         };
@@ -191,6 +193,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: None,
         };
@@ -237,6 +241,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: None,
         };

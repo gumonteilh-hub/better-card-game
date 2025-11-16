@@ -41,6 +41,9 @@ mod test_move;
 mod test_keywords;
 
 #[cfg(test)]
+mod test_positional_effects;
+
+#[cfg(test)]
 mod test_end_turn;
 
 #[cfg(test)]

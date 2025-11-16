@@ -1,10 +1,13 @@
 use crate::{
     Game,
     error::{Error, Result},
-    game::types::{InstanceId, Location, PlayerId},
+    game::{
+        action::Action,
+        types::{InstanceId, Location, PlayerId},
+    },
 };
 
-fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
+pub(crate) fn get_linked_positions(position: usize) -> Result<Vec<usize>> {
     match position {
         0 => Ok(vec![1, 2]),
         1 => Ok(vec![0, 2]),
@@ -23,7 +26,7 @@ pub fn move_card(
     player: PlayerId,
     card_id: InstanceId,
     position: usize,
-) -> Result<()> {
+) -> Result<Vec<Action>> {
     let card = context
         .entities
         .get(&card_id)
@@ -63,5 +66,7 @@ pub fn move_card(
 
     card.location = Location::Field(position);
 
-    Ok(())
+    let positional_actions = crate::game::logic::trigger_positional_effects(context)?;
+
+    Ok(positional_actions)
 }

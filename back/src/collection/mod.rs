@@ -12,12 +12,12 @@ pub use common::get_ia_deck;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-pub mod types;
 mod common;
 mod demon;
 mod dragon;
 mod human;
 mod template_converter;
+pub mod types;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Copy, PartialEq)]
 pub enum Race {
@@ -152,6 +152,8 @@ struct MonsterTemplateBuilder {
     on_play: Vec<TemplateEffect>,
     on_attack: Vec<TemplateEffect>,
     on_death: Vec<TemplateEffect>,
+    on_alone: Vec<TemplateEffect>,
+    on_surrounded: Vec<TemplateEffect>,
     race: Race,
     class: Class,
     play_target: Option<PlayTargetTemplate>,
@@ -178,6 +180,8 @@ impl MonsterTemplateBuilder {
             on_attack: vec![],
             on_play: vec![],
             on_death: vec![],
+            on_alone: vec![],
+            on_surrounded: vec![],
             play_target: None,
             race,
             class,
@@ -186,6 +190,16 @@ impl MonsterTemplateBuilder {
 
     fn keywords(mut self, keywords: Vec<Keyword>) -> MonsterTemplateBuilder {
         self.keywords = keywords;
+        self
+    }
+
+    fn on_alone(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_alone = effects;
+        self
+    }
+
+    fn on_surrounded(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_surrounded = effects;
         self
     }
 
@@ -230,6 +244,8 @@ impl MonsterTemplateBuilder {
                 on_play: self.on_play,
                 on_attack: self.on_attack,
                 on_death: self.on_death,
+                on_alone: self.on_alone,
+                on_surrounded: self.on_surrounded,
             }),
         }
     }

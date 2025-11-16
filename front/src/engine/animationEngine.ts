@@ -19,6 +19,8 @@ export const getAnimationDuration = (actionType: ActionType): number => {
 		case "TriggerOnDeath":
 		case "TriggerOnPlay":
 		case "TriggerOnAttack":
+		case "TriggerOnSurrounded":
+		case "TriggerOnAlone":
 			return 600;
 		case "IncreaseMaxMana":
 		case "RefreshMana":
@@ -45,6 +47,8 @@ export type AnimationState =
 	| "drawed"
 	| "triggerOnDeath"
 	| "triggerOnPlay"
+	| "triggerOnAlone"
+	| "triggerOnSurrounded"
 	| "triggerOnAttack";
 
 export const computeAnimationState = (
@@ -107,6 +111,14 @@ export const computeAnimationState = (
 			}
 			case "TriggerOnAttack": {
 				animationMap.set(action.value, "triggerOnAttack");
+				break;
+			}
+			case "TriggerOnAlone": {
+				animationMap.set(action.value, "triggerOnAlone");
+				break;
+			}
+			case "TriggerOnSurrounded": {
+				animationMap.set(action.value, "triggerOnSurrounded");
 				break;
 			}
 			case "BurnCard":

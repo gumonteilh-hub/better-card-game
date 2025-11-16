@@ -59,6 +59,8 @@ pub enum Action {
     TriggerOnDeath(InstanceId),
     TriggerOnPlay(InstanceId),
     TriggerOnAttack(InstanceId),
+    TriggerOnSurrounded(InstanceId),
+    TriggerOnAlone(InstanceId),
     Win(PlayerId),
     UpdateGameView {
         player: PlayerId,

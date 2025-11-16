@@ -67,6 +67,7 @@ export const useGameEngine = (userId: string, gameId: string) => {
 
 			switch (action.type) {
 				case "action": {
+					console.log(action);
 					setActionQueue((prev) => [...prev, action.value]);
 					break;
 				}

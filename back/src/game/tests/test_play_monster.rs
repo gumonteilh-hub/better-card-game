@@ -48,6 +48,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: None,
         };
@@ -96,6 +98,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: None,
         };
@@ -262,6 +266,8 @@ mod tests {
                 }],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -341,6 +347,8 @@ mod tests {
                 }],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -441,6 +449,8 @@ mod tests {
                 }],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -505,6 +515,8 @@ mod tests {
                 }],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: true,
@@ -585,6 +597,8 @@ mod tests {
                 }],
                 on_attack: vec![],
                 on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: true,

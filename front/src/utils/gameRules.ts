@@ -15,8 +15,6 @@ export const isValidTarget = (
 	card: ICardInstance,
 	cardWithTarget: ICardWithTarget | undefined,
 ) => {
-	console.log({ card });
-	console.log({ cardWithTarget });
 	if (!cardWithTarget) return false;
 
 	const matcher = cardWithTarget.target.matcher;

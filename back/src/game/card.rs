@@ -54,12 +54,11 @@ pub struct MonsterInstance {
     pub asleep: bool,
     pub attack_count: usize,
     pub keywords: Vec<Keyword>,
-    #[serde(default)]
     pub on_play: Vec<Effect>,
-    #[serde(default)]
     pub on_attack: Vec<Effect>,
-    #[serde(default)]
     pub on_death: Vec<Effect>,
+    pub on_surrounded: Vec<Effect>,
+    pub on_alone: Vec<Effect>,
 }
 
 impl CardInstance {
@@ -90,6 +89,16 @@ impl CardInstance {
                         .collect(),
                     on_death: monster_template
                         .on_death
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+                    on_surrounded: monster_template
+                        .on_surrounded
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+                    on_alone: monster_template
+                        .on_alone
                         .iter()
                         .map(|e| e.clone().convert(entity_id))
                         .collect(),

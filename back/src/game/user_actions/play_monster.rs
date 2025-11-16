@@ -96,6 +96,9 @@ pub fn play_monster(
         context.effect_queue.extend(on_play_effect);
     }
 
+    let positional_actions = crate::game::logic::trigger_positional_effects(context)?;
+    actions.extend(positional_actions);
+
     Ok(actions)
 }
 

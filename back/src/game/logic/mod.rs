@@ -8,15 +8,15 @@ use crate::{
     },
 };
 
-mod summon;
-mod draw;
+mod attack;
+mod boost;
 mod damage;
 mod destroy;
+mod draw;
 mod heal;
-mod attack;
-mod win;
 mod mana;
-mod boost;
+mod summon;
+mod win;
 
 pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>> {
     let mut actions: Vec<Action> = Vec::new();
@@ -144,6 +144,75 @@ pub(super) fn resolve_target_player_only(
         _ => vec![], // Not a player target
     };
     Ok(targets)
+}
+
+pub(super) fn trigger_positional_effects(context: &mut Game) -> Result<Vec<Action>> {
+    use crate::game::card::CardTypeInstance;
+    use crate::game::user_actions::move_card::get_linked_positions;
+    let mut actions = Vec::new();
+
+    let mut alone_cards_to_trigger: Vec<InstanceId> = Vec::new();
+    let mut surronded_cards_to_trigger: Vec<InstanceId> = Vec::new();
+
+    for (id, entity) in context.entities.iter() {
+        if let Location::Field(position) = entity.location
+            && let CardTypeInstance::Monster(monster_instance) = &entity.card_type
+        {
+            if !monster_instance.on_alone.is_empty() {
+                let linked_positions = get_linked_positions(position)?;
+                let field = context.get_field_with_position(entity.owner);
+
+                let mut alone = true;
+                for linked_position in &linked_positions {
+                    if field.contains_key(linked_position) {
+                        alone = false;
+                        break;
+                    }
+                }
+                if alone {
+                    alone_cards_to_trigger.push(*id);
+                }
+            }
+
+            if !monster_instance.on_surrounded.is_empty() {
+                let linked_positions = get_linked_positions(position)?;
+                let field = context.get_field_with_position(entity.owner);
+
+                let mut surrounded = true;
+                for linked_position in &linked_positions {
+                    if !field.contains_key(linked_position) {
+                        surrounded = false;
+                        break;
+                    }
+                }
+                if surrounded {
+                    surronded_cards_to_trigger.push(*id);
+                }
+            }
+        }
+    }
+
+    let mut effects_to_compute: Vec<Effect> = Vec::new();
+
+    for id in surronded_cards_to_trigger {
+        let entity_mut = context.get_mut_entity(id)?;
+        if let CardTypeInstance::Monster(ref mut m) = entity_mut.card_type {
+            actions.push(Action::TriggerOnSurrounded(id));
+            effects_to_compute.append(&mut m.on_surrounded);
+        }
+    }
+
+    for id in alone_cards_to_trigger {
+        let entity_mut = context.get_mut_entity(id)?;
+        if let CardTypeInstance::Monster(ref mut m) = entity_mut.card_type {
+            actions.push(Action::TriggerOnAlone(id));
+            effects_to_compute.append(&mut m.on_alone);
+        }
+    }
+
+    context.effect_queue.extend(effects_to_compute);
+
+    Ok(actions)
 }
 
 pub(super) fn resolve_player_target(

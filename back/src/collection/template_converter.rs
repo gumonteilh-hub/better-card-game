@@ -38,12 +38,12 @@ impl TemplateEffect {
             TemplateEffect::MakeDraw { player, amount } => Effect::MakeDraw {
                 initiator: initiator_id,
                 player: player.convert(),
-                amount: amount,
+                amount,
             },
             TemplateEffect::Heal { target, amount } => Effect::Heal {
                 initiator: initiator_id,
                 target: target.convert(),
-                amount: amount,
+                amount,
             },
             TemplateEffect::Destroy { target } => Effect::Destroy {
                 initiator: initiator_id,
@@ -52,7 +52,7 @@ impl TemplateEffect {
             TemplateEffect::DealDamage { target, amount } => Effect::DealDamage {
                 initiator: initiator_id,
                 target: target.convert(),
-                amount: amount,
+                amount,
             },
             TemplateEffect::Attack { target } => Effect::Attack {
                 initiator: initiator_id,
@@ -61,8 +61,8 @@ impl TemplateEffect {
             TemplateEffect::Boost { target, attack, hp } => Effect::Boost {
                 initiator: initiator_id,
                 target: target.convert(),
-                attack: attack,
-                hp: hp,
+                attack,
+                hp,
             },
             TemplateEffect::Summon { side, target } => Effect::Summon {
                 initiator: initiator_id,

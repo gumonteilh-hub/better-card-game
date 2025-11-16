@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::too_many_arguments)]
 
 pub use crate::collection::Race;
 pub use crate::game::Game;
@@ -120,8 +122,10 @@ pub fn move_card(
     card_id: usize,
     position: usize,
 ) -> Result<(Vec<Action>, Game)> {
-    game::user_actions::move_card::move_card(&mut game_state, player, card_id, position)?;
-    let mut actions = game_state.compute_commands()?;
+    let mut actions =
+        game::user_actions::move_card::move_card(&mut game_state, player, card_id, position)?;
+    let compute_actions = game_state.compute_commands()?;
+    actions.extend(compute_actions);
     append_game_view_updates(&game_state, player, &mut actions)?;
     Ok((actions, game_state))
 }

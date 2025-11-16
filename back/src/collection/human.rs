@@ -18,6 +18,8 @@ pub fn get_collection() -> Vec<CardTemplate> {
         ACCELERATEUR.clone(),
         SUPER_ACCELERATEUR.clone(),
         RAFRAICHISSEUR.clone(),
+        ALONE.clone(),
+        SURROUNDED.clone(),
     ]
 }
 
@@ -189,5 +191,35 @@ static SUPER_ACCELERATEUR: Lazy<CardTemplate> = Lazy::new(|| {
             amount: 2,
         },
     ])
+    .build()
+});
+
+static ALONE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1011,
+        2,
+        "Solitaire",
+        "seul: Gagne 2 cristaux de mana pleins",
+        4,
+        4,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_alone(vec![boost(TemplateTarget::ItSelf, 3, 3)])
+    .build()
+});
+
+static SURROUNDED: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1010,
+        3,
+        "Entouré",
+        "entouré: +3/+3",
+        3,
+        3,
+        Race::HUMAN,
+        Class::COMMON,
+    )
+    .on_surrounded(vec![boost(TemplateTarget::ItSelf, 3, 3)])
     .build()
 });

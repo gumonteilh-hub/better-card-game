@@ -42,6 +42,10 @@ pub fn compute(
             }
         }
     }
+
+    let positional_actions = super::trigger_positional_effects(context)?;
+    actions.extend(positional_actions);
+
     Ok(actions)
 }
 
@@ -71,6 +75,8 @@ mod tests {
                 on_play: vec![],
                 on_attack: vec![],
                 on_death: vec![],
+                on_alone: vec![],
+                on_surrounded: vec![],
             }),
         }
     }

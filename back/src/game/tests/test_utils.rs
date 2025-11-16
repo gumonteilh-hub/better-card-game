@@ -152,6 +152,8 @@ pub fn create_test_monster(
             on_play: vec![],
             on_attack: vec![],
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(monster_id, monster);
@@ -188,6 +190,8 @@ pub fn create_test_monster_in_hand(
             on_play,
             on_attack: vec![],
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(monster_id, monster);
@@ -230,6 +234,8 @@ pub fn create_test_monster_with_on_death(
             on_play: vec![],
             on_attack: vec![],
             on_death,
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(monster_id, monster);
@@ -266,6 +272,8 @@ pub fn create_test_monster_with_attack(
             on_play: vec![],
             on_attack: vec![],
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(monster_id, monster);
@@ -308,6 +316,8 @@ pub fn create_test_monster_with_on_attack(
             on_play: vec![],
             on_attack,
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(monster_id, monster);
@@ -337,6 +347,8 @@ pub fn add_card_to_deck(game: &mut Game, owner: usize) -> usize {
             on_play: vec![],
             on_attack: vec![],
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(card_id, card);
@@ -366,6 +378,8 @@ pub fn add_card_to_hand(game: &mut Game, owner: usize) -> usize {
             on_play: vec![],
             on_attack: vec![],
             on_death: vec![],
+            on_surrounded: vec![],
+            on_alone: vec![],
         }),
     };
     game.entities.insert(card_id, card);

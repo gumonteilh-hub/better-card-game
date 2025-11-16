@@ -12,6 +12,8 @@ export type IAction =
 	| TriggerOnAttackAction
 	| TriggerOnPlayAction
 	| TriggerOnDeathAction
+	| TriggerOnSurroundedAction
+	| TriggerOnAloneAction
 	| RefreshManaAction
 	| BoostAction
 	| UpdateGameViewAction
@@ -31,6 +33,8 @@ export type ActionType =
 	| "TriggerOnDeath"
 	| "TriggerOnPlay"
 	| "TriggerOnAttack"
+	| "TriggerOnSurrounded"
+	| "TriggerOnAlone"
 	| "IncreaseMaxMana"
 	| "Boost"
 	| "StartTurn"
@@ -144,6 +148,15 @@ type TriggerOnAttackAction = {
 	value: EntityId;
 };
 
+type TriggerOnAloneAction = {
+	type: "TriggerOnAlone";
+	value: EntityId;
+};
+
+type TriggerOnSurroundedAction = {
+	type: "TriggerOnSurrounded";
+	value: EntityId;
+};
 type IncreaseMaxManaAction = {
 	type: "IncreaseMaxMana";
 	value: {

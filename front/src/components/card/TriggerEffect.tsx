@@ -1,11 +1,13 @@
 import { AnimatePresence, motion, type Variants } from "framer-motion";
+import onAlone from "../../assets/on_alone.svg";
 import onAttack from "../../assets/on_attack.svg";
 import onDeath from "../../assets/on_death.svg";
 import onPlay from "../../assets/on_play.svg";
+import onSurrounded from "../../assets/on_surrounded.svg";
 import styles from "./TriggerEffect.module.css";
 
 interface TriggerEffectProps {
-	type: "onDeath" | "onPlay" | "onAttack" | null;
+	type: "onDeath" | "onPlay" | "onAttack" | "onAlone" | "onSurrounded" | null;
 }
 
 const overlayVariants: Variants = {
@@ -59,6 +61,22 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 						className={styles.triggerEffectImage}
 						src={onAttack}
 						alt="onAttack"
+					/>
+				);
+			case "onAlone":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onAlone}
+						alt="onAlone"
+					/>
+				);
+			case "onSurrounded":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onSurrounded}
+						alt="onSurrounded"
 					/>
 				);
 			default:

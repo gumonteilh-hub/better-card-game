@@ -30,6 +30,11 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 				return "onPlay";
 			case "triggerOnAttack":
 				return "onAttack";
+			case "triggerOnAlone":
+				return "onAlone";
+			case "triggerOnSurrounded":
+				return "onSurrounded";
+
 			default:
 				return null;
 		}

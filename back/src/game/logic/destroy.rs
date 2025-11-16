@@ -32,5 +32,8 @@ pub fn compute(
         }
     }
 
+    let positional_actions = super::trigger_positional_effects(context)?;
+    actions.extend(positional_actions);
+
     Ok(actions)
 }

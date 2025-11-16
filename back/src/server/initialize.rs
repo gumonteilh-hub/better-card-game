@@ -255,6 +255,8 @@ pub async fn game_task(
                         | Action::TriggerOnPlay { .. }
                         | Action::TriggerOnDeath { .. }
                         | Action::TriggerOnAttack { .. }
+                        | Action::TriggerOnAlone { .. }
+                        | Action::TriggerOnSurrounded { .. }
                         | Action::RefreshMana { .. } => {
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
                         }

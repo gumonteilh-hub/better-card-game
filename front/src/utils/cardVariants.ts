@@ -143,6 +143,34 @@ export const cardVariants: Variants = {
 		},
 	},
 
+	triggerOnAlone: {
+		scale: [1, 1.05, 1],
+		filter: [
+			"brightness(1) saturate(1)",
+			"brightness(1.2) saturate(1.4)",
+			"brightness(1) saturate(1)",
+		],
+		transition: {
+			duration: 0.6,
+			times: [0, 0.5, 1],
+			ease: "easeInOut",
+		},
+	},
+
+	triggerOnSurrounded: {
+		scale: [1, 1.05, 1],
+		filter: [
+			"brightness(1) saturate(1)",
+			"brightness(1.2) saturate(1.4)",
+			"brightness(1) saturate(1)",
+		],
+		transition: {
+			duration: 0.6,
+			times: [0, 0.5, 1],
+			ease: "easeInOut",
+		},
+	},
+
 	triggerOnAttack: {
 		scale: [1, 1.05, 1],
 		filter: [

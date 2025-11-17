@@ -23,6 +23,9 @@ mod test_auto_draw;
 mod test_increase_max_mana;
 
 #[cfg(test)]
+mod test_increase_absolute_max_mana;
+
+#[cfg(test)]
 mod test_refresh_mana;
 
 #[cfg(test)]

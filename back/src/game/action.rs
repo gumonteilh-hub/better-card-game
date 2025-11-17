@@ -24,7 +24,7 @@ pub enum Action {
         player: PlayerId,
         amount: usize,
     },
-    SetAbsoluteMaxMana {
+    IncreaseAbsoluteMaxMana {
         player: PlayerId,
         amount: usize,
     },

@@ -52,7 +52,7 @@ pub fn compute_refresh_mana(
     Ok(actions)
 }
 
-pub fn compute_set_absolute_max_mana(
+pub fn compute_increase_absolute_max_mana(
     context: &mut crate::Game,
     initiator: &InstanceId,
     player: &PlayerTarget,
@@ -62,8 +62,8 @@ pub fn compute_set_absolute_max_mana(
     let targets = super::resolve_player_target(*initiator, player, context)?;
 
     for target in targets {
-        context.get_mut_player(target)?.absolute_max_mana = *amount;
-        actions.push(Action::SetAbsoluteMaxMana {
+        context.get_mut_player(target)?.absolute_max_mana += amount;
+        actions.push(Action::IncreaseAbsoluteMaxMana {
             player: target,
             amount: *amount,
         });

@@ -44,7 +44,7 @@ pub enum Effect {
         player: PlayerTarget,
         amount: usize,
     },
-    SetAbsoluteMaxMana {
+    IncreaseAbsoluteMaxMana {
         initiator: InstanceId,
         player: PlayerTarget,
         amount: usize,

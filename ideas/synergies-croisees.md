@@ -24,37 +24,42 @@ Le système est conçu pour que :
 ## 🔥 HUMAN + WARRIOR : L'ARMÉE DISCIPLINÉE
 
 ### Identité
-Formations militaires organisées avec des tanks qui se protègent mutuellement.
+Formations militaires organisées qui s'aguerrissent au combat et se protègent mutuellement.
 
 ### Mécaniques Clés
-- **Formation** (Human) + **Armure** (Warrior) = Phalange blindée
-- **Ralliement** (Human) + **Vétéran** (Warrior) = Armée qui grandit
-- **Escouade** (Human) + **Mur de Chair** (Warrior) = Protection de groupe
+- **Vétéran** : Gagne +1/+1 permanent après chaque combat (attaque ou défense)
+- **Formation** (Human) : Bonus quand adjacents à des alliés
+- **Synergie de groupe** : Partagent buffs/armure entre eux
+- **Scaling linéaire** : Croissance constante et prévisible, excellent mid-game
+
+### Courbe de Puissance
+Croissance **linéaire** ↗️ - L'armée devient progressivement plus forte, fiable en mid-game
 
 ### Exemples de Cartes
 
 ```
 ⚔️ LÉGIONNAIRE ROYAL (3 mana, 2/4)
 Human Warrior
+"Vétéran : Gagne +1/+1 permanent après chaque combat"
 "Formation 1/1"
-"Fortification 1"
 "Mur de Chair : Les alliés adjacents gagnent +2 Armure"
 
 ⚔️ CENTURION VÉTÉRAN (5 mana, 4/5)
 Human Warrior
 "Vétéran"
-"Ralliement : +1/+1 et +2 Armure"
+"Formation 2/2"
+"Ralliement : Quand un allié apparaît, ce monstre gagne +1/+1 permanent"
 "Si vous contrôlez 5+ alliés : Robustesse (10)"
 
 ⚔️ PHALANGE D'ACIER (6 mana, 3/6)
 Human Warrior
-"Apparition : Invoquez 2 Légionnaires 2/3"
+"Apparition : Invoquez 2 Légionnaires 2/3 avec Vétéran"
 "Formation 2/2"
-"Escouade : Tous les membres partagent leur Armure totale"
+"Tous vos Human Warriors partagent leurs bonus de Vétéran"
 ```
 
 ### Stratégie
-Construire une formation compacte de tanks qui accumulent de l'Armure et se renforcent mutuellement. Excellent en mid-game.
+Construire une formation compacte de tanks qui accumulent de l'expérience de combat et partagent leurs buffs. Se renforce progressivement tour après tour.
 
 ---
 
@@ -131,40 +136,45 @@ Développer rapidement une équipe d'assassins, puis lancer un tour explosif ave
 
 ---
 
-## 🐉 DRAGON + WARRIOR : LA FORTERESSE VOLANTE
+## 🐉 DRAGON + WARRIOR : LE TITAN SOLITAIRE
 
 ### Identité
-Dragon-tank avec Armure massive, solitaire et inarrêtable.
+Dragon-tank solitaire qui se régénère, enrage quand blessé, et devient inarrêtable.
 
 ### Mécaniques Clés
-- **Solitaire** (Dragon) + **Armure** (Warrior) = Tank ultime
-- **Thésaurisation** (Dragon) + **Fortification** (Warrior) = Accumulation
-- **Domination** (Dragon) + **Robustesse** (Warrior) = Immortalité
+- **Solitaire** (Dragon) : Buffs massifs quand seul ou avec peu d'alliés
+- **Rage Draconique** : Gagne +X/+0 permanent quand subit des dégâts (on_damage)
+- **Régénération** : Se heal automatiquement (fin de tour ou on_damage)
+- **Génération de mana** : Certains dragons produisent du mana
+- **Robustesse** : Résiste aux petits dégâts
+
+### Courbe de Puissance
+Croissance **lente puis explosive** ↗️↗️ - Faible early, inarrêtable late-game
 
 ### Exemples de Cartes
 
 ```
 🐉 DRAGON CUIRASSÉ (7 mana, 5/8)
 Dragon Warrior
-"Solitaire : +3/+3 et Fortification 3"
-"Thésaurisation : +1 Armure par Trésor"
-"Robustesse (15)"
+"Solitaire : +3/+3 et Robustesse (5)"
+"On Damage : Gagne +2/+0 permanent (Rage Draconique)"
+"Fin de Tour : Si a combattu ce tour, heal 3 HP"
 
-🐉 WYRM INDESTRUCTIBLE (9 mana, 7/10)
+🐉 WYRM RÉGÉNÉRANT (9 mana, 6/10)
 Dragon Warrior
-"Apparition : Gagne 5 Trésors et 10 Armure"
-"Domination : Immunisé aux sorts et effets"
-"Solitaire II : Ne peut pas être détruit (minimum 1 HP)"
-"Thésaurisation : +2/+2 par Trésor. Peut attaquer avec son Armure"
+"Solitaire : +4/+4 et Robustesse (10)"
+"On Damage : Heal X HP (X = dégâts subis / 2)"
+"On Damage : Gagne +3/+0 permanent"
+"Génère 1 mana au début de votre tour"
 
-⚔️ ARMURE DRACONIQUE (5 mana)
+⚔️ FUREUR DRACONIQUE (4 mana)
 Sort Dragon Warrior
-"Un dragon ciblé gagne +10 Armure et 5 Trésors"
-"Solitaire : Doublez ces bonus"
+"Un dragon ciblé gagne : 'On Damage : +5/+0 et Heal 5 HP'"
+"Solitaire : L'effet dure toute la partie"
 ```
 
 ### Stratégie
-Jouer un seul dragon massif, accumuler Armure + Trésors, devenir inarrêtable late game.
+Jouer un seul dragon massif qui encaisse les dégâts, se régénère, et devient exponentiellement plus dangereux à mesure qu'il est blessé.
 
 ---
 
@@ -246,38 +256,43 @@ Dragon assassin qui reste Furtif, puis frappe avec Embuscade pour des dégâts m
 ## 😈 DEMON + WARRIOR : LE BERSERKER MAUDIT
 
 ### Identité
-Guerrier qui sacrifie sa vie pour des Pactes, accumule Cicatrices, renaît plus fort.
+Guerrier puissant mais maudit qui dépérit rapidement et explose à la mort.
 
 ### Mécaniques Clés
-- **Pacte** (Demon) + **Armure** (Warrior) = HP élevés pour supporter les Pactes
-- **Renaissance** (Demon) + **Vétéran** (Warrior) = Revient plus fort
-- **Prix du Sang** (Demon) + **Cicatrices de Guerre** (Warrior) = Dégâts = Force
+- **Stats initiales élevées** : Très fort dès l'invocation pour son coût
+- **Dépérissement** : Perd HP à la fin du tour, ou quand attaque
+- **On Damage triggers** : Effets quand subit des dégâts (buffs temporaires, AOE)
+- **Dernière Volonté (on_death)** : Effets puissants à la mort
+- **Pactes/Sacrifices** : Peut sacrifier HP pour des effets
+
+### Courbe de Puissance
+**Pic immédiat puis chute** ↘️ - Très fort early/mid, s'effondre ensuite ou meurt glorieusement
 
 ### Exemples de Cartes
 
 ```
-😈 BERSERKER DAMNÉ (4 mana, 3/6)
+😈 BERSERKER DAMNÉ (4 mana, 6/6)
 Demon Warrior
-"Pacte : +3/+3 mais perd 2 HP par tour"
-"Cicatrices de Guerre : +1/+0 par 3 dégâts subis"
-"Renaissance : Revient avec +5/+5 et toutes ses Cicatrices"
+"Fin de Tour : Perd 2 HP"
+"On Damage : Gagne +3/+0 jusqu'à la fin du tour"
+"Dernière Volonté : Inflige 6 dégâts à tous les ennemis"
 
-😈 CHAMPION DE L'ABÎME (6 mana, 5/8)
+😈 CHAMPION DE L'ABÎME (6 mana, 8/8)
 Demon Warrior
-"Prix du Sang : 3 mana OU 6 HP"
-"Vétéran ET Démoniaque"
-"Fortification 2"
-"Dernière Volonté : Tous les alliés gagnent +X/+X (X = Armure sacrifiée)"
+"Quand attaque : Perd 3 HP"
+"On Damage : Inflige 2 dégâts à tous les ennemis"
+"Dernière Volonté : Tous vos alliés gagnent +4/+4 permanent"
+"Prix du Sang : Sacrifiez 5 HP pour que ce monstre attaque immédiatement"
 
-📜 PACTE DE SANG (5 mana)
+📜 RAGE SUICIDAIRE (3 mana)
 Sort Demon Warrior
-"Pacte : Tous vos alliés gagnent +5/+5 mais vous perdez 5 HP par tour"
-"Prix du Sang : Payez 10 HP pour activer sans perdre de HP par tour"
-"Damnation +2"
+"Tous vos Demon Warriors gagnent +5/+5"
+"Ils perdent 4 HP supplémentaires à la fin du tour"
+"Dernière Volonté amplifiée : Double les effets de mort"
 ```
 
 ### Stratégie
-Tank maudit qui sacrifie son HP pour des buffs, accumule Cicatrices, meurt et renaît encore plus fort.
+Rush agressif avec des créatures surpuissantes qui dépérissent. Transformer leur mort inévitable en avantage tactique via Dernière Volonté.
 
 ---
 
@@ -360,6 +375,19 @@ Générer des petites créatures, les sacrifier pour jouer gratuitement, lancer 
 ---
 
 ## 🎲 Tableau Récapitulatif des Mécaniques
+
+### ⚔️ Trinité Warriors - Courbes de Puissance
+
+| | **Human Warrior** | **Dragon Warrior** | **Demon Warrior** |
+|---|---|---|---|
+| **Courbe** | Linéaire ↗️ | Lente puis explosive ↗️↗️ | Pic puis chute ↘️ |
+| **Timing fort** | Mid-game | Late-game | Early/Tempo |
+| **Scaling** | +1/+1 par combat | Rage on_damage + Regen | Stats initiales élevées |
+| **Survie** | Groupe solidaire | Tank régénérant | Autodestruction |
+| **Triggers clés** | On combat (attack/defend) | On damage (rage/heal) | On death (dernière volonté) |
+| **Playstyle** | Armée disciplinée | Titan solitaire | Berserker suicide |
+
+---
 
 ### Mécaniques par Race
 

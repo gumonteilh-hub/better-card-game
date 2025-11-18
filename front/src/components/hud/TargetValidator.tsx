@@ -10,8 +10,6 @@ export const TargetValidator = () => {
 		playMonster,
 	} = useGameContext();
 
-	console.log({ playedCardWaitingForTargets });
-
 	const isButtonDisabled =
 		playedCardWaitingForTargets?.card.playTarget?.strict &&
 		playedCardWaitingForTargets.card.playTarget.amount !==
@@ -24,7 +22,7 @@ export const TargetValidator = () => {
 	function handleConfirm(): void {
 		if (playedCardWaitingForTargets) {
 			if (playedCardWaitingForTargets.card.cardType.type === "monster") {
-				if (!playedCardWaitingForTargets.position) {
+				if (playedCardWaitingForTargets.position === undefined || playedCardWaitingForTargets === null) {
 					throw new Error(
 						"Illegal state : playedCardWaitingForTargets with type monster must have a position",
 					);

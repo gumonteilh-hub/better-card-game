@@ -26,6 +26,7 @@ pub struct EnemyInfo {
     pub secret_card: bool,
     pub field: HashMap<usize, CardInstance>,
     pub max_mana: usize,
+    pub absolute_max_mana: usize,
     pub current_mana: usize,
     pub hand: usize,
     pub hero: HeroInfo,
@@ -38,6 +39,7 @@ pub struct PlayerInfo {
     pub secret_card: Option<CardInstance>,
     pub field: HashMap<usize, CardInstance>,
     pub max_mana: usize,
+    pub absolute_max_mana: usize,
     pub current_mana: usize,
     pub move_count: usize,
     pub max_move: usize,
@@ -116,7 +118,8 @@ impl PublicGameState {
             enemy: EnemyInfo {
                 secret_card: false,
                 field: enemy_field,
-                max_mana: opponent.base_mana,
+                max_mana: opponent.max_mana,
+                absolute_max_mana: opponent.absolute_max_mana,
                 current_mana: opponent.mana,
                 hand: enemy_hand_size,
                 hero: HeroInfo {
@@ -130,7 +133,8 @@ impl PublicGameState {
             player: PlayerInfo {
                 secret_card: None,
                 field: hero_field,
-                max_mana: hero.base_mana,
+                max_mana: hero.max_mana,
+                absolute_max_mana: hero.absolute_max_mana,
                 current_mana: hero.mana,
                 hand: player_hand,
                 hero: HeroInfo {

@@ -44,6 +44,11 @@ pub enum Effect {
         player: PlayerTarget,
         amount: usize,
     },
+    IncreaseAbsoluteMaxMana {
+        initiator: InstanceId,
+        player: PlayerTarget,
+        amount: usize,
+    },
     MakeDraw {
         initiator: InstanceId,
         player: PlayerTarget,

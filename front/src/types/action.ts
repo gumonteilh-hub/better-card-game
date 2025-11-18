@@ -19,7 +19,8 @@ export type IAction =
 	| UpdateGameViewAction
 	| StartTurnAction
 	| EnemyDrawAction
-	| IncreaseMaxManaAction;
+	| IncreaseMaxManaAction
+	| IncreaseAbsoluteMaxManaAction;
 
 export type ActionType =
 	| "BurnCard"
@@ -40,7 +41,8 @@ export type ActionType =
 	| "StartTurn"
 	| "EnemyDraw"
 	| "UpdateGameView"
-	| "RefreshMana";
+	| "RefreshMana"
+	| "IncreaseAbsoluteMaxMana";
 
 export type EntityId = number;
 export type PlayerId = number;
@@ -167,6 +169,14 @@ type IncreaseMaxManaAction = {
 
 type RefreshManaAction = {
 	type: "RefreshMana";
+	value: {
+		player: PlayerId;
+		amount: number;
+	};
+};
+
+type IncreaseAbsoluteMaxManaAction = {
+	type: "IncreaseAbsoluteMaxMana";
 	value: {
 		player: PlayerId;
 		amount: number;

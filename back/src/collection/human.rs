@@ -20,6 +20,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
         RAFRAICHISSEUR.clone(),
         ALONE.clone(),
         SURROUNDED.clone(),
+        BRISEUR_DE_LIMITE.clone(),
     ]
 }
 
@@ -196,7 +197,7 @@ static SUPER_ACCELERATEUR: Lazy<CardTemplate> = Lazy::new(|| {
 
 static ALONE: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        1011,
+        1010,
         2,
         "Solitaire",
         "seul: Gagne 2 cristaux de mana pleins",
@@ -211,7 +212,7 @@ static ALONE: Lazy<CardTemplate> = Lazy::new(|| {
 
 static SURROUNDED: Lazy<CardTemplate> = Lazy::new(|| {
     monster(
-        1010,
+        1011,
         3,
         "Entouré",
         "entouré: +3/+3",
@@ -221,5 +222,23 @@ static SURROUNDED: Lazy<CardTemplate> = Lazy::new(|| {
         Class::COMMON,
     )
     .on_surrounded(vec![boost(TemplateTarget::ItSelf, 3, 3)])
+    .build()
+});
+
+static BRISEUR_DE_LIMITE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1012,
+        3,
+        "Briseur de limite",
+        "Augmente la limite de Mana de 2",
+        3,
+        3,
+        Race::HUMAN,
+        Class::WARRIOR,
+    )
+    .on_play(vec![TemplateEffect::IncreaseAbsoluteMaxMana {
+        player: PlayerTemplateTarget::Player,
+        amount: 2,
+    }])
     .build()
 });

@@ -27,7 +27,7 @@ pub fn end_turn(context: &mut Game, ending_player: PlayerId) -> Result<Vec<Actio
 
     let current_player_instance = context.get_mut_player(starting_player)?;
 
-    if current_player_instance.base_mana < 10 {
+    if current_player_instance.max_mana < current_player_instance.absolute_max_mana {
         context.effect_queue.push_back(Effect::IncreaseMaxMana {
             initiator: starting_player,
             player: effects::PlayerTarget::Player,
@@ -35,11 +35,11 @@ pub fn end_turn(context: &mut Game, ending_player: PlayerId) -> Result<Vec<Actio
         });
     }
 
-    let base_mana = context.get_player(context.current_player)?.base_mana;
+    let max_mana = context.get_player(context.current_player)?.max_mana;
     context.effect_queue.push_back(Effect::RefreshMana {
         initiator: starting_player,
         player: effects::PlayerTarget::Player,
-        amount: base_mana + 1,
+        amount: max_mana + 1,
     });
 
     context.get_mut_player(starting_player)?.move_count = 3;

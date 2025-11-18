@@ -2,8 +2,8 @@
 //
 // 1. The active player (current_player) switches to the opponent
 // 2. The new active player automatically draws 1 card
-// 3. The new player's base_mana increases by 1 (capped at 10)
-// 4. The available mana is refreshed to base_mana
+// 3. The new player's max_mana increases by 1 (capped at absolute_max_mana)
+// 4. The available mana is refreshed to max_mana
 // 5. Movement points are reset to 3
 // 6. Attack counters (attack_count) for all monsters of the new player are reset to 0
 // 7. All monsters of the new player wake up (asleep = false)
@@ -63,53 +63,54 @@ mod tests {
     }
 
     #[test]
-    fn test_end_turn_increases_base_mana_by_one() {
+    fn test_end_turn_increases_max_mana_by_one() {
         // a) Initialize
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
         let player_b = game.player_id_b;
 
-        // b) Modify state: set player B's base_mana to 3
-        game.players.get_mut(&player_b).unwrap().base_mana = 3;
+        // b) Modify state: set player B's max_mana to 3
+        game.players.get_mut(&player_b).unwrap().max_mana = 3;
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
-        // d) Assert base_mana increased to 4
-        assert_eq!(game.players.get(&player_b).unwrap().base_mana, 4);
+        // d) Assert max_mana increased to 4
+        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 4);
     }
 
     #[test]
-    fn test_end_turn_base_mana_capped_at_ten() {
+    fn test_end_turn_max_mana_capped_at_absolute_max() {
         // a) Initialize
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
         let player_b = game.player_id_b;
 
-        // b) Modify state: set player B's base_mana to 10 (max)
-        game.players.get_mut(&player_b).unwrap().base_mana = 10;
+        // b) Modify state: set player B's max_mana to 10 (absolute_max_mana)
+        game.players.get_mut(&player_b).unwrap().max_mana = 10;
+        game.players.get_mut(&player_b).unwrap().absolute_max_mana = 10;
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
-        // d) Assert base_mana stayed at 10 (not 11)
-        assert_eq!(game.players.get(&player_b).unwrap().base_mana, 10);
+        // d) Assert max_mana stayed at 10 (not 11)
+        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 10);
     }
 
     #[test]
-    fn test_end_turn_refreshes_mana_to_base_mana() {
+    fn test_end_turn_refreshes_mana_to_max_mana() {
         // a) Initialize
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
         let player_b = game.player_id_b;
 
-        // b) Modify state: player B has base_mana 5 but only 2 available
-        game.players.get_mut(&player_b).unwrap().base_mana = 5;
+        // b) Modify state: player B has max_mana 5 but only 2 available
+        game.players.get_mut(&player_b).unwrap().max_mana = 5;
         game.players.get_mut(&player_b).unwrap().mana = 2;
         add_card_to_deck(&mut game, player_b); // For AutoDraw
 
@@ -119,8 +120,8 @@ mod tests {
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
-        // d) Assert mana refreshed to base_mana (which increased to 6)
-        assert_eq!(game.players.get(&player_b).unwrap().base_mana, 6);
+        // d) Assert mana refreshed to max_mana (which increased to 6)
+        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 6);
         assert_eq!(game.players.get(&player_b).unwrap().mana, 6);
     }
 

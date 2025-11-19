@@ -33,16 +33,23 @@ pub fn compute(
         match &mut target.card_type {
             crate::game::card::CardTypeInstance::Monster(monster_instance) => {
                 monster_instance.hp = monster_instance.hp.saturating_sub(*amount);
+                actions.push(Action::ReceiveDamage {
+                    target: target_id,
+                    amount: *amount,
+                });
+
                 if monster_instance.hp == 0 {
                     context.effect_queue.push_back(Effect::Destroy {
                         initiator: *initiator,
                         target: Target::Id(target_id),
                     });
+                } else {
+                    let on_damaged_effects = monster_instance.on_damaged.clone();
+                    if !on_damaged_effects.is_empty() {
+                        actions.push(Action::TriggerOnDamaged(target_id));
+                        context.effect_queue.extend(on_damaged_effects);
+                    }
                 }
-                actions.push(Action::ReceiveDamage {
-                    target: target_id,
-                    amount: *amount,
-                });
             }
             crate::game::card::CardTypeInstance::Spell(_) => {
                 return Err(Error::Game("Can't deal damage to a spell".into()));

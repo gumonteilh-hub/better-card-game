@@ -74,9 +74,14 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defend: vec![],
                 on_death: vec![],
                 on_alone: vec![],
                 on_surrounded: vec![],
+                on_damaged: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
             }),
         }
     }

@@ -27,6 +27,12 @@ pub fn compute(
                         .effect_queue
                         .extend(monster_instance.on_attack.clone());
                 }
+                if !monster_instance.on_defense.is_empty() {
+                    actions.push(Action::TriggerOnDefend(target_id));
+                    context
+                        .effect_queue
+                        .extend(monster_instance.on_defense.clone());
+                }
                 context.effect_queue.push_back(Effect::DealDamage {
                     initiator: *initiator,
                     target: Target::Id(target_id),

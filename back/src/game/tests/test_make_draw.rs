@@ -44,7 +44,8 @@ mod tests {
                 amount: 2,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 2);
@@ -75,7 +76,8 @@ mod tests {
                 amount: 12,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -128,9 +130,14 @@ mod tests {
                     keywords: vec![],
                     on_play: vec![],
                     on_attack: vec![],
+                    on_defense: vec![],
                     on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                    on_surrounded: vec![],
+                    on_alone: vec![],
+                    on_kill: vec![],
+                    on_turn_end: vec![],
+                    on_turn_start: vec![],
+                    on_damaged: vec![],
                 }),
             };
             game.entities.insert(card_id, card);
@@ -153,7 +160,8 @@ mod tests {
                 amount: 3,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 10);
@@ -197,7 +205,8 @@ mod tests {
                 amount: 3,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         let hand_size_after = game.get_hand(player_a).len();
@@ -231,7 +240,8 @@ mod tests {
                 amount: 2,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_b).len(), 2);
@@ -270,7 +280,8 @@ mod tests {
                 amount: 5,
             }],
         );
-        crate::game::user_actions::play_spell::play_spell(&mut game,player_a, draw_spell, None).unwrap();
+        crate::game::user_actions::play_spell::play_spell(&mut game, player_a, draw_spell, None)
+            .unwrap();
         game.compute_commands().unwrap();
 
         assert_eq!(game.get_hand(player_a).len(), 2);

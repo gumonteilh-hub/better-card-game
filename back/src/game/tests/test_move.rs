@@ -28,7 +28,8 @@ mod tests {
         );
 
         // c) Test as user would: move to linked position 1
-        crate::game::user_actions::move_card::move_card(&mut game,player_a, monster_id, 1).unwrap();
+        crate::game::user_actions::move_card::move_card(&mut game, player_a, monster_id, 1)
+            .unwrap();
 
         // d) Assert the monster moved to position 1
         assert_eq!(
@@ -50,7 +51,8 @@ mod tests {
         assert_eq!(game.players.get(&player_a).unwrap().move_count, 3);
 
         // c) Test: move the monster
-        crate::game::user_actions::move_card::move_card(&mut game,player_a, monster_id, 1).unwrap();
+        crate::game::user_actions::move_card::move_card(&mut game, player_a, monster_id, 1)
+            .unwrap();
 
         // d) Assert movement points decreased by 1
         assert_eq!(game.players.get(&player_a).unwrap().move_count, 2);
@@ -67,7 +69,8 @@ mod tests {
         let monster_b = create_test_monster(&mut game, player_a, 1, 5, 5);
 
         // c) Test: try to move monster_a to position 1 (occupied by monster_b)
-        let result = crate::game::user_actions::move_card::move_card(&mut game,player_a, monster_a, 1);
+        let result =
+            crate::game::user_actions::move_card::move_card(&mut game, player_a, monster_a, 1);
 
         // d) Assert the move failed
         assert!(result.is_err());
@@ -93,7 +96,8 @@ mod tests {
         let monster_a = create_test_monster(&mut game, player_a, 0, 5, 5);
 
         // c) Test: player B tries to move player A's monster
-        let result = crate::game::user_actions::move_card::move_card(&mut game,player_b, monster_a, 1);
+        let result =
+            crate::game::user_actions::move_card::move_card(&mut game, player_b, monster_a, 1);
 
         // d) Assert the move failed
         assert!(result.is_err());
@@ -138,16 +142,22 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
-            play_target: None
+            play_target: None,
         };
         game.entities.insert(monster_id, monster);
 
         // c) Test: try to move a monster in hand
-        let result = crate::game::user_actions::move_card::move_card(&mut game,player_a, monster_id, 1);
+        let result =
+            crate::game::user_actions::move_card::move_card(&mut game, player_a, monster_id, 1);
 
         // d) Assert the move failed
         assert!(result.is_err());
@@ -168,7 +178,8 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().move_count = 0;
 
         // c) Test: try to move without movement points
-        let result = crate::game::user_actions::move_card::move_card(&mut game,player_a, monster_id, 1);
+        let result =
+            crate::game::user_actions::move_card::move_card(&mut game, player_a, monster_id, 1);
 
         // d) Assert the move failed
         assert!(result.is_err());

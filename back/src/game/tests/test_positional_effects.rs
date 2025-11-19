@@ -40,16 +40,20 @@ mod tests {
     use crate::game::card::{CardInstance, CardTypeInstance, MonsterInstance};
     use crate::game::effects::{Effect, Target};
     use crate::game::types::Location;
-    use crate::{collection::Class, Race};
+    use crate::{Race, collection::Class};
 
     // ===== HELPER FUNCTIONS =====
 
     fn has_trigger_on_alone(actions: &[Action], monster_id: usize) -> bool {
-        actions.iter().any(|action| matches!(action, Action::TriggerOnAlone(id) if *id == monster_id))
+        actions
+            .iter()
+            .any(|action| matches!(action, Action::TriggerOnAlone(id) if *id == monster_id))
     }
 
     fn has_trigger_on_surrounded(actions: &[Action], monster_id: usize) -> bool {
-        actions.iter().any(|action| matches!(action, Action::TriggerOnSurrounded(id) if *id == monster_id))
+        actions
+            .iter()
+            .any(|action| matches!(action, Action::TriggerOnSurrounded(id) if *id == monster_id))
     }
 
     fn create_monster_with_on_alone(
@@ -79,14 +83,19 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
+                on_surrounded: vec![],
                 on_alone: vec![Effect::Boost {
                     initiator: monster_id,
                     target: Target::ItSelf,
                     attack: 3,
                     hp: 3,
                 }],
-                on_surrounded: vec![],
             }),
             play_target: None,
         };
@@ -121,14 +130,19 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-                on_alone: vec![],
                 on_surrounded: vec![Effect::Boost {
                     initiator: monster_id,
                     target: Target::ItSelf,
                     attack: 3,
                     hp: 3,
                 }],
+                on_alone: vec![],
             }),
             play_target: None,
         };

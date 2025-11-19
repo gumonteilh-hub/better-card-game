@@ -151,6 +151,11 @@ struct MonsterTemplateBuilder {
     keywords: Vec<Keyword>,
     on_play: Vec<TemplateEffect>,
     on_attack: Vec<TemplateEffect>,
+    on_defend: Vec<TemplateEffect>,
+    on_kill: Vec<TemplateEffect>,
+    on_damaged: Vec<TemplateEffect>,
+    on_turn_end: Vec<TemplateEffect>,
+    on_turn_start: Vec<TemplateEffect>,
     on_death: Vec<TemplateEffect>,
     on_alone: Vec<TemplateEffect>,
     on_surrounded: Vec<TemplateEffect>,
@@ -178,9 +183,14 @@ impl MonsterTemplateBuilder {
             hp,
             keywords: vec![],
             on_attack: vec![],
+            on_defend: vec![],
             on_play: vec![],
             on_death: vec![],
             on_alone: vec![],
+            on_kill: vec![],
+            on_turn_end: vec![],
+            on_turn_start: vec![],
+            on_damaged: vec![],
             on_surrounded: vec![],
             play_target: None,
             race,
@@ -210,6 +220,30 @@ impl MonsterTemplateBuilder {
 
     fn on_attack(mut self, effects: Vec<TemplateEffect>) -> Self {
         self.on_attack = effects;
+        self
+    }
+
+    fn on_defend(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_defend = effects;
+        self
+    }
+    fn on_kill(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_kill = effects;
+        self
+    }
+
+    fn on_damaged(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_damaged = effects;
+        self
+    }
+
+    fn on_turn_end(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_turn_end = effects;
+        self
+    }
+
+    fn on_turn_start(mut self, effects: Vec<TemplateEffect>) -> Self {
+        self.on_turn_start = effects;
         self
     }
 
@@ -243,9 +277,14 @@ impl MonsterTemplateBuilder {
                 keywords: self.keywords,
                 on_play: self.on_play,
                 on_attack: self.on_attack,
+                on_defend: self.on_defend,
                 on_death: self.on_death,
                 on_alone: self.on_alone,
                 on_surrounded: self.on_surrounded,
+                on_turn_start: self.on_turn_start,
+                on_turn_end: self.on_turn_end,
+                on_damaged: self.on_damaged,
+                on_kill: self.on_kill,
             }),
         }
     }

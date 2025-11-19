@@ -83,6 +83,11 @@ pub struct MonsterTemplate {
     pub on_surrounded: Vec<TemplateEffect>,
     pub on_play: Vec<TemplateEffect>,
     pub on_attack: Vec<TemplateEffect>,
+    pub on_defend: Vec<TemplateEffect>,
+    pub on_damaged: Vec<TemplateEffect>,
+    pub on_kill: Vec<TemplateEffect>,
+    pub on_turn_end: Vec<TemplateEffect>,
+    pub on_turn_start: Vec<TemplateEffect>,
     pub on_death: Vec<TemplateEffect>,
 }
 

@@ -56,6 +56,11 @@ pub struct MonsterInstance {
     pub keywords: Vec<Keyword>,
     pub on_play: Vec<Effect>,
     pub on_attack: Vec<Effect>,
+    pub on_defense: Vec<Effect>,
+    pub on_kill: Vec<Effect>,
+    pub on_turn_end: Vec<Effect>,
+    pub on_turn_start: Vec<Effect>,
+    pub on_damaged: Vec<Effect>,
     pub on_death: Vec<Effect>,
     pub on_surrounded: Vec<Effect>,
     pub on_alone: Vec<Effect>,
@@ -87,6 +92,11 @@ impl CardInstance {
                         .iter()
                         .map(|e| e.clone().convert(entity_id))
                         .collect(),
+                    on_defense: monster_template
+                        .on_defend
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
                     on_death: monster_template
                         .on_death
                         .iter()
@@ -99,6 +109,28 @@ impl CardInstance {
                         .collect(),
                     on_alone: monster_template
                         .on_alone
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+                    on_damaged: monster_template
+                        .on_damaged
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+                    on_kill: monster_template
+                        .on_kill
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+
+                    on_turn_end: monster_template
+                        .on_turn_end
+                        .iter()
+                        .map(|e| e.clone().convert(entity_id))
+                        .collect(),
+
+                    on_turn_start: monster_template
+                        .on_turn_start
                         .iter()
                         .map(|e| e.clone().convert(entity_id))
                         .collect(),

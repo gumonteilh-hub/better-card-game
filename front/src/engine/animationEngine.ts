@@ -21,11 +21,18 @@ export const getAnimationDuration = (actionType: ActionType): number => {
 		case "TriggerOnAttack":
 		case "TriggerOnSurrounded":
 		case "TriggerOnAlone":
+		case "TriggerOnKill":
+		case "TriggerOnTurnStart":
+		case "TriggerOnTurnEnd":
+		case "TriggerOnDamaged":
+		case "TriggerOnDefend":
+		case "IncreaseAbsoluteMaxMana":
 			return 600;
 		case "IncreaseMaxMana":
 		case "RefreshMana":
 		case "BurnCard":
 		case "StartTurn":
+		case "EndTurn":
 		case "UpdateGameView":
 		case "EnemyDraw":
 		case "Draw":
@@ -49,6 +56,11 @@ export type AnimationState =
 	| "triggerOnPlay"
 	| "triggerOnAlone"
 	| "triggerOnSurrounded"
+	| "triggerOnKill"
+	| "triggerOnTurnEnd"
+	| "TriggerOnTurnStart"
+	| "TriggerOnDamaged"
+	| "triggerOnDefend"
 	| "triggerOnAttack";
 
 export const computeAnimationState = (
@@ -121,12 +133,34 @@ export const computeAnimationState = (
 				animationMap.set(action.value, "triggerOnSurrounded");
 				break;
 			}
+			case "TriggerOnKill": {
+				animationMap.set(action.value, "triggerOnKill");
+				break;
+			}
+			case "TriggerOnTurnEnd": {
+				animationMap.set(action.value, "triggerOnTurnEnd");
+				break;
+			}
+			case "TriggerOnTurnStart": {
+				animationMap.set(action.value, "TriggerOnTurnStart");
+				break;
+			}
+			case "TriggerOnDamaged": {
+				animationMap.set(action.value, "TriggerOnDamaged");
+				break;
+			}
+			case "TriggerOnDefend": {
+				animationMap.set(action.value, "triggerOnDefend");
+				break;
+			}
+			case "IncreaseAbsoluteMaxMana":
 			case "BurnCard":
 			case "RefreshMana":
 			case "IncreaseMaxMana":
 			case "StartTurn":
 			case "UpdateGameView":
 			case "EnemyDraw":
+			case "EndTurn":
 		}
 	}
 

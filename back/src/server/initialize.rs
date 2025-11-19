@@ -258,6 +258,12 @@ pub async fn game_task(
                         | Action::TriggerOnAttack { .. }
                         | Action::TriggerOnAlone { .. }
                         | Action::TriggerOnSurrounded { .. }
+                        | Action::TriggerOnDamaged { .. }
+                        | Action::TriggerOnKill { .. }
+                        | Action::TriggerOnTurnEnd { .. }
+                        | Action::TriggerOnTurnStart { .. }
+                        | Action::EndTurn(..)
+                        | Action::TriggerOnDefend { .. }
                         | Action::RefreshMana { .. } => {
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
                         }

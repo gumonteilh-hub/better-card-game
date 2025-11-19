@@ -1,9 +1,12 @@
-use crate::collection::{
-    Class, Race, boost, monster, spell,
-    types::{
-        CardTemplate, PlayTargetTemplate, PlayerTemplateTarget, Side, TargetMatcherTemplate,
-        TemplateEffect, TemplateTarget,
+use crate::{
+    collection::{
+        Class, Race, boost, monster, spell,
+        types::{
+            CardTemplate, PlayTargetTemplate, PlayerTemplateTarget, Side, TargetMatcherTemplate,
+            TemplateEffect, TemplateTarget,
+        },
     },
+    game::card::Keyword,
 };
 use once_cell::sync::Lazy;
 
@@ -21,6 +24,10 @@ pub fn get_collection() -> Vec<CardTemplate> {
         ALONE.clone(),
         SURROUNDED.clone(),
         BRISEUR_DE_LIMITE.clone(),
+        GUERRIER_MOTIVE.clone(),
+        BLOQUEUR.clone(),
+        ASSASSIN_RAPIDE.clone(),
+        MASOCHISTE.clone(),
     ]
 }
 
@@ -239,6 +246,86 @@ static BRISEUR_DE_LIMITE: Lazy<CardTemplate> = Lazy::new(|| {
     .on_play(vec![TemplateEffect::IncreaseAbsoluteMaxMana {
         player: PlayerTemplateTarget::Player,
         amount: 2,
+    }])
+    .build()
+});
+
+static GUERRIER_MOTIVE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1013,
+        3,
+        "Guerrier motivé",
+        "Au début du tour gagne +2/+0, a la fin du tour gagne +0/+2",
+        3,
+        3,
+        Race::HUMAN,
+        Class::WARRIOR,
+    )
+    .on_turn_start(vec![TemplateEffect::Boost {
+        target: TemplateTarget::ItSelf,
+        attack: 2,
+        hp: 0,
+    }])
+    .on_turn_end(vec![TemplateEffect::Boost {
+        target: TemplateTarget::ItSelf,
+        attack: 0,
+        hp: 2,
+    }])
+    .build()
+});
+
+static MASOCHISTE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1014,
+        3,
+        "Masochiste",
+        "Souffrance: gagne 2 d'attaque ",
+        0,
+        12,
+        Race::HUMAN,
+        Class::WARRIOR,
+    )
+    .on_damaged(vec![TemplateEffect::Boost {
+        target: TemplateTarget::ItSelf,
+        attack: 2,
+        hp: 0,
+    }])
+    .build()
+});
+
+static BLOQUEUR: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1015,
+        5,
+        "Bloqueur",
+        "En defense: pioche une carte",
+        4,
+        9,
+        Race::HUMAN,
+        Class::WARRIOR,
+    )
+    .on_defend(vec![TemplateEffect::MakeDraw {
+        player: PlayerTemplateTarget::Player,
+        amount: 1,
+    }])
+    .build()
+});
+
+static ASSASSIN_RAPIDE: Lazy<CardTemplate> = Lazy::new(|| {
+    monster(
+        1016,
+        3,
+        "Assassin rapide",
+        "Charge, En tuant: invoque 1 bloqueur",
+        7,
+        1,
+        Race::HUMAN,
+        Class::WARRIOR,
+    )
+    .keywords(vec![Keyword::Charge])
+    .on_kill(vec![TemplateEffect::Summon {
+        side: PlayerTemplateTarget::Player,
+        target: BLOQUEUR.clone(),
     }])
     .build()
 });

@@ -1,15 +1,16 @@
 use crate::error::{Error, Result};
 use crate::game::action::Action;
+use crate::game::card::CardTypeInstance;
 use crate::game::effects::Target;
 use crate::game::types::{InstanceId, Location};
 
 pub fn compute(
     context: &mut crate::Game,
-    initiator: &InstanceId,
+    initiator_id: &InstanceId,
     target: &Target,
 ) -> Result<Vec<Action>> {
     let mut actions = Vec::new();
-    let targets = super::resolve_field_target(*initiator, target, context)?;
+    let targets = super::resolve_field_target(*initiator_id, target, context)?;
 
     for target in targets {
         let target_entity = context.entities.get_mut(&target).ok_or_else(|| {
@@ -29,6 +30,13 @@ pub fn compute(
             crate::game::card::CardTypeInstance::Spell(_) => {
                 return Err(Error::Game("Can't destroy a spell".into()));
             }
+        }
+        let initiator = context.get_entity(*initiator_id)?;
+        if let CardTypeInstance::Monster(monster) = &initiator.card_type
+            && !monster.on_kill.is_empty()
+        {
+            actions.push(Action::TriggerOnKill(*initiator_id));
+            context.effect_queue.extend(monster.on_kill.clone());
         }
     }
 

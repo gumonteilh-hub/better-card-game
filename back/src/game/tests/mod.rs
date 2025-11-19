@@ -60,3 +60,15 @@ mod test_play_spell;
 
 #[cfg(test)]
 mod test_public_game_state;
+
+#[cfg(test)]
+mod test_on_kill;
+
+#[cfg(test)]
+mod test_on_damaged;
+
+#[cfg(test)]
+mod test_on_turn_start;
+
+#[cfg(test)]
+mod test_on_turn_end;

@@ -35,7 +35,13 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 		case "TriggerOnDeath":
 		case "TriggerOnSurrounded":
 		case "TriggerOnAlone":
+		case "TriggerOnKill":
+		case "TriggerOnTurnEnd":
+		case "TriggerOnTurnStart":
+		case "TriggerOnDamaged":
+		case "TriggerOnDefend":
 		case "StartTurn":
+		case "EndTurn":
 			return state;
 	}
 };

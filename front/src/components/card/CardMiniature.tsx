@@ -18,27 +18,9 @@ interface ICardMiniatureProps {
 export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 	const { animationMap } = useGameContext();
 	const animationState = useMemo(
-		() => animationMap.get(card.id) ?? "idle",
+		() => animationMap.get(card.id),
 		[animationMap, card.id],
 	);
-
-	const triggerType = useMemo(() => {
-		switch (animationState) {
-			case "triggerOnDeath":
-				return "onDeath";
-			case "triggerOnPlay":
-				return "onPlay";
-			case "triggerOnAttack":
-				return "onAttack";
-			case "triggerOnAlone":
-				return "onAlone";
-			case "triggerOnSurrounded":
-				return "onSurrounded";
-
-			default:
-				return null;
-		}
-	}, [animationState]);
 
 	if (card.cardType.type !== "monster") {
 		throw new Error("only monster can be in miniature");
@@ -56,7 +38,7 @@ export const CardMiniature = ({ card, type, side }: ICardMiniatureProps) => {
 						layout
 						layoutId={`card-${card.id}`}
 					>
-						<TriggerEffect type={triggerType} />
+						<TriggerEffect type={animationState} />
 						<div className={styles.cardBody}>
 							<div className={styles.cardImage}>
 								<img src={placeholder} alt="card" />

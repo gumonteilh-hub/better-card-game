@@ -3,12 +3,14 @@ import onAlone from "../../assets/on_alone.svg";
 import onAttack from "../../assets/on_attack.svg";
 import onDeath from "../../assets/on_death.svg";
 import onPlay from "../../assets/on_play.svg";
+import onKill from "../../assets/on_kill.svg";
+import onDamaged from "../../assets/on_damaged.svg";
+import onDefend from "../../assets/on_defend.svg";
+import onTurnEnd from "../../assets/on_turn_end.svg";
+import onTurnStart from "../../assets/on_turn_start.svg";
 import onSurrounded from "../../assets/on_surrounded.svg";
+import type { AnimationState } from "../../engine/animationEngine";
 import styles from "./TriggerEffect.module.css";
-
-interface TriggerEffectProps {
-	type: "onDeath" | "onPlay" | "onAttack" | "onAlone" | "onSurrounded" | null;
-}
 
 const overlayVariants: Variants = {
 	hidden: {
@@ -36,10 +38,10 @@ const overlayVariants: Variants = {
 	},
 };
 
-export const TriggerEffect = ({ type }: TriggerEffectProps) => {
+export const TriggerEffect = ({ type }: { type?: AnimationState }) => {
 	const getIcon = () => {
 		switch (type) {
-			case "onDeath":
+			case "triggerOnDeath":
 				return (
 					<img
 						className={styles.triggerEffectImage}
@@ -47,7 +49,7 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 						alt="onDeath"
 					/>
 				);
-			case "onPlay":
+			case "triggerOnPlay":
 				return (
 					<img
 						className={styles.triggerEffectImage}
@@ -55,7 +57,7 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 						alt="onPlay"
 					/>
 				);
-			case "onAttack":
+			case "triggerOnAttack":
 				return (
 					<img
 						className={styles.triggerEffectImage}
@@ -63,7 +65,7 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 						alt="onAttack"
 					/>
 				);
-			case "onAlone":
+			case "triggerOnAlone":
 				return (
 					<img
 						className={styles.triggerEffectImage}
@@ -71,12 +73,52 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 						alt="onAlone"
 					/>
 				);
-			case "onSurrounded":
+			case "triggerOnSurrounded":
 				return (
 					<img
 						className={styles.triggerEffectImage}
 						src={onSurrounded}
 						alt="onSurrounded"
+					/>
+				);
+			case "TriggerOnDamaged":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onDamaged}
+						alt="onDamaged"
+					/>
+				);
+			case "triggerOnKill":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onKill}
+						alt="onKill"
+					/>
+				);
+			case "triggerOnTurnEnd":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onTurnEnd}
+						alt="onTurnEnd"
+					/>
+				);
+			case "TriggerOnTurnStart":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onTurnStart}
+						alt="onTurnStart"
+					/>
+				);
+			case "triggerOnDefend":
+				return (
+					<img
+						className={styles.triggerEffectImage}
+						src={onDefend}
+						alt="onDefend"
 					/>
 				);
 			default:
@@ -86,11 +128,11 @@ export const TriggerEffect = ({ type }: TriggerEffectProps) => {
 
 	const getColorClass = () => {
 		switch (type) {
-			case "onDeath":
+			case "triggerOnDeath":
 				return styles.death;
-			case "onPlay":
+			case "triggerOnPlay":
 				return styles.play;
-			case "onAttack":
+			case "triggerOnAttack":
 				return styles.attack;
 			default:
 				return "";

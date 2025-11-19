@@ -14,10 +14,16 @@ export type IAction =
 	| TriggerOnDeathAction
 	| TriggerOnSurroundedAction
 	| TriggerOnAloneAction
+	| TriggerOnKillAction
+	| TriggerOnTurnEndAction
+	| TriggerOnTurnStartAction
+	| TriggerOnDamagedAction
+	| TriggerOnDefendAction
 	| RefreshManaAction
 	| BoostAction
 	| UpdateGameViewAction
 	| StartTurnAction
+	| EndTurnAction
 	| EnemyDrawAction
 	| IncreaseMaxManaAction
 	| IncreaseAbsoluteMaxManaAction;
@@ -36,9 +42,15 @@ export type ActionType =
 	| "TriggerOnAttack"
 	| "TriggerOnSurrounded"
 	| "TriggerOnAlone"
+	| "TriggerOnKill"
+	| "TriggerOnTurnStart"
+	| "TriggerOnTurnEnd"
+	| "TriggerOnDamaged"
+	| "TriggerOnDefend"
 	| "IncreaseMaxMana"
 	| "Boost"
 	| "StartTurn"
+	| "EndTurn"
 	| "EnemyDraw"
 	| "UpdateGameView"
 	| "RefreshMana"
@@ -57,6 +69,11 @@ type UpdateGameViewAction = {
 		player: PlayerId;
 		game: IGameState;
 	};
+};
+
+type EndTurnAction = {
+	type: "EndTurn";
+	value: PlayerId;
 };
 
 type StartTurnAction = {
@@ -155,6 +172,26 @@ type TriggerOnAloneAction = {
 	value: EntityId;
 };
 
+type TriggerOnKillAction = {
+	type: "TriggerOnKill";
+	value: EntityId;
+};
+type TriggerOnDamagedAction = {
+	type: "TriggerOnDamaged";
+	value: EntityId;
+};
+type TriggerOnTurnStartAction = {
+	type: "TriggerOnTurnStart";
+	value: EntityId;
+};
+type TriggerOnTurnEndAction = {
+	type: "TriggerOnTurnEnd";
+	value: EntityId;
+};
+type TriggerOnDefendAction = {
+	type: "TriggerOnDefend";
+	value: EntityId;
+};
 type TriggerOnSurroundedAction = {
 	type: "TriggerOnSurrounded";
 	value: EntityId;

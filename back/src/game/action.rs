@@ -63,6 +63,11 @@ pub enum Action {
     TriggerOnDeath(InstanceId),
     TriggerOnPlay(InstanceId),
     TriggerOnAttack(InstanceId),
+    TriggerOnDefend(InstanceId),
+    TriggerOnDamaged(InstanceId),
+    TriggerOnTurnEnd(InstanceId),
+    TriggerOnTurnStart(InstanceId),
+    TriggerOnKill(InstanceId),
     TriggerOnSurrounded(InstanceId),
     TriggerOnAlone(InstanceId),
     Win(PlayerId),
@@ -71,4 +76,5 @@ pub enum Action {
         game: PublicGameState,
     },
     StartTurn(PlayerId),
+    EndTurn(PlayerId),
 }

@@ -47,9 +47,14 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: None,
         };
@@ -57,7 +62,9 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to play monster from deck
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None);
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game, player_a, monster_id, 0, None,
+        );
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -97,9 +104,14 @@ mod tests {
                 keywords: vec![],
                 on_play: vec![],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: None,
         };
@@ -107,7 +119,9 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 3; // Only 3 mana
 
         // c) Test: try to play expensive monster without enough mana
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None);
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game, player_a, monster_id, 0, None,
+        );
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -134,7 +148,10 @@ mod tests {
         assert_eq!(game.players.get(&player_a).unwrap().mana, 5);
 
         // c) Test: play the monster
-        crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None).unwrap();
+        crate::game::user_actions::play_monster::play_monster(
+            &mut game, player_a, monster_id, 0, None,
+        )
+        .unwrap();
 
         // d) Assert mana was consumed (5 - 3 = 2)
         assert_eq!(game.players.get(&player_a).unwrap().mana, 2);
@@ -153,7 +170,13 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to play new monster at occupied position 0
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, new_monster, 0, None);
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
+            player_a,
+            new_monster,
+            0,
+            None,
+        );
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -182,7 +205,13 @@ mod tests {
         assert_eq!(game.get_field(player_a).len(), 8);
 
         // c) Test: try to play 9th monster (no position available)
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, new_monster, 0, None);
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
+            player_a,
+            new_monster,
+            0,
+            None,
+        );
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -206,7 +235,10 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the monster
-        crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None).unwrap();
+        crate::game::user_actions::play_monster::play_monster(
+            &mut game, player_a, monster_id, 0, None,
+        )
+        .unwrap();
 
         // d) Assert monster is on field at position 0
         let monster = game.entities.get(&monster_id).unwrap();
@@ -265,9 +297,14 @@ mod tests {
                     amount: 2,
                 }],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -282,7 +319,8 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the monster with targets
-        crate::game::user_actions::play_monster::play_monster(&mut game,
+        crate::game::user_actions::play_monster::play_monster(
+            &mut game,
             player_a,
             monster_id,
             0,
@@ -346,9 +384,14 @@ mod tests {
                     amount: 2,
                 }],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -363,7 +406,10 @@ mod tests {
         assert_eq!(game.effect_queue.len(), 0);
 
         // c) Test: play the monster without providing targets
-        crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, None).unwrap();
+        crate::game::user_actions::play_monster::play_monster(
+            &mut game, player_a, monster_id, 0, None,
+        )
+        .unwrap();
 
         // d) Assert monster is on field
         assert_eq!(
@@ -395,7 +441,13 @@ mod tests {
         let enemy_monster = create_test_monster(&mut game, player_b, 0, 3, 5);
 
         // c) Test: try to play the monster with targets (should fail or ignore)
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, Some(vec![enemy_monster]));
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
+            player_a,
+            monster_id,
+            0,
+            Some(vec![enemy_monster]),
+        );
 
         // d) Assert: This should either fail with an error or succeed by ignoring the targets
         // Based on the code, it should succeed and ignore the targets
@@ -448,9 +500,14 @@ mod tests {
                     amount: 2,
                 }],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: false,
@@ -462,7 +519,13 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: try to play the monster targeting a friendly monster (should fail)
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, Some(vec![friendly_monster]));
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
+            player_a,
+            monster_id,
+            0,
+            Some(vec![friendly_monster]),
+        );
 
         // d) Assert the play failed
         assert!(result.is_err());
@@ -514,9 +577,14 @@ mod tests {
                     amount: 2,
                 }],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: true,
@@ -528,7 +596,8 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: play the monster with exactly 2 targets (strict requirement)
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
             player_a,
             monster_id,
             0,
@@ -596,9 +665,14 @@ mod tests {
                     amount: 2,
                 }],
                 on_attack: vec![],
+                on_defense: vec![],
+                on_kill: vec![],
+                on_turn_end: vec![],
+                on_turn_start: vec![],
+                on_damaged: vec![],
                 on_death: vec![],
-            on_surrounded: vec![],
-            on_alone: vec![],
+                on_surrounded: vec![],
+                on_alone: vec![],
             }),
             play_target: Some(PlayTarget {
                 strict: true,
@@ -610,7 +684,13 @@ mod tests {
         game.players.get_mut(&player_a).unwrap().mana = 5;
 
         // c) Test: play the monster with only 1 target (should fail because strict requires exactly 2)
-        let result = crate::game::user_actions::play_monster::play_monster(&mut game,player_a, monster_id, 0, Some(vec![enemy_monster_1]));
+        let result = crate::game::user_actions::play_monster::play_monster(
+            &mut game,
+            player_a,
+            monster_id,
+            0,
+            Some(vec![enemy_monster_1]),
+        );
 
         // d) Assert the play failed with the correct error message
         assert!(result.is_err());

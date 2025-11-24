@@ -29,6 +29,8 @@ export const applyAction = (state: IGameState, action: IAction): IGameState => {
 		case "UpdateGameView":
 			console.log(action.value.game);
 			return action.value.game;
+		case "CardStolen":
+			return applyCardStolen(state, action);
 		case "BurnCard":
 		case "TriggerOnAttack":
 		case "TriggerOnPlay":
@@ -414,4 +416,36 @@ function applyEnemyDraw(
 	_: Extract<IAction, { type: "EnemyDraw" }>,
 ): IGameState {
 	return { ...state, enemy: { ...state.enemy, hand: state.enemy.hand + 1 } };
+}
+
+function applyCardStolen(
+	state: IGameState,
+	action: Extract<IAction, { type: "CardStolen" }>,
+): IGameState {
+	const isThiefPlayer = action.value.thief === state.player.hero.id;
+
+	if (isThiefPlayer) {
+		// Player stole from enemy
+		return {
+			...state,
+			player: {
+				...state.player,
+				hand: [...state.player.hand, action.value.card],
+			},
+			enemy: {
+				...state.enemy,
+				hand: action.value.fromLocation.type === "Hand" ? state.enemy.hand - 1 : state.enemy.hand,
+				field: action.value.fromLocation.type === "Field"
+					? Object.fromEntries(
+						Object.entries(state.enemy.field).filter(
+							([_, c]) => c.id !== action.value.card.id,
+						),
+					)
+					: state.enemy.field,
+			},
+		};
+	} else {
+		// Enemy stole from player (we shouldn't see the card details, but the action should only be sent to the thief)
+		return state;
+	}
 }

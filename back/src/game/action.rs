@@ -77,4 +77,10 @@ pub enum Action {
     },
     StartTurn(PlayerId),
     EndTurn(PlayerId),
+    CardStolen {
+        thief: PlayerId,
+        victim: PlayerId,
+        card: CardInstance,
+        from_location: Location,
+    },
 }

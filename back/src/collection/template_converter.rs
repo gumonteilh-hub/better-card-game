@@ -84,6 +84,10 @@ impl TemplateEffect {
                 player: player.convert(),
                 amount,
             },
+            Self::StealCard { location } => Effect::StealCard {
+                initiator: initiator_id,
+                location,
+            },
         }
     }
 }

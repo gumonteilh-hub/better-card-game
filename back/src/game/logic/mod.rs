@@ -15,6 +15,7 @@ mod destroy;
 mod draw;
 mod heal;
 mod mana;
+mod steal;
 mod summon;
 mod win;
 
@@ -104,6 +105,13 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
         } => {
             let summon_actions = summon::compute(context, initiator, side, target)?;
             actions.extend(summon_actions);
+        }
+        Effect::StealCard {
+            initiator,
+            location,
+        } => {
+            let steal_actions = steal::compute(context, initiator, location)?;
+            actions.extend(steal_actions);
         }
     }
 

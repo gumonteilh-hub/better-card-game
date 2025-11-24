@@ -234,7 +234,8 @@ pub async fn game_task(
                     match action {
                         Action::UpdateGameView { player, .. }
                         | Action::Draw { player, .. }
-                        | Action::EnemyDraw { player } => {
+                        | Action::EnemyDraw { player }
+                        | Action::CardStolen { thief: player, .. } => {
                             let (user_id, _) = state
                                 .user_id_player_id_mapping
                                 .iter()

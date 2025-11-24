@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     Race,
     collection::Class,
-    game::{card::Keyword, types::PlayerId},
+    game::{card::Keyword, types::{PlayerId, Location}},
 };
 
 pub type TemplateId = usize;
@@ -156,5 +156,8 @@ pub enum TemplateEffect {
     IncreaseAbsoluteMaxMana {
         player: PlayerTemplateTarget,
         amount: usize,
+    },
+    StealCard {
+        location: Location,
     },
 }

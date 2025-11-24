@@ -26,7 +26,8 @@ export type IAction =
 	| EndTurnAction
 	| EnemyDrawAction
 	| IncreaseMaxManaAction
-	| IncreaseAbsoluteMaxManaAction;
+	| IncreaseAbsoluteMaxManaAction
+	| CardStolenAction;
 
 export type ActionType =
 	| "BurnCard"
@@ -54,7 +55,8 @@ export type ActionType =
 	| "EnemyDraw"
 	| "UpdateGameView"
 	| "RefreshMana"
-	| "IncreaseAbsoluteMaxMana";
+	| "IncreaseAbsoluteMaxMana"
+	| "CardStolen";
 
 export type EntityId = number;
 export type PlayerId = number;
@@ -217,5 +219,15 @@ type IncreaseAbsoluteMaxManaAction = {
 	value: {
 		player: PlayerId;
 		amount: number;
+	};
+};
+
+type CardStolenAction = {
+	type: "CardStolen";
+	value: {
+		thief: PlayerId;
+		victim: PlayerId;
+		card: ICardInstance;
+		fromLocation: Location;
 	};
 };

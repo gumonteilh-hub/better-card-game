@@ -1,6 +1,6 @@
 use crate::{
     collection::types::{CardTemplate, TargetMatcherTemplate},
-    game::types::{InstanceId, PlayerId},
+    game::types::{InstanceId, Location, PlayerId},
 };
 
 use super::events::EventType;
@@ -86,6 +86,10 @@ pub enum Effect {
         initiator: InstanceId,
         side: PlayerTarget,
         target: CardTemplate,
+    },
+    StealCard {
+        initiator: InstanceId,
+        location: Location,
     },
     Win(PlayerId),
 }

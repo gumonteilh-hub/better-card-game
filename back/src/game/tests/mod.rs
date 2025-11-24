@@ -72,3 +72,6 @@ mod test_on_turn_start;
 
 #[cfg(test)]
 mod test_on_turn_end;
+
+#[cfg(test)]
+mod test_steal_card;

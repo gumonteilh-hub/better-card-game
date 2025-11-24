@@ -125,6 +125,10 @@ pub fn update_effect_initiator(effect: Effect, initiator_id: usize) -> Effect {
             side,
             target,
         },
+        Effect::StealCard { location, .. } => Effect::StealCard {
+            initiator: initiator_id,
+            location,
+        },
     }
 }
 

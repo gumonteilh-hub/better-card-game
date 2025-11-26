@@ -68,17 +68,15 @@ mod tests {
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
-        let player_b = game.player_id_b;
 
         // b) Modify state: set player B's max_mana to 3
-        game.players.get_mut(&player_b).unwrap().max_mana = 3;
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
+        game.players.get_mut(&player_a).unwrap().max_mana = 3;
 
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert max_mana increased to 4
-        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 4);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 4);
     }
 
     #[test]
@@ -87,18 +85,16 @@ mod tests {
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
-        let player_b = game.player_id_b;
 
         // b) Modify state: set player B's max_mana to 10 (absolute_max_mana)
-        game.players.get_mut(&player_b).unwrap().max_mana = 10;
-        game.players.get_mut(&player_b).unwrap().absolute_max_mana = 10;
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
+        game.players.get_mut(&player_a).unwrap().absolute_max_mana = 10;
 
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert max_mana stayed at 10 (not 11)
-        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 10);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 10);
     }
 
     #[test]
@@ -107,26 +103,24 @@ mod tests {
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
         let player_a = game.player_id_a;
-        let player_b = game.player_id_b;
 
         // b) Modify state: player B has max_mana 5 but only 2 available
-        game.players.get_mut(&player_b).unwrap().max_mana = 5;
-        game.players.get_mut(&player_b).unwrap().mana = 2;
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
+        game.players.get_mut(&player_a).unwrap().max_mana = 5;
+        game.players.get_mut(&player_a).unwrap().mana = 2;
 
         // Verify before
-        assert_eq!(game.players.get(&player_b).unwrap().mana, 2);
+        assert_eq!(game.players.get(&player_a).unwrap().mana, 2);
 
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert mana refreshed to max_mana (which increased to 6)
-        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 6);
-        assert_eq!(game.players.get(&player_b).unwrap().mana, 6);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 6);
+        assert_eq!(game.players.get(&player_a).unwrap().mana, 6);
     }
 
     #[test]
-    fn test_end_turn_resets_movement_points_to_three() {
+    fn test_start_turn_resets_movement_points_to_three() {
         // a) Initialize
         let mut game = create_test_game();
         game.vs_ia = false; // Disable AI to prevent auto-play
@@ -134,17 +128,17 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: player B has 0 movement points
-        game.players.get_mut(&player_b).unwrap().move_count = 0;
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
+        game.players.get_mut(&player_a).unwrap().move_count = 0;
 
         // Verify before
-        assert_eq!(game.players.get(&player_b).unwrap().move_count, 0);
+        assert_eq!(game.players.get(&player_a).unwrap().move_count, 0);
 
-        // c) Test: end turn
+        // c) Test: end turn -> start turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_b).unwrap();
 
         // d) Assert movement points reset to 3
-        assert_eq!(game.players.get(&player_b).unwrap().move_count, 3);
+        assert_eq!(game.players.get(&player_a).unwrap().move_count, 3);
     }
 
     #[test]
@@ -156,8 +150,8 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: create monsters for player B with attack_count > 0
-        let monster_1 = create_test_monster(&mut game, player_b, 0, 5, 5);
-        let monster_2 = create_test_monster(&mut game, player_b, 1, 5, 5);
+        let monster_1 = create_test_monster(&mut game, player_a, 0, 5, 5);
+        let monster_2 = create_test_monster(&mut game, player_a, 1, 5, 5);
 
         // Set attack_count to non-zero
         if let CardTypeInstance::Monster(m) =
@@ -171,10 +165,9 @@ mod tests {
             m.attack_count = 2;
         }
 
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
-
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_b).unwrap();
 
         // d) Assert all attack counts are reset to 0
         if let CardTypeInstance::Monster(m) = &game.entities.get(&monster_1).unwrap().card_type {
@@ -194,8 +187,8 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: create asleep monsters for player B
-        let monster_1 = create_test_monster(&mut game, player_b, 0, 5, 5);
-        let monster_2 = create_test_monster(&mut game, player_b, 1, 5, 5);
+        let monster_1 = create_test_monster(&mut game, player_a, 0, 5, 5);
+        let monster_2 = create_test_monster(&mut game, player_a, 1, 5, 5);
 
         // Set monsters as asleep
         if let CardTypeInstance::Monster(m) =
@@ -209,10 +202,9 @@ mod tests {
             m.asleep = true;
         }
 
-        add_card_to_deck(&mut game, player_b); // For AutoDraw
-
         // c) Test: end turn
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_b).unwrap();
 
         // d) Assert all monsters are now awake (asleep = false)
         if let CardTypeInstance::Monster(m) = &game.entities.get(&monster_1).unwrap().card_type {

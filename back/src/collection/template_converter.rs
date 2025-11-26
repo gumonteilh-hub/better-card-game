@@ -84,6 +84,11 @@ impl TemplateEffect {
                 player: player.convert(),
                 amount,
             },
+            TemplateEffect::DecreaseCurrentMana { player, amount } => Effect::DecreaseCurrentMana {
+                initiator: initiator_id,
+                player: player.convert(),
+                amount,
+            },
         }
     }
 }

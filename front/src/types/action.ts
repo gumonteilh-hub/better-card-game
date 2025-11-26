@@ -1,221 +1,230 @@
 import type { ICardInstance, IGameState, Location } from "./game";
 
 export type IAction =
-	| BurnAction
-	| DrawAction
-	| HealAction
-	| DestroyAction
-	| ReceiveDamageAction
-	| SummonAction
-	| AttackAction
-	| WinAction
-	| TriggerOnAttackAction
-	| TriggerOnPlayAction
-	| TriggerOnDeathAction
-	| TriggerOnSurroundedAction
-	| TriggerOnAloneAction
-	| TriggerOnKillAction
-	| TriggerOnTurnEndAction
-	| TriggerOnTurnStartAction
-	| TriggerOnDamagedAction
-	| TriggerOnDefendAction
-	| RefreshManaAction
-	| BoostAction
-	| UpdateGameViewAction
-	| StartTurnAction
-	| EndTurnAction
-	| EnemyDrawAction
-	| IncreaseMaxManaAction
-	| IncreaseAbsoluteMaxManaAction;
+  | BurnAction
+  | DrawAction
+  | HealAction
+  | DestroyAction
+  | ReceiveDamageAction
+  | SummonAction
+  | AttackAction
+  | WinAction
+  | TriggerOnAttackAction
+  | TriggerOnPlayAction
+  | TriggerOnDeathAction
+  | TriggerOnSurroundedAction
+  | TriggerOnAloneAction
+  | TriggerOnKillAction
+  | TriggerOnTurnEndAction
+  | TriggerOnTurnStartAction
+  | TriggerOnDamagedAction
+  | TriggerOnDefendAction
+  | RefreshManaAction
+  | BoostAction
+  | UpdateGameViewAction
+  | StartTurnAction
+  | EndTurnAction
+  | EnemyDrawAction
+  | IncreaseMaxManaAction
+  | DecreaseCurrentManaAction
+  | IncreaseAbsoluteMaxManaAction;
 
 export type ActionType =
-	| "BurnCard"
-	| "Draw"
-	| "Heal"
-	| "Destroy"
-	| "ReceiveDamage"
-	| "Summon"
-	| "Attack"
-	| "Win"
-	| "TriggerOnDeath"
-	| "TriggerOnPlay"
-	| "TriggerOnAttack"
-	| "TriggerOnSurrounded"
-	| "TriggerOnAlone"
-	| "TriggerOnKill"
-	| "TriggerOnTurnStart"
-	| "TriggerOnTurnEnd"
-	| "TriggerOnDamaged"
-	| "TriggerOnDefend"
-	| "IncreaseMaxMana"
-	| "Boost"
-	| "StartTurn"
-	| "EndTurn"
-	| "EnemyDraw"
-	| "UpdateGameView"
-	| "RefreshMana"
-	| "IncreaseAbsoluteMaxMana";
+  | "BurnCard"
+  | "Draw"
+  | "Heal"
+  | "Destroy"
+  | "ReceiveDamage"
+  | "Summon"
+  | "Attack"
+  | "Win"
+  | "TriggerOnDeath"
+  | "TriggerOnPlay"
+  | "TriggerOnAttack"
+  | "TriggerOnSurrounded"
+  | "TriggerOnAlone"
+  | "TriggerOnKill"
+  | "TriggerOnTurnStart"
+  | "TriggerOnTurnEnd"
+  | "TriggerOnDamaged"
+  | "TriggerOnDefend"
+  | "IncreaseMaxMana"
+  | "Boost"
+  | "StartTurn"
+  | "EndTurn"
+  | "EnemyDraw"
+  | "UpdateGameView"
+  | "RefreshMana"
+  | "DecreaseCurrentMana"
+  | "IncreaseAbsoluteMaxMana";
 
 export type EntityId = number;
 export type PlayerId = number;
 
 type EnemyDrawAction = {
-	type: "EnemyDraw";
+  type: "EnemyDraw";
 };
 
 type UpdateGameViewAction = {
-	type: "UpdateGameView";
-	value: {
-		player: PlayerId;
-		game: IGameState;
-	};
+  type: "UpdateGameView";
+  value: {
+    player: PlayerId;
+    game: IGameState;
+  };
 };
 
 type EndTurnAction = {
-	type: "EndTurn";
-	value: PlayerId;
+  type: "EndTurn";
+  value: PlayerId;
 };
 
 type StartTurnAction = {
-	type: "StartTurn";
-	value: PlayerId;
+  type: "StartTurn";
+  value: PlayerId;
 };
 
 type BoostAction = {
-	type: "Boost";
-	value: {
-		target: number;
-		attack: number;
-		hp: number;
-	};
+  type: "Boost";
+  value: {
+    target: number;
+    attack: number;
+    hp: number;
+  };
 };
 
 type BurnAction = {
-	type: "BurnCard";
-	value: {
-		player: PlayerId;
-		card: EntityId;
-	};
+  type: "BurnCard";
+  value: {
+    player: PlayerId;
+    card: EntityId;
+  };
 };
 
 type DrawAction = {
-	type: "Draw";
-	value: {
-		player: PlayerId;
-		card: ICardInstance;
-	};
+  type: "Draw";
+  value: {
+    player: PlayerId;
+    card: ICardInstance;
+  };
 };
 
 type HealAction = {
-	type: "Heal";
-	value: {
-		target: EntityId;
-		amount: number;
-	};
+  type: "Heal";
+  value: {
+    target: EntityId;
+    amount: number;
+  };
 };
 
 type DestroyAction = {
-	type: "Destroy";
-	value: {
-		target: EntityId;
-	};
+  type: "Destroy";
+  value: {
+    target: EntityId;
+  };
 };
 
 type ReceiveDamageAction = {
-	type: "ReceiveDamage";
-	value: {
-		target: EntityId | PlayerId;
-		amount: number;
-	};
+  type: "ReceiveDamage";
+  value: {
+    target: EntityId | PlayerId;
+    amount: number;
+  };
 };
 
 type SummonAction = {
-	type: "Summon";
-	value: {
-		source: Location;
-		destination: number;
-		target: ICardInstance;
-		owner: PlayerId;
-	};
+  type: "Summon";
+  value: {
+    source: Location;
+    destination: number;
+    target: ICardInstance;
+    owner: PlayerId;
+  };
 };
 
 type AttackAction = {
-	type: "Attack";
-	value: {
-		initiator: EntityId;
-		target: EntityId;
-	};
+  type: "Attack";
+  value: {
+    initiator: EntityId;
+    target: EntityId;
+  };
 };
 
 type WinAction = {
-	type: "Win";
-	value: PlayerId;
+  type: "Win";
+  value: PlayerId;
 };
 
 type TriggerOnDeathAction = {
-	type: "TriggerOnDeath";
-	value: EntityId;
+  type: "TriggerOnDeath";
+  value: EntityId;
 };
 
 type TriggerOnPlayAction = {
-	type: "TriggerOnPlay";
-	value: EntityId;
+  type: "TriggerOnPlay";
+  value: EntityId;
 };
 
 type TriggerOnAttackAction = {
-	type: "TriggerOnAttack";
-	value: EntityId;
+  type: "TriggerOnAttack";
+  value: EntityId;
 };
 
 type TriggerOnAloneAction = {
-	type: "TriggerOnAlone";
-	value: EntityId;
+  type: "TriggerOnAlone";
+  value: EntityId;
 };
 
 type TriggerOnKillAction = {
-	type: "TriggerOnKill";
-	value: EntityId;
+  type: "TriggerOnKill";
+  value: EntityId;
 };
 type TriggerOnDamagedAction = {
-	type: "TriggerOnDamaged";
-	value: EntityId;
+  type: "TriggerOnDamaged";
+  value: EntityId;
 };
 type TriggerOnTurnStartAction = {
-	type: "TriggerOnTurnStart";
-	value: EntityId;
+  type: "TriggerOnTurnStart";
+  value: EntityId;
 };
 type TriggerOnTurnEndAction = {
-	type: "TriggerOnTurnEnd";
-	value: EntityId;
+  type: "TriggerOnTurnEnd";
+  value: EntityId;
 };
 type TriggerOnDefendAction = {
-	type: "TriggerOnDefend";
-	value: EntityId;
+  type: "TriggerOnDefend";
+  value: EntityId;
 };
 type TriggerOnSurroundedAction = {
-	type: "TriggerOnSurrounded";
-	value: EntityId;
+  type: "TriggerOnSurrounded";
+  value: EntityId;
 };
 type IncreaseMaxManaAction = {
-	type: "IncreaseMaxMana";
-	value: {
-		player: PlayerId;
-		amount: number;
-	};
+  type: "IncreaseMaxMana";
+  value: {
+    player: PlayerId;
+    amount: number;
+  };
 };
+type DecreaseCurrentManaAction = {
+  type: "DecreaseCurrentMana",
+  value: {
+    player: PlayerId;
+    amount: number;
+  }
+}
 
 type RefreshManaAction = {
-	type: "RefreshMana";
-	value: {
-		player: PlayerId;
-		amount: number;
-	};
+  type: "RefreshMana";
+  value: {
+    player: PlayerId;
+    amount: number;
+  };
 };
 
 type IncreaseAbsoluteMaxManaAction = {
-	type: "IncreaseAbsoluteMaxMana";
-	value: {
-		player: PlayerId;
-		amount: number;
-	};
+  type: "IncreaseAbsoluteMaxMana";
+  value: {
+    player: PlayerId;
+    amount: number;
+  };
 };

@@ -35,10 +35,7 @@ mod tests {
         game.compute_commands().unwrap();
 
         // d) Assert absolute_max_mana increased to 13
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            13
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 13);
     }
 
     #[test]
@@ -67,10 +64,7 @@ mod tests {
 
         // d) Assert max_mana unchanged, only absolute_max_mana increased
         assert_eq!(game.players.get(&player_a).unwrap().max_mana, 5);
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            15
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 15);
     }
 
     #[test]
@@ -101,10 +95,7 @@ mod tests {
         // d) Assert current mana unchanged
         assert_eq!(game.players.get(&player_a).unwrap().mana, 3);
         assert_eq!(game.players.get(&player_a).unwrap().max_mana, 7);
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            15
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 15);
     }
 
     #[test]
@@ -133,14 +124,8 @@ mod tests {
         game.compute_commands().unwrap();
 
         // d) Assert only player A's absolute_max_mana increased
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            13
-        );
-        assert_eq!(
-            game.players.get(&player_b).unwrap().absolute_max_mana,
-            10
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 13);
+        assert_eq!(game.players.get(&player_b).unwrap().absolute_max_mana, 10);
     }
 
     #[test]
@@ -169,14 +154,8 @@ mod tests {
         game.compute_commands().unwrap();
 
         // d) Assert only player B's absolute_max_mana increased
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            10
-        );
-        assert_eq!(
-            game.players.get(&player_b).unwrap().absolute_max_mana,
-            13
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 10);
+        assert_eq!(game.players.get(&player_b).unwrap().absolute_max_mana, 13);
     }
 
     #[test]
@@ -205,14 +184,8 @@ mod tests {
         game.compute_commands().unwrap();
 
         // d) Assert both players' absolute_max_mana increased
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            15
-        );
-        assert_eq!(
-            game.players.get(&player_b).unwrap().absolute_max_mana,
-            15
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 15);
+        assert_eq!(game.players.get(&player_b).unwrap().absolute_max_mana, 15);
     }
 
     #[test]
@@ -252,10 +225,7 @@ mod tests {
         game.compute_commands().unwrap();
 
         // d) Assert increases stacked (10 + 3 + 2 = 15)
-        assert_eq!(
-            game.players.get(&player_a).unwrap().absolute_max_mana,
-            15
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 15);
     }
 
     #[test]
@@ -267,25 +237,22 @@ mod tests {
         let player_b = game.player_id_b;
 
         // b) Modify state: set player B at their absolute_max_mana cap
-        game.players.get_mut(&player_b).unwrap().max_mana = 10;
-        game.players.get_mut(&player_b).unwrap().absolute_max_mana = 10;
-        game.players.get_mut(&player_b).unwrap().mana = 10;
-
-        // Add card for auto-draw
-        crate::game::tests::test_utils::add_card_to_deck(&mut game, player_b);
+        game.players.get_mut(&player_a).unwrap().max_mana = 10;
+        game.players.get_mut(&player_a).unwrap().absolute_max_mana = 10;
+        game.players.get_mut(&player_a).unwrap().mana = 10;
 
         // Verify player B is at cap - end turn should not increase max_mana
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
-        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 10);
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 10);
 
         // c) Test as user: increase absolute_max_mana for player B
-        game.current_player = player_a; // Switch back to player A
+        crate::game::user_actions::end_turn::end_turn(&mut game, player_b).unwrap();
         let spell = create_test_spell(
             &mut game,
             player_a,
             vec![Effect::IncreaseAbsoluteMaxMana {
                 initiator: 0,
-                player: PlayerTarget::EnnemyPlayer,
+                player: PlayerTarget::Player,
                 amount: 5,
             }],
         );
@@ -293,17 +260,11 @@ mod tests {
             .unwrap();
         game.compute_commands().unwrap();
 
-        // Add card for next auto-draw
-        crate::game::tests::test_utils::add_card_to_deck(&mut game, player_b);
-
         // End turn again - now max_mana should increase
         crate::game::user_actions::end_turn::end_turn(&mut game, player_a).unwrap();
 
         // d) Assert max_mana can now increase beyond previous cap
-        assert_eq!(game.players.get(&player_b).unwrap().max_mana, 11);
-        assert_eq!(
-            game.players.get(&player_b).unwrap().absolute_max_mana,
-            15
-        );
+        assert_eq!(game.players.get(&player_a).unwrap().max_mana, 11);
+        assert_eq!(game.players.get(&player_a).unwrap().absolute_max_mana, 15);
     }
 }

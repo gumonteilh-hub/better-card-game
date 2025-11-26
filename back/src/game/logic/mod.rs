@@ -105,6 +105,15 @@ pub fn execute_effect(effect: &Effect, context: &mut Game) -> Result<Vec<Action>
             let summon_actions = summon::compute(context, initiator, side, target)?;
             actions.extend(summon_actions);
         }
+        Effect::DecreaseCurrentMana {
+            initiator,
+            player,
+            amount,
+        } => {
+            let mana_actions =
+                mana::compute_decrease_current_mana(context, *initiator, player, *amount)?;
+            actions.extend(mana_actions);
+        }
     }
 
     Ok(actions)

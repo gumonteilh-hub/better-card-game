@@ -11,7 +11,7 @@ export type Archetype =
 export type Race = "HUMAN" | "DRAGON" | "DEMON" | "COMMON";
 export type Class = "WARRIOR" | "MAGE" | "ROGUE" | "COMMON";
 
-export type Keywords = "CHARGE" | "WINDFURRY" | "INVISBLE";
+export type Keywords = "Charge" | "Windfury";
 
 export type TemplateId = number;
 

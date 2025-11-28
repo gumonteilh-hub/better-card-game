@@ -39,6 +39,11 @@ pub enum Effect {
         player: PlayerTarget,
         amount: usize,
     },
+    DecreaseCurrentMana {
+        initiator: InstanceId,
+        player: PlayerTarget,
+        amount: usize,
+    },
     RefreshMana {
         initiator: InstanceId,
         player: PlayerTarget,

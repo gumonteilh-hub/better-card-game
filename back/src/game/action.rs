@@ -20,6 +20,10 @@ pub enum Action {
         player: PlayerId,
         amount: usize,
     },
+    DecreaseCurrentMana {
+        player: PlayerId,
+        amount: usize,
+    },
     RefreshMana {
         player: PlayerId,
         amount: usize,

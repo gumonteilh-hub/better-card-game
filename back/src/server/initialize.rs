@@ -264,6 +264,7 @@ pub async fn game_task(
                         | Action::TriggerOnTurnStart { .. }
                         | Action::EndTurn(..)
                         | Action::TriggerOnDefend { .. }
+                        | Action::DecreaseCurrentMana { .. }
                         | Action::RefreshMana { .. } => {
                             broadcast_to_all(&state, ServerMessage::Action(action)).await;
                         }

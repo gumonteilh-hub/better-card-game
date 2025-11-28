@@ -149,6 +149,10 @@ pub enum TemplateEffect {
         player: PlayerTemplateTarget,
         amount: usize,
     },
+    DecreaseCurrentMana {
+        player: PlayerTemplateTarget,
+        amount: usize,
+    },
     RefreshMana {
         player: PlayerTemplateTarget,
         amount: usize,

@@ -125,6 +125,15 @@ pub fn update_effect_initiator(effect: Effect, initiator_id: usize) -> Effect {
             side,
             target,
         },
+        Effect::DecreaseCurrentMana {
+            initiator,
+            player,
+            amount,
+        } => Effect::DecreaseCurrentMana {
+            initiator: initiator_id,
+            player,
+            amount,
+        },
     }
 }
 

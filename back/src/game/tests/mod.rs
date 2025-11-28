@@ -71,4 +71,7 @@ mod test_on_damaged;
 mod test_on_turn_start;
 
 #[cfg(test)]
+mod test_decrease_mana;
+
+#[cfg(test)]
 mod test_on_turn_end;

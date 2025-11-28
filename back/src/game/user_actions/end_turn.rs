@@ -13,6 +13,12 @@ use crate::{
 pub fn end_turn(context: &mut Game, ending_player_id: PlayerId) -> Result<Vec<Action>> {
     let mut actions = Vec::new();
 
+    if context.current_player != ending_player_id {
+        return Err(Error::Game(
+            "You can't end your turn if it's not your turn".into(),
+        ));
+    }
+
     let mut ending_effects = Vec::new();
     for (card_id, monster) in context.get_field(ending_player_id) {
         if let CardTypeInstance::Monster(monster) = &monster.card_type
@@ -25,7 +31,31 @@ pub fn end_turn(context: &mut Game, ending_player_id: PlayerId) -> Result<Vec<Ac
     context.effect_queue.extend(ending_effects);
     actions.push(Action::EndTurn(ending_player_id));
 
+    let end_turn_actions = context.compute_commands()?;
+    actions.extend(end_turn_actions);
+
+    let ending_player = context.get_mut_player(ending_player_id)?;
+    if ending_player.max_mana < ending_player.absolute_max_mana {
+        context.effect_queue.push_back(Effect::IncreaseMaxMana {
+            initiator: ending_player_id,
+            player: effects::PlayerTarget::Player,
+            amount: 1,
+        });
+    }
+    let max_mana = context.get_player(context.current_player)?.max_mana;
+    context.effect_queue.push_back(Effect::RefreshMana {
+        initiator: ending_player_id,
+        player: effects::PlayerTarget::Player,
+        amount: max_mana + 1,
+    });
+
+    let end_turn_actions = context.compute_commands()?;
+    actions.extend(end_turn_actions);
+    // End Turn
+
+    // Start Turn
     let starting_player_id = context.get_opponent(&ending_player_id)?.player_id;
+    context.current_player = starting_player_id;
 
     actions.push(Action::StartTurn(starting_player_id));
     let mut starting_effects = Vec::new();
@@ -38,29 +68,13 @@ pub fn end_turn(context: &mut Game, ending_player_id: PlayerId) -> Result<Vec<Ac
         }
     }
     context.effect_queue.extend(starting_effects);
-
-    context.current_player = starting_player_id;
     context.effect_queue.push_back(Effect::AutoDraw {
         player: starting_player_id,
         amount: 1,
     });
 
-    let current_player_instance = context.get_mut_player(starting_player_id)?;
-
-    if current_player_instance.max_mana < current_player_instance.absolute_max_mana {
-        context.effect_queue.push_back(Effect::IncreaseMaxMana {
-            initiator: starting_player_id,
-            player: effects::PlayerTarget::Player,
-            amount: 1,
-        });
-    }
-
-    let max_mana = context.get_player(context.current_player)?.max_mana;
-    context.effect_queue.push_back(Effect::RefreshMana {
-        initiator: starting_player_id,
-        player: effects::PlayerTarget::Player,
-        amount: max_mana + 1,
-    });
+    let start_turn_actions = context.compute_commands()?;
+    actions.extend(start_turn_actions);
 
     context.get_mut_player(starting_player_id)?.move_count = 3;
 
@@ -75,9 +89,6 @@ pub fn end_turn(context: &mut Game, ending_player_id: PlayerId) -> Result<Vec<Ac
             }
         }
     }
-
-    let mut reset_turn_actions = context.compute_commands()?;
-    actions.append(&mut reset_turn_actions);
 
     if starting_player_id == context.player_id_b && context.vs_ia {
         let mut ia_actions = ia::ai_play_turn(context, context.player_id_b)?;

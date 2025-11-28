@@ -28,6 +28,7 @@ pub fn get_collection() -> Vec<CardTemplate> {
         BLOQUEUR.clone(),
         ASSASSIN_RAPIDE.clone(),
         MASOCHISTE.clone(),
+        DESACTIVATEUR_DE_MANA.clone(),
     ]
 }
 
@@ -326,6 +327,22 @@ static ASSASSIN_RAPIDE: Lazy<CardTemplate> = Lazy::new(|| {
     .on_kill(vec![TemplateEffect::Summon {
         side: PlayerTemplateTarget::Player,
         target: BLOQUEUR.clone(),
+    }])
+    .build()
+});
+
+static DESACTIVATEUR_DE_MANA: Lazy<CardTemplate> = Lazy::new(|| {
+    spell(
+        1017,
+        2,
+        "court-circuit",
+        "Reduit de 3 la mana de l'adversaire pour son prochain tour",
+        Race::HUMAN,
+        Class::MAGE,
+    )
+    .effect(vec![TemplateEffect::DecreaseCurrentMana {
+        player: PlayerTemplateTarget::EnnemyPlayer,
+        amount: 3,
     }])
     .build()
 });

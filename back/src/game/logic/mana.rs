@@ -71,3 +71,25 @@ pub fn compute_increase_absolute_max_mana(
 
     Ok(actions)
 }
+
+pub(crate) fn compute_decrease_current_mana(
+    context: &mut crate::Game,
+    initiator: usize,
+    player: &PlayerTarget,
+    amount: usize,
+) -> Result<Vec<Action>> {
+    let mut actions = Vec::new();
+    let targets = super::resolve_player_target(initiator, player, context)?;
+
+    for target in targets {
+        let player = context.get_mut_player(target)?;
+        let new_mana = player.mana.saturating_sub(amount);
+        player.mana = new_mana;
+        actions.push(Action::DecreaseCurrentMana {
+            player: target,
+            amount,
+        });
+    }
+
+    Ok(actions)
+}

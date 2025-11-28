@@ -1,7 +1,7 @@
-use crate::collection::{
+use crate::{collection::{
     Race, deal_damage, monster,
-    types::{CardTemplate, TemplateTarget},
-};
+    types::CardTemplate,
+}, game::effects::Target};
 use once_cell::sync::Lazy;
 
 pub fn get_collection() -> Vec<CardTemplate> {
@@ -19,6 +19,6 @@ static INDICIBLE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::DEMON,
         super::Class::COMMON,
     )
-    .on_death(vec![deal_damage(TemplateTarget::Ennemies, 3)])
+    .on_death(vec![deal_damage(Target::Ennemies, 3)])
     .build()
 });

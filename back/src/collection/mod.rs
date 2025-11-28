@@ -1,11 +1,11 @@
 use std::vec;
 
 use crate::{
-    collection::types::{
-        CardTemplate, PlayTargetTemplate, PlayerTemplateTarget, TemplateEffect, TemplateId,
-        TemplateTarget,
+    collection::types::{CardTemplate, PlayTargetTemplate, TemplateId},
+    game::{
+        card::Keyword,
+        effects::{Effect, PlayerTarget, Target},
     },
-    game::card::Keyword,
 };
 
 pub use common::get_ia_deck;
@@ -125,20 +125,91 @@ fn get_mage_cards() -> Vec<CardTemplate> {
         .collect()
 }
 
-pub fn draw(player: PlayerTemplateTarget, amount: usize) -> TemplateEffect {
-    TemplateEffect::MakeDraw { player, amount }
+pub fn draw(player: PlayerTarget, amount: usize) -> Effect {
+    Effect::MakeDraw {
+        initiator: 0,
+        player,
+        amount,
+    }
 }
 
-pub fn deal_damage(target: TemplateTarget, amount: usize) -> TemplateEffect {
-    TemplateEffect::DealDamage { target, amount }
+pub fn deal_damage(target: Target, amount: usize) -> Effect {
+    Effect::DealDamage {
+        initiator: 0,
+        target,
+        amount,
+    }
 }
 
-pub fn heal(target: TemplateTarget, amount: usize) -> TemplateEffect {
-    TemplateEffect::Heal { target, amount }
+pub fn summon(side: PlayerTarget, target: CardTemplate) -> Effect {
+    Effect::Summon {
+        initiator: 0,
+        side,
+        target,
+    }
 }
 
-pub fn boost(target: TemplateTarget, attack: usize, hp: usize) -> TemplateEffect {
-    TemplateEffect::Boost { target, attack, hp }
+pub fn decrease_current_mana(player: PlayerTarget, amount: usize) -> Effect {
+    Effect::DecreaseCurrentMana {
+        initiator: 0,
+        player,
+        amount,
+    }
+}
+
+pub fn refresh_mana(player: PlayerTarget, amount: usize) -> Effect {
+    Effect::RefreshMana {
+        initiator: 0,
+        player,
+        amount,
+    }
+}
+
+pub fn increase_absolute_max_mana(player: PlayerTarget, amount: usize) -> Effect {
+    Effect::IncreaseAbsoluteMaxMana {
+        initiator: 0,
+        player,
+        amount,
+    }
+}
+
+pub fn destroy(target: Target) -> Effect {
+    Effect::Destroy {
+        initiator: 0,
+        target,
+    }
+}
+
+pub fn attack(target: Target) -> Effect {
+    Effect::Attack {
+        initiator: 0,
+        target,
+    }
+}
+
+pub fn increase_max_mana(player: PlayerTarget, amount: usize) -> Effect {
+    Effect::IncreaseMaxMana {
+        initiator: 0,
+        player,
+        amount,
+    }
+}
+
+pub fn heal(target: Target, amount: usize) -> Effect {
+    Effect::Heal {
+        initiator: 0,
+        target,
+        amount,
+    }
+}
+
+pub fn boost(target: Target, attack: usize, hp: usize) -> Effect {
+    Effect::Boost {
+        initiator: 0,
+        target,
+        attack,
+        hp,
+    }
 }
 
 struct MonsterTemplateBuilder {
@@ -149,16 +220,16 @@ struct MonsterTemplateBuilder {
     atk: usize,
     hp: usize,
     keywords: Vec<Keyword>,
-    on_play: Vec<TemplateEffect>,
-    on_attack: Vec<TemplateEffect>,
-    on_defend: Vec<TemplateEffect>,
-    on_kill: Vec<TemplateEffect>,
-    on_damaged: Vec<TemplateEffect>,
-    on_turn_end: Vec<TemplateEffect>,
-    on_turn_start: Vec<TemplateEffect>,
-    on_death: Vec<TemplateEffect>,
-    on_alone: Vec<TemplateEffect>,
-    on_surrounded: Vec<TemplateEffect>,
+    on_play: Vec<Effect>,
+    on_attack: Vec<Effect>,
+    on_defend: Vec<Effect>,
+    on_kill: Vec<Effect>,
+    on_damaged: Vec<Effect>,
+    on_turn_end: Vec<Effect>,
+    on_turn_start: Vec<Effect>,
+    on_death: Vec<Effect>,
+    on_alone: Vec<Effect>,
+    on_surrounded: Vec<Effect>,
     race: Race,
     class: Class,
     play_target: Option<PlayTargetTemplate>,
@@ -203,58 +274,58 @@ impl MonsterTemplateBuilder {
         self
     }
 
-    fn on_alone(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_alone(mut self, effects: Vec<Effect>) -> Self {
         self.on_alone = effects;
         self
     }
 
-    fn on_surrounded(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_surrounded(mut self, effects: Vec<Effect>) -> Self {
         self.on_surrounded = effects;
         self
     }
 
-    fn on_play(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_play(mut self, effects: Vec<Effect>) -> Self {
         self.on_play = effects;
         self
     }
 
-    fn on_attack(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_attack(mut self, effects: Vec<Effect>) -> Self {
         self.on_attack = effects;
         self
     }
 
-    fn on_defend(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_defend(mut self, effects: Vec<Effect>) -> Self {
         self.on_defend = effects;
         self
     }
-    fn on_kill(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_kill(mut self, effects: Vec<Effect>) -> Self {
         self.on_kill = effects;
         self
     }
 
-    fn on_damaged(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_damaged(mut self, effects: Vec<Effect>) -> Self {
         self.on_damaged = effects;
         self
     }
 
-    fn on_turn_end(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_turn_end(mut self, effects: Vec<Effect>) -> Self {
         self.on_turn_end = effects;
         self
     }
 
-    fn on_turn_start(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_turn_start(mut self, effects: Vec<Effect>) -> Self {
         self.on_turn_start = effects;
         self
     }
 
-    fn on_death(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn on_death(mut self, effects: Vec<Effect>) -> Self {
         self.on_death = effects;
         self
     }
 
     fn on_play_with_target_choice(
         mut self,
-        effects: Vec<TemplateEffect>,
+        effects: Vec<Effect>,
         target: PlayTargetTemplate,
     ) -> Self {
         self.on_play = effects;
@@ -310,7 +381,7 @@ struct SpellTemplateBuilder {
     desc: String,
     race: Race,
     class: Class,
-    effect: Vec<TemplateEffect>,
+    effect: Vec<Effect>,
     play_target: Option<PlayTargetTemplate>,
 }
 impl SpellTemplateBuilder {
@@ -327,14 +398,14 @@ impl SpellTemplateBuilder {
         }
     }
 
-    fn effect(mut self, effects: Vec<TemplateEffect>) -> Self {
+    fn effect(mut self, effects: Vec<Effect>) -> Self {
         self.effect = effects;
         self
     }
 
     fn effect_with_target_choice(
         mut self,
-        effects: Vec<TemplateEffect>,
+        effects: Vec<Effect>,
         target: PlayTargetTemplate,
     ) -> Self {
         self.effect = effects;

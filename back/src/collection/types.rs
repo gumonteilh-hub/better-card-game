@@ -1,16 +1,20 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::{
     Race,
     collection::Class,
-    game::{card::Keyword, types::PlayerId},
+    game::{
+        card::Keyword,
+        effects::{Effect, PlayerTarget},
+        types::PlayerId,
+    },
 };
 
 pub type TemplateId = usize;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SpellTemplate {
-    pub effect: Vec<TemplateEffect>,
+    pub effect: Vec<Effect>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -79,86 +83,55 @@ pub struct MonsterTemplate {
     pub attack: usize,
     pub hp: usize,
     pub keywords: Vec<Keyword>,
-    pub on_alone: Vec<TemplateEffect>,
-    pub on_surrounded: Vec<TemplateEffect>,
-    pub on_play: Vec<TemplateEffect>,
-    pub on_attack: Vec<TemplateEffect>,
-    pub on_defend: Vec<TemplateEffect>,
-    pub on_damaged: Vec<TemplateEffect>,
-    pub on_kill: Vec<TemplateEffect>,
-    pub on_turn_end: Vec<TemplateEffect>,
-    pub on_turn_start: Vec<TemplateEffect>,
-    pub on_death: Vec<TemplateEffect>,
+    pub on_alone: Vec<Effect>,
+    pub on_surrounded: Vec<Effect>,
+    pub on_play: Vec<Effect>,
+    pub on_attack: Vec<Effect>,
+    pub on_defend: Vec<Effect>,
+    pub on_damaged: Vec<Effect>,
+    pub on_kill: Vec<Effect>,
+    pub on_turn_end: Vec<Effect>,
+    pub on_turn_start: Vec<Effect>,
+    pub on_death: Vec<Effect>,
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub enum TemplateTarget {
-    EnnemyPlayer,
-    Player,
-    BothPlayers,
-    ItSelf,
-    Allies,
-    Ennemies,
-    AllMonsters,
-    All,
-    Choose,
-    Matching(TargetMatcherTemplate),
-    And(Box<TemplateTarget>, Box<TemplateTarget>),
-    Or(Box<TemplateTarget>, Box<TemplateTarget>),
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum PlayerTemplateTarget {
-    EnnemyPlayer,
-    Player,
-    BothPlayers,
+pub enum Comparator {
+    More,
+    Less,
+    Equal,
 }
 
 #[derive(Debug, Serialize, Clone)]
-#[serde(tag = "type", content = "value")]
-pub enum TemplateEffect {
-    Boost {
-        target: TemplateTarget,
-        attack: usize,
-        hp: usize,
+pub enum ComparableVariable {
+    Mana {
+        player: PlayerTarget,
+        comparator: Comparator,
+        value: usize,
     },
-    MakeDraw {
-        player: PlayerTemplateTarget,
-        amount: usize,
+    Hp {
+        player: PlayerTarget,
+        comparator: Comparator,
+        value: usize,
     },
-    Heal {
-        target: TemplateTarget,
-        amount: usize,
+    Turn {
+        comparator: Comparator,
+        value: usize,
     },
-    Destroy {
-        target: TemplateTarget,
+    MaxMana {
+        player: PlayerTarget,
+        comparator: Comparator,
+        value: usize,
     },
-    DealDamage {
-        target: TemplateTarget,
-        amount: usize,
+    FieldLength {
+        player: PlayerTarget,
+        comparator: Comparator,
+        value: usize,
     },
-    // Custom(String),
-    Attack {
-        target: TemplateTarget,
-    },
-    Summon {
-        side: PlayerTemplateTarget,
-        target: CardTemplate,
-    },
-    IncreaseMaxMana {
-        player: PlayerTemplateTarget,
-        amount: usize,
-    },
-    DecreaseCurrentMana {
-        player: PlayerTemplateTarget,
-        amount: usize,
-    },
-    RefreshMana {
-        player: PlayerTemplateTarget,
-        amount: usize,
-    },
-    IncreaseAbsoluteMaxMana {
-        player: PlayerTemplateTarget,
-        amount: usize,
+    OwnMonster {
+        player: PlayerTarget,
+        comparator: Comparator,
+        value: usize,
+        matching: TargetMatcherTemplate,
     },
 }

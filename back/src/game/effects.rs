@@ -3,7 +3,6 @@ use crate::{
     game::types::{InstanceId, PlayerId},
 };
 
-use super::events::EventType;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Clone)]
@@ -34,6 +33,11 @@ pub enum PlayerTarget {
 #[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type", content = "value")]
 pub enum Effect {
+    // Condition {
+    //     initiator: InstanceId,
+    //     effect: Box<Effect>,
+    //     condition:
+    // },
     IncreaseMaxMana {
         initiator: InstanceId,
         player: PlayerTarget,
@@ -93,10 +97,4 @@ pub enum Effect {
         target: CardTemplate,
     },
     Win(PlayerId),
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct TriggeredEffect {
-    pub trigger: EventType,
-    pub effects: Vec<Effect>,
 }

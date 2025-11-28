@@ -1,10 +1,12 @@
 use crate::{
     UserDeck,
     collection::{
-        Archetype, Class, Race, boost, deal_damage, draw, heal, monster, spell,
-        types::{CardTemplate, PlayerTemplateTarget, TemplateTarget},
+        Archetype, Class, Race, boost, deal_damage, draw, heal, monster, spell, types::CardTemplate,
     },
-    game::card::Keyword,
+    game::{
+        card::Keyword,
+        effects::{PlayerTarget, Target},
+    },
 };
 use once_cell::sync::Lazy;
 
@@ -98,7 +100,7 @@ static BOOSTER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_play(vec![boost(TemplateTarget::Allies, 1, 1)])
+    .on_play(vec![boost(Target::Allies, 1, 1)])
     .build()
 });
 
@@ -111,7 +113,7 @@ static HEALER_TEST: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .effect(vec![heal(TemplateTarget::Allies, 5)])
+    .effect(vec![heal(Target::Allies, 5)])
     .build()
 });
 
@@ -258,7 +260,7 @@ static APPRENTI_MAGE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_play(vec![draw(PlayerTemplateTarget::Player, 1)])
+    .on_play(vec![draw(PlayerTarget::Player, 1)])
     .build()
 });
 
@@ -273,7 +275,7 @@ static CLERC: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_play(vec![heal(TemplateTarget::Allies, 3)])
+    .on_play(vec![heal(Target::Allies, 3)])
     .build()
 });
 
@@ -288,7 +290,7 @@ static PYROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_play(vec![deal_damage(TemplateTarget::Ennemies, 2)])
+    .on_play(vec![deal_damage(Target::Ennemies, 2)])
     .build()
 });
 
@@ -303,7 +305,7 @@ static ARCANISTE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_play(vec![draw(PlayerTemplateTarget::BothPlayers, 2)])
+    .on_play(vec![draw(PlayerTarget::BothPlayers, 2)])
     .build()
 });
 
@@ -319,7 +321,7 @@ static ANGE_GARDIEN: Lazy<CardTemplate> = Lazy::new(|| {
         Class::COMMON,
     )
     .keywords(vec![])
-    .on_play(vec![heal(TemplateTarget::Player, 5)])
+    .on_play(vec![heal(Target::Player, 5)])
     .build()
 });
 
@@ -334,7 +336,7 @@ static KAMIKAZE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_death(vec![deal_damage(TemplateTarget::All, 3)])
+    .on_death(vec![deal_damage(Target::All, 3)])
     .build()
 });
 
@@ -349,7 +351,7 @@ static NECROMANCIEN: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_death(vec![deal_damage(TemplateTarget::EnnemyPlayer, 4)])
+    .on_death(vec![deal_damage(Target::EnnemyPlayer, 4)])
     .build()
 });
 
@@ -364,7 +366,7 @@ static SORCIERE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_attack(vec![deal_damage(TemplateTarget::EnnemyPlayer, 1)])
+    .on_attack(vec![deal_damage(Target::EnnemyPlayer, 1)])
     .build()
 });
 
@@ -379,7 +381,7 @@ static VAMPIRE: Lazy<CardTemplate> = Lazy::new(|| {
         Race::COMMON,
         Class::COMMON,
     )
-    .on_attack(vec![heal(TemplateTarget::Player, 2)])
+    .on_attack(vec![heal(Target::Player, 2)])
     .build()
 });
 
@@ -395,6 +397,6 @@ static PALADIN: Lazy<CardTemplate> = Lazy::new(|| {
         Class::COMMON,
     )
     .keywords(vec![])
-    .on_play(vec![heal(TemplateTarget::Allies, 4)])
+    .on_play(vec![heal(Target::Allies, 4)])
     .build()
 });

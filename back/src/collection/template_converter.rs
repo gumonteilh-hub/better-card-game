@@ -1,10 +1,9 @@
 use crate::{
     collection::types::{
-        PlayTarget, PlayTargetTemplate, PlayerTemplateTarget, Side, TargetMatcher,
-        TargetMatcherTemplate, TemplateEffect, TemplateTarget,
+        PlayTarget, PlayTargetTemplate, Side, TargetMatcher, TargetMatcherTemplate,
     },
     game::{
-        effects::{Effect, PlayerTarget, Target},
+        effects::Effect,
         types::{InstanceId, PlayerId},
     },
 };
@@ -32,92 +31,69 @@ impl TargetMatcherTemplate {
     }
 }
 
-impl TemplateEffect {
+impl Effect {
     pub fn convert(self, initiator_id: InstanceId) -> Effect {
         match self {
-            TemplateEffect::MakeDraw { player, amount } => Effect::MakeDraw {
+            Effect::IncreaseMaxMana { player, amount, .. } => Effect::IncreaseMaxMana {
                 initiator: initiator_id,
-                player: player.convert(),
+                player,
                 amount,
             },
-            TemplateEffect::Heal { target, amount } => Effect::Heal {
+            Effect::DecreaseCurrentMana { player, amount, .. } => Effect::DecreaseCurrentMana {
                 initiator: initiator_id,
-                target: target.convert(),
+                player,
                 amount,
             },
-            TemplateEffect::Destroy { target } => Effect::Destroy {
+            Effect::RefreshMana { player, amount, .. } => Effect::RefreshMana {
                 initiator: initiator_id,
-                target: target.convert(),
-            },
-            TemplateEffect::DealDamage { target, amount } => Effect::DealDamage {
-                initiator: initiator_id,
-                target: target.convert(),
+                player,
                 amount,
             },
-            TemplateEffect::Attack { target } => Effect::Attack {
+            Effect::IncreaseAbsoluteMaxMana { player, amount, .. } => {
+                Effect::IncreaseAbsoluteMaxMana {
+                    initiator: initiator_id,
+                    player,
+                    amount,
+                }
+            }
+            Effect::MakeDraw { player, amount, .. } => Effect::MakeDraw {
                 initiator: initiator_id,
-                target: target.convert(),
+                player,
+                amount,
             },
-            TemplateEffect::Boost { target, attack, hp } => Effect::Boost {
+            Effect::AutoDraw { player, amount } => Effect::AutoDraw { player, amount },
+            Effect::Heal { target, amount, .. } => Effect::Heal {
                 initiator: initiator_id,
-                target: target.convert(),
+                target,
+                amount,
+            },
+            Effect::Destroy { target, .. } => Effect::Destroy {
+                initiator: initiator_id,
+                target,
+            },
+            Effect::DealDamage { target, amount, .. } => Effect::DealDamage {
+                initiator: initiator_id,
+                target,
+                amount,
+            },
+            Effect::Attack { target, .. } => Effect::Attack {
+                initiator: initiator_id,
+                target,
+            },
+            Effect::Boost {
+                attack, hp, target, ..
+            } => Effect::Boost {
+                initiator: initiator_id,
                 attack,
                 hp,
+                target,
             },
-            TemplateEffect::Summon { side, target } => Effect::Summon {
+            Effect::Summon { side, target, .. } => Effect::Summon {
                 initiator: initiator_id,
-                side: side.convert(),
-                target: target.clone(),
+                side,
+                target,
             },
-            Self::RefreshMana { player, amount } => Effect::RefreshMana {
-                initiator: initiator_id,
-                player: player.convert(),
-                amount,
-            },
-            Self::IncreaseMaxMana { player, amount } => Effect::IncreaseMaxMana {
-                initiator: initiator_id,
-                player: player.convert(),
-                amount,
-            },
-            Self::IncreaseAbsoluteMaxMana { player, amount } => Effect::IncreaseAbsoluteMaxMana {
-                initiator: initiator_id,
-                player: player.convert(),
-                amount,
-            },
-            TemplateEffect::DecreaseCurrentMana { player, amount } => Effect::DecreaseCurrentMana {
-                initiator: initiator_id,
-                player: player.convert(),
-                amount,
-            },
-        }
-    }
-}
-
-impl TemplateTarget {
-    fn convert(self) -> Target {
-        match self {
-            TemplateTarget::EnnemyPlayer => Target::EnnemyPlayer,
-            TemplateTarget::Player => Target::Player,
-            TemplateTarget::BothPlayers => Target::BothPlayers,
-            TemplateTarget::ItSelf => Target::ItSelf,
-            TemplateTarget::Allies => Target::Allies,
-            TemplateTarget::Ennemies => Target::Ennemies,
-            TemplateTarget::AllMonsters => Target::AllMonsters,
-            TemplateTarget::All => Target::All,
-            TemplateTarget::Choose => Target::Ids(vec![]),
-            TemplateTarget::Matching(target_matcher) => Target::Matching(target_matcher),
-            TemplateTarget::And(a, b) => Target::And(Box::new(a.convert()), Box::new(b.convert())),
-            TemplateTarget::Or(a, b) => Target::Or(Box::new(a.convert()), Box::new(b.convert())),
-        }
-    }
-}
-
-impl PlayerTemplateTarget {
-    fn convert(self) -> PlayerTarget {
-        match self {
-            PlayerTemplateTarget::EnnemyPlayer => PlayerTarget::EnnemyPlayer,
-            PlayerTemplateTarget::Player => PlayerTarget::Player,
-            PlayerTemplateTarget::BothPlayers => PlayerTarget::BothPlayers,
+            Effect::Win(player) => Effect::Win(player),
         }
     }
 }

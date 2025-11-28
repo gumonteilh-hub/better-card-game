@@ -4,7 +4,7 @@ import type { ICardInstance } from "../types/game";
 export const attackReady = (card: ICardInstance) => {
 	if (card.cardType.type !== "monster") return false;
 	let maxAttackPerTurn = 1;
-	if (card.cardType.keywords?.includes("WINDFURRY")) {
+	if (card.cardType.keywords?.includes("Windfury")) {
 		maxAttackPerTurn = 2;
 	}
 
